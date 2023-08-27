@@ -1,0 +1,11 @@
+.usecase {
+    button {
+        opacity: 0;
+    }
+}
+
+.usecase:hover {
+    button {
+        opacity: 1;
+    }
+}

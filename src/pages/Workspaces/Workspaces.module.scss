@@ -1,0 +1,23 @@
+.board-title {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.board_thumb {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    @apply relative p-3 h-28 rounded-xl bg-blue-300 text-slate-300 font-semibold;
+}
+
+.board_thumb-overlay {
+    @apply bg-black/50 rounded-xl inset-0 absolute;
+}
+
+.board_thumb-body {
+    @apply text-slate-100 absolute z-10;
+}

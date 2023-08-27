@@ -1,0 +1,29 @@
+.cell-desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+}
+
+.cell + .cell {
+    border-top-width: 1px;
+    border-color: rgb(226 232 240);
+}
+
+.cell-tag {
+    display: none;
+}
+
+.cell:hover {
+    background-color: rgb(255 255 255);
+
+    .cell-tag {
+        display: inline-block;
+    }
+}
+
+.user-avatar + .user-avatar {
+    margin-top: 0.5rem;
+}

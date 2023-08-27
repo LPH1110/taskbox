@@ -1,0 +1,43 @@
+.wrapper {
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.leftIcon {
+    margin-right: 0.5rem;
+}
+
+.rightIcon {
+    margin-left: 0.5rem;
+}
+
+.wrapper + .wrapper {
+    margin-left: 0.5rem;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.small {
+    padding: 0 1rem;
+    min-height: 2rem;
+}
+
+.medium {
+    padding: 0 1.5rem;
+    min-height: 2.75rem;
+}
+
+.large {
+    padding: 0 2rem;
+    min-height: 3.25rem;
+}
+
+.disabled {
+    @apply text-no-result bg-slate-300 cursor-default #{!important};
+}

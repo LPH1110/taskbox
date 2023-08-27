@@ -1,0 +1,7 @@
+.board_menu-items {
+    @apply max-h-screen overflow-y-auto border border-nav-border bg-white min-w-[22.5rem] rounded-lg p-4 flex flex-col items-center justify-start absolute shadow-xl right-0 gap-3;
+}
+
+.board_menu-item {
+    @apply relative hover:bg-slate-100 ease-linear duration-100 rounded-md py-2 px-4 w-full flex items-center justify-start gap-3;
+}

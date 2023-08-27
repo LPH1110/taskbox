@@ -1,0 +1,7 @@
+.combobox_option {
+    @apply ui-selected:bg-blue-100 ui-not-selected:bg-white w-full flex items-center justify-start gap-3 p-2 ui-not-selected:hover:bg-slate-100 cursor-pointer ease-linear duration-100;
+}
+
+.combobox_options {
+    @apply absolute flex flex-col items-start justify-center py-1 mt-1 w-full overflow-auto rounded-md bg-white text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
+}

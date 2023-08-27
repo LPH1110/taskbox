@@ -1,0 +1,17 @@
+.landing-overlay {
+    background: rgb(9, 9, 121);
+    background: linear-gradient(180deg, rgba(9, 9, 121, 0) 35%, rgba(255, 255, 255, 0.742734593837535) 70%);
+}
+
+.company {
+    padding-top: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.slide-platform-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}

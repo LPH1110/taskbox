@@ -1,0 +1,12 @@
+.menuItem::after {
+    content: '';
+    display: none;
+    height: 100%;
+    position: absolute;
+    width: 0.25rem;
+    background-color: rgb(37, 99, 235);
+    border-radius: 0.375rem;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
