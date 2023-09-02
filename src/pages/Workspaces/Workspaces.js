@@ -1,29 +1,27 @@
-import { ClockIcon } from '@heroicons/react/24/outline';
+import { ClockIcon, PlusIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import { Link } from 'react-router-dom';
 
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
-import CreateBoardMenu from '~/components/CreateBoardMenu/CreateBoardMenu';
+import { Button } from '~/components';
+import { ActivityAuth } from '~/contexts/ActivityContext';
 import { UserAuth } from '~/contexts/AuthContext';
-import { db } from '~/firebase-config';
+import { actions, useStore } from '~/store';
 import ClosedBoards from './ClosedBoards';
 import styles from './Workspaces.module.scss';
-import { Toast } from '~/components';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { getDocs, collection, query, where, setDoc } from 'firebase/firestore';
+import { db } from '~/firebase-config';
+import CreateBoardMenu from '~/components/CreateBoardMenu/CreateBoardMenu';
 
 const cx = classNames.bind(styles);
 
 function Workspaces() {
+    const [state, dispatch] = useStore();
     const { user } = UserAuth();
+    const { saveAction } = ActivityAuth();
     const [boards, setBoards] = useState([]);
-    const [toast, setToast] = useState({
-        show: false,
-        body: {
-            message: '',
-            status: '',
-        },
-    });
-
+    console.log(boards);
     useEffect(() => {
         const fetchBoards = async () => {
             try {
@@ -41,32 +39,33 @@ function Workspaces() {
 
     return (
         <section className="p-6">
-            <h1 className="text-lg font-semibold text-slate-600 flex items-center gap-2 justify-start">
-                <ClockIcon className="w-5 h-5" /> Recently viewed
-            </h1>
-            <section className="py-4 flex flex-wrap gap-4">
-                {/* Boards */}
-                {boards.map((board) => (
-                    <Link
-                        key={board?.uid}
-                        to={`/boards/${board?.uid}`}
-                        style={{ backgroundImage: `url(${board?.thumbnail})` }}
-                        className={cx('board_thumb')}
-                    >
-                        <div className={cx('board_thumb-overlay')}></div>
-                        <div className={cx('board_thumb-body')}>
-                            <h1>{board?.title}</h1>
-                        </div>
-                    </Link>
-                ))}
+            <div>
+                <h1 className="text-lg font-semibold text-slate-600 flex items-center gap-2 justify-start">
+                    <ClockIcon className="w-5 h-5" /> Recently viewed
+                </h1>
+                <section className="py-4 flex flex-wrap gap-8">
+                    {/* Boards */}
+                    {boards.map((board) => (
+                        <Link
+                            key={board?.id}
+                            to={`/boards/${board?.id}`}
+                            style={{ backgroundImage: `url(${board?.thumbnail})` }}
+                            className={cx('board_thumb')}
+                        >
+                            <div className={cx('board_thumb-overlay')}></div>
+                            <div className={cx('board_thumb-body')}>
+                                <h1>{board?.title}</h1>
+                            </div>
+                        </Link>
+                    ))}
 
-                {/* Create Boards Button */}
-                <CreateBoardMenu setBoards={setBoards} setToast={setToast} />
-            </section>
+                    {/* Create Boards Button */}
+                    <CreateBoardMenu />
+                </section>
+            </div>
             <section className="mt-6">
                 <ClosedBoards />
             </section>
-            {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
         </section>
     );
 }

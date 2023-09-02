@@ -18,13 +18,11 @@ import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './BoardDetail.module.scss';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { Board, BoardMenu, Button, Tooltip } from '~/components';
 import { ActivityAuth } from '~/contexts/ActivityContext';
 import { UserAuth } from '~/contexts/AuthContext';
 import { actions, useStore } from '~/store';
-import { collection, getDoc } from 'firebase/firestore';
-import { db } from '~/firebase-config';
 
 const cx = classNames.bind(styles);
 
@@ -47,28 +45,15 @@ function BoardDetail() {
     const [state, dispatch] = useStore();
     const { user } = UserAuth();
     const { saveAction } = ActivityAuth();
+    const { boards } = state;
     const { id } = useParams();
-    const { board, setBoard } = useState({});
-    const [boardTitle, setBoardTitle] = useState(board?.title | '');
+    const board = boards[id];
+    const [boardTitle, setBoardTitle] = useState(board.title);
     const [searchKeys, setSearchKeys] = useState('');
     const inputRef = useRef();
 
-    useEffect(() => {
-        const fetchBoard = async () => {
-            try {
-                const res = await getDoc(collection(db, 'boards'), { uid: id });
-                if (res.exists()) {
-                    setBoard(res.data());
-                    setBoardTitle(res.data()?.title);
-                }
-            } catch (error) {
-                console.log('Failed to fetch board info', error);
-            }
-        };
-        fetchBoard();
-    }, []);
-
     const handleOnChangeTitle = () => {
+        dispatch(actions.onChangeBoardTitle({ boardId: id, value: boardTitle }));
         saveAction({
             userId: user.uid,
             action: 'renamed',
