@@ -189,9 +189,6 @@ function Home() {
                 </div>
             </section>
 
-            {/* Slide Platforms */}
-            <SlidePlatforms className="bg-slate-100/70 pt-12 pb-24 w-full mt-12" />
-
             {/* Join us */}
             <section className="py-12 w-full flex items-center justify-center">
                 <div className="rounded-xl shadow-lg pt-12 pb-8  w-4/6 flex flex-col items-center justify-center">

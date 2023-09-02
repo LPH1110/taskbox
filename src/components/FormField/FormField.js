@@ -12,12 +12,13 @@ const FormField = ({ name, value, handleChange, touched, errors, label, placehol
                 className="my-2 border border-slate-200 p-2 ring ring-transparent focus:ring-blue-500 outline-none rounded-md ease duration-200"
                 name={name}
                 id={name}
+                autoComplete="off"
                 type="text"
                 value={value}
-                onChange={(e) => handleChange(name, e.target.value)}
+                onChange={handleChange}
                 placeholder={placeholder}
             />
-            {errors ? <span className="text-red-400">{errors}</span> : null}
+            {touched && errors ? <span className="text-red-400">{errors}</span> : null}
         </section>
     );
 };

@@ -10,6 +10,7 @@ import {
     DELETE_COMMENT_BY_ID,
     SET_USER_SESSION,
     SET_OTP_CODE,
+    SAVE_UNSPLASH_THUMBNAILS,
 } from './constants';
 
 const initState = {
@@ -18,6 +19,7 @@ const initState = {
         loggedIn: false,
         info: {},
     },
+    unsplashThumbs: [],
     boards: {
         [uuidv4()]: {
             title: 'Board 1',
@@ -103,6 +105,11 @@ function reducer(state, action) {
     const { comments } = state;
     let board;
     switch (action.type) {
+        case SAVE_UNSPLASH_THUMBNAILS:
+            return {
+                ...state,
+                unsplashThumbs: [...action.payload],
+            };
         case SET_OTP_CODE:
             return {
                 ...state,

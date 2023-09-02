@@ -6,8 +6,7 @@ import styles from './ComboboxWrapper.module.scss';
 
 const cx = classNames.bind(styles);
 
-const ComboboxWrapper = ({ data, label, name }) => {
-    const [selected, setSelected] = useState(data.find((item) => item?.title === 'Workspace'));
+const ComboboxWrapper = ({ data, selected, setSelected, label, name }) => {
     const [query, setQuery] = useState('');
 
     const filteredData =

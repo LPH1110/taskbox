@@ -5,10 +5,21 @@ const images = {
     star: require('./svgs/star.svg').default,
     buildingOffices: require('./svgs/buildingOffices.svg').default,
     starCircleIcon: require('./svgs/starCircle.svg').default,
+    gradient1: require('./svgs/8ab3b35f3a786bb6cdac.svg').default,
+    gradient2: require('./svgs/707f35bc691220846678.svg').default,
+    gradient3: require('./svgs/a7c521b94eb153008f2d.svg').default,
+    gradient4: require('./svgs/aec98becb6d15a5fc95e.svg').default,
+    gradient5: require('./svgs/d106776cb297f000b1f4.svg').default,
+    boardHolder: require('./svgs/14cda5dc635d1f13bc48.svg').default,
     instagramIcon: require('./imgs/instagram.png'),
     landingWallpaper: require('./imgs/landingWallpaper.png'),
     redoIcon: require('./imgs/redo.png'),
     shieldHalfLeft: require('./imgs/shield.png'),
+    landscape1: require('./imgs/cody-scott-milewski-aCnkRlBD0i4-unsplash.jpg'),
+    landscape2: require('./imgs/manson-yim-4vf1KEkD7Gc-unsplash.jpg'),
+    landscape3: require('./imgs/mohamed-nohassi-odxB5oIG_iA-unsplash.jpg'),
+    landscape4: require('./imgs/stanley-platt-jones-BFWSwAknaJU-unsplash.jpg'),
+    landscape5: require('./imgs/tiago-silva-lFucs5S_L6w-unsplash.jpg'),
 };
 
 export default images;
