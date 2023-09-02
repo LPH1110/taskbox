@@ -8,7 +8,13 @@ import {
     DELETE_COMMENT_BY_ID,
     SET_USER_SESSION,
     SET_OTP_CODE,
+    SAVE_UNSPLASH_THUMBNAILS,
 } from './constants';
+
+export const saveUnsplashThumbs = (payload) => ({
+    type: SAVE_UNSPLASH_THUMBNAILS,
+    payload,
+});
 
 export const setOTPcode = (payload) => ({
     type: SET_OTP_CODE,
