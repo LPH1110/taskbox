@@ -130,20 +130,6 @@ const CreateBoardForm = ({ setOpenModal }) => {
                 required
             />
             <ComboboxWrapper label="Visibility" name="visibility" data={visibilities} />
-            {/* Description Free trials */}
-            <div className="flex flex-col justify-start gap-3 mb-2">
-                <p className="text-description text-sm">
-                    This Workspace has 7 boards remaining. Free Workspaces can only have 10 open boards. For unlimited
-                    boards, upgrade your Workspace.
-                </p>
-                <Button
-                    className="bg-purple-500 text-white hover:bg-purple-500/90 ease duration-100"
-                    size="medium"
-                    leftIcon={<CommandLineIcon className="w-6 h-6" />}
-                >
-                    Start free trial
-                </Button>
-            </div>
             {/* Footer */}
             <div className="flex flex-col items-start gap-3">
                 <button
