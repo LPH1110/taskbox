@@ -64,27 +64,6 @@ const CreateBoardForm = ({ setOpenModal }) => {
         fetchBgThumbnails();
     }, []);
 
-    const [visibilities] = useState([
-        {
-            id: uuidv4(),
-            title: 'Private',
-            description: 'Only members can see and edit this board.',
-            icon: <LockClosedIcon />,
-        },
-        {
-            id: uuidv4(),
-            title: 'Workspace',
-            description: `All members of the ${user.displayName}'s workspace can see and edit this board.`,
-            icon: <UserGroupIcon />,
-        },
-        {
-            id: uuidv4(),
-            title: 'Public',
-            description: 'Anyone on the internet can see this board. Only board members can edit.',
-            icon: <GlobeAsiaAustraliaIcon />,
-        },
-    ]);
-
     return (
         <form onSubmit={handleSubmit} className="flex flex-col mx-auto w-full gap-4">
             <header className="relative">
