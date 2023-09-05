@@ -18,11 +18,12 @@ import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './BoardDetail.module.scss';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Board, BoardMenu, Button, Tooltip } from '~/components';
 import { ActivityAuth } from '~/contexts/ActivityContext';
 import { UserAuth } from '~/contexts/AuthContext';
 import { actions, useStore } from '~/store';
+import { fetchBoard } from '~/lib/actions';
 
 const cx = classNames.bind(styles);
 
@@ -42,30 +43,21 @@ const tabs = [
 ];
 
 function BoardDetail() {
-    const [state, dispatch] = useStore();
-    const { user } = UserAuth();
-    const { saveAction } = ActivityAuth();
-    const { boards } = state;
     const { id } = useParams();
-    const board = boards[id];
-    const [boardTitle, setBoardTitle] = useState(board.title);
+
+    const [board, setBoard] = useState({});
+
+    const [boardTitle, setBoardTitle] = useState(board?.title);
     const [searchKeys, setSearchKeys] = useState('');
     const inputRef = useRef();
 
-    const handleOnChangeTitle = () => {
-        dispatch(actions.onChangeBoardTitle({ boardId: id, value: boardTitle }));
-        saveAction({
-            userId: user.uid,
-            action: 'renamed',
-            message: boardTitle,
-            previous: board.title,
-            date: new Date(),
-        });
-    };
-
-    const handleChangeFavor = () => {
-        dispatch(actions.changeBoardFavor({ boardId: id, favor: !board.favor || false }));
-    };
+    useEffect(() => {
+        const getBoard = async () => {
+            const result = fetchBoard(id);
+            setBoard(result);
+        };
+        getBoard();
+    }, [id]);
 
     const handleInputChange = (e) => {
         const searchKeys = e.target.value;
@@ -87,7 +79,6 @@ function BoardDetail() {
                 <div>
                     <div className="mb-2">
                         <input
-                            onBlur={handleOnChangeTitle}
                             onChange={(e) => setBoardTitle(e.target.value)}
                             className="caret-blue-500 ease duration-200 outline-none ring ring-transparent rounded-md p-1 -m-1 hover:ring-blue-400 focus:ring-blue-400 text-2xl font-semibold"
                             value={boardTitle}
@@ -100,7 +91,7 @@ function BoardDetail() {
                                 <QuestionMarkCircleIcon className="w-5 h-5" />
                             </span>
                         </Tooltip>
-                        <Button type="button" onClick={handleChangeFavor}>
+                        <Button type="button">
                             <span>
                                 {board && !board.favor ? (
                                     <StarIconOutline className="w-5 h-5" />

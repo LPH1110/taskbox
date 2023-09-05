@@ -70,7 +70,6 @@ const BoardMenu = ({ data }) => {
         },
     ]);
 
-    console.log(currentMenu);
     const [boardMenu] = useState([
         {
             id: uuidv4(),

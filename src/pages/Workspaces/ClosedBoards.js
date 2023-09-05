@@ -1,13 +1,12 @@
-import React from 'react';
-import { useState, useCallback } from 'react';
-import { XMarkIcon, CheckIcon } from '@heroicons/react/24/solid';
-import { Button, Toast } from '~/components';
+import { XMarkIcon } from '@heroicons/react/24/solid';
+import { useState } from 'react';
+import { Toast } from '~/components';
 import { useStore } from '~/store';
 import ClosedBoardRow from './ClosedBoardRow';
 import './Modal-overrides.scss';
 
 function ClosedBoards() {
-    const [state, dispatch] = useStore();
+    const [state] = useStore();
     const { boards } = state;
     const [toast, setToast] = useState({
         body: {

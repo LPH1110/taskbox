@@ -1,41 +1,40 @@
-import { ClockIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ClockIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import { Link } from 'react-router-dom';
 
-import { Button } from '~/components';
-import { ActivityAuth } from '~/contexts/ActivityContext';
+import { useEffect, useState } from 'react';
+import { Toast } from '~/components';
+import CreateBoardMenu from '~/components/CreateBoardMenu/CreateBoardMenu';
 import { UserAuth } from '~/contexts/AuthContext';
-import { actions, useStore } from '~/store';
+import { fetchBoards } from '~/lib/actions';
 import ClosedBoards from './ClosedBoards';
 import styles from './Workspaces.module.scss';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { getDocs, collection, query, where, setDoc } from 'firebase/firestore';
-import { db } from '~/firebase-config';
-import CreateBoardMenu from '~/components/CreateBoardMenu/CreateBoardMenu';
 
 const cx = classNames.bind(styles);
 
 function Workspaces() {
-    const [state, dispatch] = useStore();
     const { user } = UserAuth();
-    const { saveAction } = ActivityAuth();
     const [boards, setBoards] = useState([]);
-    console.log(boards);
+    const [toast, setToast] = useState({
+        show: false,
+        body: {
+            message: '',
+            status: '',
+        },
+    });
+
     useEffect(() => {
-        const fetchBoards = async () => {
+        const getBoards = async () => {
             try {
-                const q = query(collection(db, 'boards'), where('userId', '==', user.uid));
-                const res = await getDocs(q);
-                const result = res.docs.reduce((acc, data) => [...acc, data.data()], []);
+                const result = await fetchBoards(user?.uid);
                 setBoards(result);
             } catch (error) {
                 console.log(error);
             }
         };
 
-        fetchBoards();
-    }, []);
+        getBoards();
+    }, [user?.uid]);
 
     return (
         <section className="p-6">
@@ -49,8 +48,9 @@ function Workspaces() {
                         <Link
                             key={board?.id}
                             to={`/boards/${board?.id}`}
-                            style={{ backgroundImage: `url(${board?.thumbnail})` }}
+                            style={{ backgroundImage: `url(${board?.thumbnailURL})` }}
                             className={cx('board_thumb')}
+                            async
                         >
                             <div className={cx('board_thumb-overlay')}></div>
                             <div className={cx('board_thumb-body')}>
@@ -60,12 +60,13 @@ function Workspaces() {
                     ))}
 
                     {/* Create Boards Button */}
-                    <CreateBoardMenu />
+                    <CreateBoardMenu setBoards={setBoards} setToast={setToast} />
                 </section>
             </div>
             <section className="mt-6">
                 <ClosedBoards />
             </section>
+            {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
         </section>
     );
 }

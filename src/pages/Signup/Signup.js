@@ -1,29 +1,26 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
-import { collection, where, onSnapshot, query } from 'firebase/firestore';
-import { db } from '~/firebase-config';
-import { signInWithCredential } from 'firebase/auth';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { useFormik } from 'formik';
+import { useCallback, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
 
-import { Button, Spinner, Tooltip, Toast, GoogleSignInBtn } from '~/components';
-import OTP from './OTP';
-import { useStore, actions } from '~/store';
+import { Button, GoogleSignInBtn, Spinner, Toast, Tooltip } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
+import { actions, useStore } from '~/store';
+import OTP from './OTP';
 
 const emailjs_service_id = 'service_7h1hbr1';
 const emailjs_template_id = 'template_3fq68xe';
 const emailjs_public_key = 'A3Uj8TuJqV8IVObAM'; // EMAILJS API KEY
 
 function Signup() {
-    const [state, dispatch] = useStore();
-    const { createUser, signin, logOut } = UserAuth();
+    const [dispatch] = useStore();
+    const { createUser } = UserAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [showLoading, setShowLoading] = useState(false);
-    const [forward, setForward] = useState(false);
+    const [forward] = useState(false);
     const [toast, setToast] = useState({
         onShow: false,
         body: {
@@ -65,7 +62,7 @@ function Signup() {
         } catch (e) {
             console.log('SENT FAILED...', e);
         }
-    });
+    }, []);
 
     const handleShowPasswordConfirmation = () => {
         setShowPasswordConfirmation(!showPasswordConfirmation);

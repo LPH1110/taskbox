@@ -1,15 +1,14 @@
-import { comment } from 'postcss';
 import { v4 as uuidv4 } from 'uuid';
 import {
-    ONCHANGE_BOARD_TITLE,
-    CHANGE_BOARD_STATUS,
-    CHANGE_BOARD_FAVOR,
     ADD_NEW_BOARD,
-    DELETE_BOARD,
     ADD_NEW_COMMENT_TO_TASK,
+    CHANGE_BOARD_FAVOR,
+    CHANGE_BOARD_STATUS,
+    DELETE_BOARD,
     DELETE_COMMENT_BY_ID,
-    SET_USER_SESSION,
+    ONCHANGE_BOARD_TITLE,
     SET_OTP_CODE,
+    SET_USER_SESSION,
 } from './constants';
 
 const initState = {

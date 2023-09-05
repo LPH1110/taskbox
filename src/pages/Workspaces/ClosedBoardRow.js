@@ -5,13 +5,13 @@ import styles from './ClosedBoardRow.module.scss';
 
 import { UserAuth } from '~/contexts/AuthContext';
 import { ActivityAuth } from '~/contexts/ActivityContext';
-import { Button, PopperWrapper } from '~/components';
+import { Button } from '~/components';
 import { useStore, actions } from '~/store';
 
 const cx = classNames.bind(styles);
 
 function ClosedBoardRow({ data, setToast }) {
-    const [state, dispatch] = useStore();
+    const [dispatch] = useStore();
     const { user } = UserAuth();
     const { saveAction } = ActivityAuth();
 

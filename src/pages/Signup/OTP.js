@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcryptjs';
-import { Button, Toast, Spinner } from '~/components';
-import CountDown from './CountDown';
-import { useStore } from '~/store';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '~/firebase-config';
+import { Button, Spinner, Toast } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
+import { useStore } from '~/store';
+import CountDown from './CountDown';
 
 const initialOtp = {
     [uuidv4()]: {
@@ -40,8 +37,8 @@ function OTP({ signupData, sendOtpVerificationEmail }) {
     });
     const [showLoading, setShowLoading] = useState(false);
     const navigate = useNavigate();
-    const [timeoutNavigate, setTimeoutNavigate] = useState('');
-    const [timeoutToast, setTimeoutToast] = useState('');
+    const [timeoutNavigate] = useState('');
+    const [timeoutToast] = useState('');
 
     useEffect(() => {
         return () => {

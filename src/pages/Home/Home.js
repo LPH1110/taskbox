@@ -1,29 +1,26 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '~/components';
 import images from '~/assets';
+import { Button } from '~/components';
 
+import { ArrowDownCircleIcon, ArrowUpOnSquareIcon, PlusIcon, Square2StackIcon } from '@heroicons/react/24/outline';
 import {
+    ArrowSmallRightIcon,
     BoltIcon,
+    CheckCircleIcon,
     LockClosedIcon,
     Square3Stack3DIcon,
-    ArrowSmallRightIcon,
-    CheckCircleIcon,
     UsersIcon,
 } from '@heroicons/react/24/solid';
-import { ArrowDownCircleIcon, ArrowUpOnSquareIcon, PlusIcon, Square2StackIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
+import { UserAuth } from '~/contexts/AuthContext';
 import styles from './Home.module.scss';
 import SlidePlatforms from './SlidePlatforms';
-import { useStore } from '~/store';
-import { UserAuth } from '~/contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 
 function Home() {
     const { user } = UserAuth();
     const navigate = useNavigate();
-    const [state, dispatch] = useStore();
 
     const getStarted = () => {
         if (user) {

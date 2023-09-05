@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
@@ -7,12 +7,15 @@ import CreateBoardForm from '../CreateBoardForm/';
 
 const cx = classNames.bind(styles);
 
-const CreateBoardMenu = () => {
+const CreateBoardMenu = ({ setBoards, setToast }) => {
     const [openModal, setOpenModal] = useState(false);
-    const [menuHeight, setMenuHeight] = useState(0);
+    const [menuHeight, setMenuHeight] = useState(window.innerHeight - 80);
+    const popperRef = useRef();
+
     const handleWindowResize = (e) => {
-        setMenuHeight(window.innerHeight - 100);
+        setMenuHeight(window.innerHeight - 80);
     };
+
     useEffect(() => {
         window.addEventListener('resize', handleWindowResize);
 
@@ -43,8 +46,12 @@ const CreateBoardMenu = () => {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items style={{ maxHeight: `${menuHeight}px` }} className={cx('board_menu-items')}>
-                        <CreateBoardForm setOpenModal={setOpenModal} />
+                    <Menu.Items
+                        ref={popperRef}
+                        style={{ maxHeight: `${menuHeight}px` }}
+                        className={cx('board_menu-items')}
+                    >
+                        <CreateBoardForm setBoards={setBoards} setToast={setToast} setOpenModal={setOpenModal} />
                     </Menu.Items>
                 </Transition>
             </Menu>

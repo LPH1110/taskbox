@@ -6,8 +6,9 @@ import styles from './ComboboxWrapper.module.scss';
 
 const cx = classNames.bind(styles);
 
-const ComboboxWrapper = ({ data, label, name }) => {
-    const [selected, setSelected] = useState(data.find((item) => item?.title === 'Workspace'));
+// To use this component, you have to initialize [selected, setSelected] as state in parent form component and pass them as props
+
+const ComboboxWrapper = ({ selected, setSelected, data, label, name }) => {
     const [query, setQuery] = useState('');
 
     const filteredData =
