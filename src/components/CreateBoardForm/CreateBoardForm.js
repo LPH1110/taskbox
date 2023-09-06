@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { colorThumbnails } from '~/constants';
 import { UserAuth } from '~/contexts/AuthContext';
-import { createBoard, fetchBoards, saveBoard } from '~/lib/actions';
+import { fetchBoards, saveBoard } from '~/lib/actions';
 import ComboboxWrapper from '../ComboboxWrapper';
 import FormField from '../FormField';
 
@@ -66,7 +66,7 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
                 thumbnailURL: currentThumb?.urls?.full || currentThumb.thumbnailURL,
             };
             const result = await saveBoard(data);
-            if (result.status === 200) {
+            if (result?.status === 200) {
                 setToast({
                     show: true,
                     body: {
@@ -76,6 +76,7 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
                 });
                 const boards = await fetchBoards(user?.uid);
                 setBoards(boards);
+                setOpenModal(false);
             } else {
                 setToast({
                     show: true,
@@ -86,11 +87,9 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
                 });
             }
 
-            setOpenModal(false);
-
             setTimeout(() => {
                 setToast((prev) => ({ ...prev, show: false }));
-            }, 2000);
+            }, 3000);
         }
     };
 

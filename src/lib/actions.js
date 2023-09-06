@@ -1,11 +1,22 @@
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { db } from '~/firebase-config';
+/* 
+    Firebase Note: addDoc
+    - If document not found in db first, then create a new one
+    - If document has been already in db, then update
+    -> never fire error
+*/
 
 export const saveBoard = async (data) => {
     try {
-        let boardRef = collection(db, 'boards');
-        await addDoc(boardRef, data);
-        return { status: 200, message: `Created board ${data.title} successfully` };
+        const boardRef = doc(db, 'boards', data.title);
+        let boardSnap = await getDoc(boardRef);
+        if (boardSnap.exists()) {
+            return { status: 502, message: `Board name has already existed` };
+        } else {
+            await setDoc(boardRef, data);
+            return { status: 200, message: `Successfully` };
+        }
     } catch (error) {
         console.error(error.message + ' error saving board');
         return { status: 501, message: `Something went wrong. Please try again` };
