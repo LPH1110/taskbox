@@ -8,7 +8,13 @@ import {
     DELETE_COMMENT_BY_ID,
     SET_USER_SESSION,
     SET_OTP_CODE,
+    UPDATE_COLUMNS,
 } from './constants';
+
+export const updateColumns = (payload) => ({
+    type: UPDATE_COLUMNS,
+    payload,
+});
 
 export const setOTPcode = (payload) => ({
     type: SET_OTP_CODE,

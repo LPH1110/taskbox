@@ -22,3 +22,31 @@ export const colorThumbnails = [
         thumbnailURL: 'https://trello.com/assets/aec98becb6d15a5fc95e.svg',
     },
 ];
+
+export const columns = {
+    'column-1': {
+        id: 'column-1',
+        title: 'Todo',
+        taskIds: ['task-1', 'task-2', 'task-3'],
+    },
+};
+
+export const tasks = {
+    'task-1': {
+        id: 'task-1',
+        content: 'Doing homework',
+        reference: 'Todo',
+    },
+    'task-2': {
+        id: 'task-1',
+        content: 'Take out the trash',
+        reference: 'Todo',
+    },
+    'task-3': {
+        id: 'task-1',
+        content: 'Charge my phone',
+        reference: 'Todo',
+    },
+};
+
+export const columnOrder = ['column-1'];

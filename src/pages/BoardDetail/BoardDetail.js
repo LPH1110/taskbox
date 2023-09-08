@@ -47,14 +47,17 @@ function BoardDetail() {
 
     const [board, setBoard] = useState({});
 
-    const [boardTitle, setBoardTitle] = useState(board?.title);
+    const [boardTitle, setBoardTitle] = useState('');
     const [searchKeys, setSearchKeys] = useState('');
     const inputRef = useRef();
 
+    console.log(board);
+
     useEffect(() => {
         const getBoard = async () => {
-            const result = fetchBoard(id);
+            const result = await fetchBoard(id);
             setBoard(result);
+            setBoardTitle(result?.title);
         };
         getBoard();
     }, [id]);
@@ -211,9 +214,9 @@ function BoardDetail() {
                         </div>
                     </Tab.List>
                     <Tab.Panels>
-                        <Tab.Panel className="absolute left-0 right-0">
+                        <Tab.Panel className="absolute left-0 right-0 px-6 flex justify-start flex-col flex-1">
                             {/* Filters */}
-                            <div className="mb-2 px-6 pb-4 flex items-center justify-between">
+                            <div className="mb-2 pb-4 flex items-center justify-between">
                                 <div className="flex items-center">
                                     <Button
                                         className="text-slate-300 hover:text-slate-500 rounded-md hover:bg-slate-100 ease-in-out duration-200"

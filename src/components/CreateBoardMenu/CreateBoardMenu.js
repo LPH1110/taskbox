@@ -4,15 +4,30 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import styles from './CreateBoardMenu.module.scss';
 import CreateBoardForm from '../CreateBoardForm/';
+import { set } from 'date-fns';
 
 const cx = classNames.bind(styles);
 
 const CreateBoardMenu = ({ setBoards, setToast }) => {
     const [openModal, setOpenModal] = useState(false);
     const [menuHeight, setMenuHeight] = useState(window.innerHeight - 80);
+    const [windowWidth, setWindowWidth] = useState(0);
+    const [popperPosition, setPopperPosition] = useState({
+        top: 0,
+        left: 12,
+        right: 'unset',
+    });
     const popperRef = useRef();
 
     const handleWindowResize = (e) => {
+        const popperElement = popperRef.current;
+        const popperRightPos = popperElement?.getBoundingClientRect().right;
+        const newWindowWidth = window.innerWidth;
+        setWindowWidth(window.innerWidth);
+
+        if (newWindowWidth < windowWidth && popperRightPos > newWindowWidth) {
+            console.log('touched');
+        }
         setMenuHeight(window.innerHeight - 80);
     };
 
@@ -48,7 +63,12 @@ const CreateBoardMenu = ({ setBoards, setToast }) => {
                 >
                     <Menu.Items
                         ref={popperRef}
-                        style={{ maxHeight: `${menuHeight}px` }}
+                        style={{
+                            maxHeight: `${menuHeight}px`,
+                            top: popperPosition.top,
+                            left: popperPosition.left + 'rem',
+                            right: popperPosition.right,
+                        }}
                         className={cx('board_menu-items')}
                     >
                         <CreateBoardForm setBoards={setBoards} setToast={setToast} setOpenModal={setOpenModal} />

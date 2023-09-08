@@ -9,6 +9,7 @@ import {
     ONCHANGE_BOARD_TITLE,
     SET_OTP_CODE,
     SET_USER_SESSION,
+    UPDATE_COLUMNS,
 } from './constants';
 
 const initState = {
@@ -95,6 +96,36 @@ const initState = {
                 'https://res.cloudinary.com/dzzv49yec/image/upload/v1670050964/taskbox-assets/avatar1_ilyzbz.jpg',
         },
     },
+    columns: {
+        'column-1': {
+            id: 'column-1',
+            title: 'Todo',
+            taskIds: ['task-1', 'task-2'],
+        },
+        'column-2': {
+            id: 'column-2',
+            title: 'In progress',
+            taskIds: [],
+        },
+        'column-3': {
+            id: 'column-3',
+            title: 'Done',
+            taskIds: [],
+        },
+    },
+    tasks: {
+        'task-1': {
+            id: 'task-1',
+            content: 'Doing homework',
+            reference: 'Todo',
+        },
+        'task-2': {
+            id: 'task-2',
+            content: 'Take out garbage',
+            reference: 'Todo',
+        },
+    },
+    columnOrder: ['column-1', 'column-2', 'column-3'],
 };
 
 function reducer(state, action) {
@@ -102,6 +133,14 @@ function reducer(state, action) {
     const { comments } = state;
     let board;
     switch (action.type) {
+        case UPDATE_COLUMNS:
+            return {
+                ...state,
+                columns: {
+                    ...state.columns,
+                    [action.payload.id]: action.payload,
+                },
+            };
         case SET_OTP_CODE:
             return {
                 ...state,

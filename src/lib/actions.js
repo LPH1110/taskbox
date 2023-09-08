@@ -15,7 +15,7 @@ export const saveBoard = async (data) => {
             return { status: 502, message: `Board name has already existed` };
         } else {
             await setDoc(boardRef, data);
-            return { status: 200, message: `Successfully` };
+            return { status: 200, message: `Create board (${data.title}) successfully` };
         }
     } catch (error) {
         console.error(error.message + ' error saving board');

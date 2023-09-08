@@ -40,9 +40,9 @@ const MenuList = ({ data, setCurrentMenu }) => {
                 <Fragment key={item?.id}>
                     <Menu.Item className={cx('board_menu-item')}>
                         <button className="items-start w-full" onClick={() => handleClick(item)}>
-                            {item?.thumbnail ? (
+                            {item?.thumbnailURL ? (
                                 <div
-                                    style={{ backgroundImage: `url(${item?.thumbnail})` }}
+                                    style={{ backgroundImage: `url(${item.thumbnailURL})` }}
                                     className="w-5 h-5 image rounded-sm"
                                 />
                             ) : (
@@ -102,7 +102,7 @@ const BoardMenu = ({ data }) => {
             id: uuidv4(),
             title: 'Change background',
             path: '/change-background',
-            thumbnail: data?.thumbnail,
+            thumbnailURL: data?.thumbnailURL,
         },
         {
             id: uuidv4(),
