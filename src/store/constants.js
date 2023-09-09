@@ -7,4 +7,6 @@ export const ADD_NEW_COMMENT_TO_TASK = 'add_new_comment_to_task';
 export const DELETE_COMMENT_BY_ID = 'delete_comment_by_id';
 export const SET_USER_SESSION = 'set_user_session';
 export const SET_OTP_CODE = 'set_otp_code';
+export const UPDATE_COLUMN_ID = 'update_column_id';
 export const UPDATE_COLUMNS = 'update_columns';
+export const UPDATE_TASKS = 'update_tasks';

@@ -40,3 +40,47 @@ export const fetchBoard = async (boardId) => {
         console.error('Nothing found!');
     }
 };
+
+export const createTask = async () => {};
+
+export const fetchColumns = async (boardId) => {
+    const q = query(collection(db, 'columns'), where('reference', '==', boardId));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
+    return data;
+};
+export const fetchTasks = async (boardId) => {
+    const q = query(collection(db, 'tasks'), where('boardId', '==', boardId));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
+    return data;
+};
+
+export const saveColumn = async (data) => {
+    try {
+        console.log('Save column fired', data);
+        const columnRef = doc(db, 'columns', data.id);
+        const columnSnap = await getDoc(columnRef);
+        if (columnSnap.exists()) {
+            await setDoc(columnRef, data);
+        }
+        return;
+    } catch (error) {
+        console.error(error.message + ' error saving column');
+        return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};
+
+export const saveTask = async (data) => {
+    try {
+        const taskRef = doc(db, 'tasks', data.id);
+        const taskSnap = await getDoc(taskRef);
+        if (taskSnap.exists()) {
+            await setDoc(taskRef, data);
+        }
+        return;
+    } catch (error) {
+        console.error(error.message + ' error saving task');
+        return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};

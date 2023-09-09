@@ -9,7 +9,9 @@ import {
     ONCHANGE_BOARD_TITLE,
     SET_OTP_CODE,
     SET_USER_SESSION,
+    UPDATE_COLUMN_ID,
     UPDATE_COLUMNS,
+    UPDATE_TASKS,
 } from './constants';
 
 const initState = {
@@ -100,16 +102,6 @@ const initState = {
         'column-1': {
             id: 'column-1',
             title: 'Todo',
-            taskIds: ['task-1', 'task-2'],
-        },
-        'column-2': {
-            id: 'column-2',
-            title: 'In progress',
-            taskIds: [],
-        },
-        'column-3': {
-            id: 'column-3',
-            title: 'Done',
             taskIds: [],
         },
     },
@@ -119,13 +111,8 @@ const initState = {
             content: 'Doing homework',
             reference: 'Todo',
         },
-        'task-2': {
-            id: 'task-2',
-            content: 'Take out garbage',
-            reference: 'Todo',
-        },
     },
-    columnOrder: ['column-1', 'column-2', 'column-3'],
+    columnOrder: [],
 };
 
 function reducer(state, action) {
@@ -133,7 +120,21 @@ function reducer(state, action) {
     const { comments } = state;
     let board;
     switch (action.type) {
+        case UPDATE_TASKS:
+            return {
+                ...state,
+                tasks: {
+                    ...action.payload,
+                },
+            };
         case UPDATE_COLUMNS:
+            return {
+                ...state,
+                columns: {
+                    ...action.payload,
+                },
+            };
+        case UPDATE_COLUMN_ID:
             return {
                 ...state,
                 columns: {

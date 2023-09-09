@@ -3,7 +3,7 @@ import React from 'react';
 
 const Task = ({ task, index }) => {
     return (
-        <Draggable key={task.id} draggableId={task?.id} index={index}>
+        <Draggable key={task?.id} draggableId={task?.id} index={index}>
             {(provided, snapshot) => (
                 <div
                     {...provided.draggableProps}

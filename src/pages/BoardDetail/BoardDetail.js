@@ -19,10 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
-import { Board, BoardMenu, Button, Tooltip } from '~/components';
-import { ActivityAuth } from '~/contexts/ActivityContext';
-import { UserAuth } from '~/contexts/AuthContext';
-import { actions, useStore } from '~/store';
+import { Board, BoardMenu, Button, Toast, Tooltip } from '~/components';
 import { fetchBoard } from '~/lib/actions';
 
 const cx = classNames.bind(styles);
@@ -42,22 +39,43 @@ const tabs = [
     },
 ];
 
+const LazyLoad = ({ isLoading, children }) => {
+    return isLoading ? (
+        <div className="relative">
+            {children}
+            <div className="rounded-md absolute inset-0 bg-slate-300 animate-pulse"></div>
+        </div>
+    ) : (
+        children
+    );
+};
+
 function BoardDetail() {
     const { id } = useParams();
 
     const [board, setBoard] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
 
     const [boardTitle, setBoardTitle] = useState('');
     const [searchKeys, setSearchKeys] = useState('');
+    const [toast, setToast] = useState({
+        show: false,
+        body: {
+            message: '',
+            status: '',
+        },
+    });
     const inputRef = useRef();
 
     console.log(board);
 
     useEffect(() => {
+        setIsLoading(true);
         const getBoard = async () => {
             const result = await fetchBoard(id);
             setBoard(result);
             setBoardTitle(result?.title);
+            setIsLoading(false);
         };
         getBoard();
     }, [id]);
@@ -79,14 +97,14 @@ function BoardDetail() {
             {/* Header */}
             <section className="p-6 min-h-[5rem] flex items-center justify-between">
                 {/* Left heading */}
-                <div>
-                    <div className="mb-2">
+                <div className="space-y-2">
+                    <LazyLoad isLoading={isLoading}>
                         <input
                             onChange={(e) => setBoardTitle(e.target.value)}
                             className="caret-blue-500 ease duration-200 outline-none ring ring-transparent rounded-md p-1 -m-1 hover:ring-blue-400 focus:ring-blue-400 text-2xl font-semibold"
                             value={boardTitle}
                         />
-                    </div>
+                    </LazyLoad>
                     <div className="flex items-center text-slate-500">
                         <p>Description of your project what do want to do</p>
                         <Tooltip message="You could modify the description later">
@@ -280,7 +298,7 @@ function BoardDetail() {
                                 </div>
                             </div>
                             {/* Board */}
-                            <Board />
+                            <Board setToast={setToast} boardId={id} columnOrder={board?.columnOrder} />
                         </Tab.Panel>
                         <Tab.Panel>
                             <div>Timeline panel</div>
@@ -291,6 +309,7 @@ function BoardDetail() {
                     </Tab.Panels>
                 </Tab.Group>
             </section>
+            {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
         </section>
     );
 }

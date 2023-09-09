@@ -1,15 +1,23 @@
-import { useState } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import classNames from 'classnames/bind';
-import styles from './Board.module.scss';
+import { useEffect, useState } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
+import { fetchColumns, fetchTasks, saveColumn } from '~/lib/actions';
+import { convertArrayFromObj, convertObjFromArray } from '~/lib/helpers';
 import { actions, useStore } from '~/store';
 import Column from '../Column/Column';
+import styles from './Board.module.scss';
 
 const cx = classNames.bind(styles);
 
-const Board = (data) => {
+const Board = ({ boardId, columnOrder = [], setToast }) => {
     const [state, dispatch] = useStore();
-    const { tasks, columns, columnOrder } = state;
+    const { tasks, columns } = state;
+    const [timeoutId, setTimeoutId] = useState(null);
+
+    const onDragStart = (start) => {
+        console.log(start);
+    };
+
     const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
 
@@ -35,7 +43,8 @@ const Board = (data) => {
                 taskIds: newTaskIds,
             };
 
-            dispatch(actions.updateColumns(newColumn));
+            dispatch(actions.updateColumnById(newColumn));
+            saveColumn(newColumn);
         } else {
             // Update start col
             const startTaskIds = Array.from(startColumn.taskIds);
@@ -53,24 +62,63 @@ const Board = (data) => {
                 taskIds: finishTaskIds,
             };
 
-            dispatch(actions.updateColumns(newStartCol));
-            dispatch(actions.updateColumns(newFinishCol));
+            dispatch(actions.updateColumnById(newStartCol));
+            dispatch(actions.updateColumnById(newFinishCol));
+            saveColumn(newStartCol);
+            saveColumn(newFinishCol);
         }
+        setToast({
+            show: true,
+            body: {
+                message: 'Saving board...',
+                status: 'success',
+            },
+        });
+
+        setTimeoutId(
+            setTimeout(() => {
+                setToast((prev) => ({ ...prev, show: false }));
+            }, 3000),
+        );
     };
 
-    return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <div className={cx('board_container')}>
-                {columnOrder.map((columnId) => {
-                    const column = columns[columnId];
-                    const taskList = column.taskIds.map((taskId) => tasks[taskId]);
+    console.log(columns);
+    useEffect(() => {
+        const getData = async () => {
+            const columnsResult = await fetchColumns(boardId);
+            const tasksResult = await fetchTasks(boardId);
 
-                    return (
-                        <div>
-                            <Column key={columnId} column={column} tasks={taskList} />
-                        </div>
-                    );
-                })}
+            const columnData = convertObjFromArray(columnsResult);
+            const taskData = convertObjFromArray(tasksResult);
+
+            dispatch(actions.updateColumns(columnData));
+            dispatch(actions.updateTasks(taskData));
+        };
+
+        getData();
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, []);
+
+    return (
+        <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+            <div className={cx('board_container')}>
+                {columnOrder.length > 0 ? (
+                    columnOrder.map((columnId) => {
+                        const column = columns[columnId];
+                        const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
+
+                        return (
+                            <div>
+                                <Column key={columnId} column={column} tasks={taskList} />
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div>Create a list</div>
+                )}
             </div>
         </DragDropContext>
     );

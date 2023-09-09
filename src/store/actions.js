@@ -8,8 +8,20 @@ import {
     DELETE_COMMENT_BY_ID,
     SET_USER_SESSION,
     SET_OTP_CODE,
+    UPDATE_COLUMN_ID,
     UPDATE_COLUMNS,
+    UPDATE_TASKS,
 } from './constants';
+
+export const updateColumnById = (payload) => ({
+    type: UPDATE_COLUMN_ID,
+    payload,
+});
+
+export const updateTasks = (payload) => ({
+    type: UPDATE_TASKS,
+    payload,
+});
 
 export const updateColumns = (payload) => ({
     type: UPDATE_COLUMNS,
