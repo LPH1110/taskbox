@@ -67,17 +67,15 @@ function BoardDetail() {
     });
     const inputRef = useRef();
 
-    console.log(board);
-
     useEffect(() => {
         setIsLoading(true);
         const getBoard = async () => {
             const result = await fetchBoard(id);
             setBoard(result);
             setBoardTitle(result?.title);
-            setIsLoading(false);
         };
         getBoard();
+        setIsLoading(false);
     }, [id]);
 
     const handleInputChange = (e) => {
@@ -298,7 +296,12 @@ function BoardDetail() {
                                 </div>
                             </div>
                             {/* Board */}
-                            <Board setToast={setToast} boardId={id} columnOrder={board?.columnOrder} />
+                            <Board
+                                setBoard={setBoard}
+                                setToast={setToast}
+                                boardId={id}
+                                columnOrder={board?.columnOrder}
+                            />
                         </Tab.Panel>
                         <Tab.Panel>
                             <div>Timeline panel</div>

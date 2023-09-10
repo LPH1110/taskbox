@@ -7,7 +7,7 @@ import { db } from '~/firebase-config';
     -> never fire error
 */
 
-export const saveBoard = async (data) => {
+export const createBoard = async (data) => {
     try {
         const boardRef = doc(db, 'boards', data.title);
         let boardSnap = await getDoc(boardRef);
@@ -19,6 +19,20 @@ export const saveBoard = async (data) => {
         }
     } catch (error) {
         console.error(error.message + ' error saving board');
+        return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};
+
+export const saveBoard = async (boardId, data) => {
+    try {
+        const boardRef = doc(db, 'boards', boardId);
+        const boardSnap = await getDoc(boardRef);
+        if (boardSnap.exists()) {
+            await setDoc(boardRef, data);
+        }
+        return { status: 200, message: `Saved board successfully` };
+    } catch (error) {
+        console.error(error.message + ' error saving column');
         return { status: 501, message: `Something went wrong. Please try again` };
     }
 };

@@ -145,7 +145,6 @@ const BoardMenu = ({ data }) => {
     });
 
     const renderMenu = () => {
-        console.log(currentMenu[currentMenu.length - 1]);
         switch (currentMenu[currentMenu.length - 1]?.path) {
             case '/about':
                 return <AboutMenu setCurrentMenu={setCurrentMenu} />;
