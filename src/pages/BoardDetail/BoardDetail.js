@@ -91,7 +91,7 @@ function BoardDetail() {
     };
 
     return (
-        <section className="w-full h-screen overflow-y-auto">
+        <section className="w-full h-screen overflow-y-auto bg-slate-100">
             {/* Header */}
             <section className="p-6 min-h-[5rem] flex items-center justify-between">
                 {/* Left heading */}
@@ -99,12 +99,14 @@ function BoardDetail() {
                     <LazyLoad isLoading={isLoading}>
                         <input
                             onChange={(e) => setBoardTitle(e.target.value)}
-                            className="caret-blue-500 ease duration-200 outline-none ring ring-transparent rounded-md p-1 -m-1 hover:ring-blue-400 focus:ring-blue-400 text-2xl font-semibold"
+                            className="caret-blue-500 bg-transparent focus:bg-white ease duration-200 outline-none ring ring-transparent rounded-md p-1 -m-1 hover:ring-blue-400 focus:ring-blue-400 text-2xl font-semibold"
                             value={boardTitle}
                         />
                     </LazyLoad>
                     <div className="flex items-center text-slate-500">
-                        <p>Description of your project what do want to do</p>
+                        <p>
+                            Last updated on: <span className="text-slate-700 font-semibold">Mar 12, 2023</span>
+                        </p>
                         <Tooltip message="You could modify the description later">
                             <span className="mx-2">
                                 <QuestionMarkCircleIcon className="w-5 h-5" />
@@ -184,9 +186,9 @@ function BoardDetail() {
                 </div>
             </section>
             {/* Navigations */}
-            <section className="p-6 mb-6 relative">
+            <section className="px-6 pb-6 mb-6 relative">
                 <Tab.Group>
-                    <Tab.List className="mb-3 py-2 border-y border-slate-100">
+                    <Tab.List className="mb-3 py-2 border-y border-slate-200">
                         {/* Tabs */}
                         <div className="flex items-center justify-between">
                             <div className="inline-block relative">
@@ -231,70 +233,6 @@ function BoardDetail() {
                     </Tab.List>
                     <Tab.Panels>
                         <Tab.Panel className="absolute left-0 right-0 px-6 flex justify-start flex-col flex-1">
-                            {/* Filters */}
-                            <div className="mb-2 pb-4 flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <Button
-                                        className="text-slate-300 hover:text-slate-500 rounded-md hover:bg-slate-100 ease-in-out duration-200"
-                                        leftIcon={<UserIcon className="w-5 h-5" />}
-                                        size="small"
-                                        type="button"
-                                    >
-                                        Person
-                                    </Button>
-                                    <Button
-                                        className="text-slate-300 hover:text-slate-500 rounded-md hover:bg-slate-100 ease-in-out duration-200"
-                                        leftIcon={<FunnelIcon className="w-5 h-5" />}
-                                        size="small"
-                                        type="button"
-                                    >
-                                        Filters
-                                    </Button>
-                                    <Button
-                                        className="text-slate-300 hover:text-slate-500 rounded-md hover:bg-slate-100 ease-in-out duration-200"
-                                        leftIcon={<Bars3BottomRightIcon className="w-5 h-5" />}
-                                        size="small"
-                                        type="button"
-                                    >
-                                        Sort
-                                    </Button>
-                                </div>
-                                <div className="flex items-center">
-                                    {/* Search bar */}
-                                    <div className="ease duration-200 focus-within:ring-blue-500 ring ring-slate-100 flex items-center p-1.5 bg-slate-100 rounded-md">
-                                        <Button
-                                            type="button"
-                                            className={
-                                                searchKeys.length > 0 ? 'text-slate-600 mr-2' : 'text-slate-400 mr-2'
-                                            }
-                                        >
-                                            <MagnifyingGlassIcon className="w-5 h-5" />
-                                        </Button>
-                                        <input
-                                            ref={inputRef}
-                                            value={searchKeys}
-                                            onChange={(e) => handleInputChange(e)}
-                                            placeholder="Search tasks..."
-                                            className="text-slate-600 bg-transparent outline-none"
-                                        />
-                                        {searchKeys.length > 0 ? (
-                                            <span onClick={handleClearSearchKeys}>
-                                                <XMarkIcon className="w-4 h-4 ml-2" />
-                                            </span>
-                                        ) : (
-                                            <span className="w-4 h-4 ml-2"></span>
-                                        )}
-                                    </div>
-                                    {/* Add task btn */}
-                                    <Button
-                                        size="medium"
-                                        className="h-full ml-4 rounded-md bg-blue-100 text-blue-500 font-semibold hover:bg-blue-100/70 hover:text-blue-500/70 ease-in-out duration-200"
-                                        leftIcon={<PlusIcon className="w-5 h-5" />}
-                                    >
-                                        Add task
-                                    </Button>
-                                </div>
-                            </div>
                             {/* Board */}
                             <Board
                                 setBoard={setBoard}
