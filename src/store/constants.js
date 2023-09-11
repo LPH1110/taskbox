@@ -10,3 +10,4 @@ export const SET_OTP_CODE = 'set_otp_code';
 export const UPDATE_COLUMN_ID = 'update_column_id';
 export const UPDATE_COLUMNS = 'update_columns';
 export const UPDATE_TASKS = 'update_tasks';
+export const UPDATE_BOARD = 'update_board';

@@ -38,6 +38,10 @@ html *::-webkit-scrollbar-track {
     background-color: rgba(0, 0, 0, 0);
 }
 
+input {
+    outline: none;
+}
+
 .popper-close {
     @apply absolute top-1/2 -translate-y-1/2 right-0 hover:text-slate-500 ease-linear duration-100 w-5 h-5;
 }

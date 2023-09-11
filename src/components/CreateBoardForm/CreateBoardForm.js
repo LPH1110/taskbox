@@ -64,6 +64,7 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
                     description: visibility.description,
                 },
                 thumbnailURL: currentThumb?.urls?.full || currentThumb.thumbnailURL,
+                columnOrder: [],
             };
             const result = await createBoard(data);
             if (result?.status === 200) {

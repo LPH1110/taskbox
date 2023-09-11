@@ -1,4 +1,4 @@
 .board_menu-items {
     overflow: overlay;
-    @apply border max-h-screen border-nav-border bg-white w-[22.5rem] rounded-lg p-4 flex flex-col items-center justify-start shadow-xl absolute gap-3;
+    @apply fixed top-1/2 -translate-y-1/2 right-0 border max-h-screen border-nav-border bg-white w-[22.5rem] rounded-lg p-4 flex flex-col items-center justify-start shadow-xl gap-3;
 }

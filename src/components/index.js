@@ -14,3 +14,4 @@ export { default as IconButton } from './IconButton';
 export { default as BoardMenu } from './BoardMenu';
 export { default as Spacer } from './Spacer';
 export { default as Board } from './Board';
+export { default as LazyLoad } from './LazyLoad';

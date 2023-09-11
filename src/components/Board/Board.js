@@ -1,15 +1,116 @@
 import classNames from 'classnames/bind';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { fetchColumns, fetchTasks, createBoard, saveColumn, saveBoard } from '~/lib/actions';
+import { fetchColumns, fetchTasks, createBoard, saveColumn, saveBoard, createColumn } from '~/lib/actions';
 import { convertArrayFromObj, convertObjFromArray } from '~/lib/helpers';
 import { actions, useStore } from '~/store';
 import Column from '../Column/Column';
 import styles from './Board.module.scss';
+import { XMarkIcon } from '@heroicons/react/24/solid';
+import { Transition } from '@headlessui/react';
+import { v4 as uuidv4 } from 'uuid';
 
 const cx = classNames.bind(styles);
 
-const Board = ({ setBoard, boardId, columnOrder = [], setToast }) => {
+const CreateListBtn = ({ boardId, setBoard, setToast, dispatch }) => {
+    const [openCreateListForm, setOpenCreateListForm] = useState(false);
+    const inputRef = useRef();
+    const [listTitle, setListTitle] = useState('');
+
+    useEffect(() => {
+        inputRef?.current?.focus();
+    }, []);
+
+    const handleCreateList = () => {
+        if (listTitle !== '') {
+            console.log('Created: ', listTitle);
+            const data = {
+                id: uuidv4(),
+                title: listTitle,
+                reference: boardId,
+                taskIds: [],
+            };
+            createColumn(data);
+            setBoard((prev) => {
+                const newOrder = [...prev.columnOrder, data.id];
+                const newBoard = {
+                    ...prev,
+                    columnOrder: newOrder,
+                };
+
+                const savingBoard = async () => await saveBoard(boardId, newBoard);
+
+                savingBoard();
+
+                return newBoard;
+            });
+            dispatch(actions.updateColumnById(data));
+
+            setListTitle('');
+            setOpenCreateListForm(false);
+        }
+    };
+
+    const handleOnChange = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setListTitle(e.target.value);
+    };
+
+    return (
+        <div className="relative">
+            <button
+                className="relative w-[24rem] flexCenter min-h-[8rem] h-full rounded-xl border border-dashed bg-white/20 hover:bg-white/80 ease duration-100"
+                type="button"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setOpenCreateListForm((prev) => !prev);
+                }}
+            >
+                Create a list
+            </button>
+            <Transition
+                className="absolute inset-0 top-0"
+                show={openCreateListForm}
+                enter="transition-opacity duration-75"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-opacity duration-150"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+            >
+                <div className="w-[24rem] bg-slate-600 rounded-xl border border-nav-border p-2 space-y-2">
+                    <input
+                        ref={inputRef}
+                        value={listTitle}
+                        onChange={handleOnChange}
+                        className="p-2 w-full ring-2 ring-transparent focus:ring-blue-500 rounded"
+                        placeholder="Enter a title"
+                    />
+                    <div className="flexStart gap-3">
+                        <button
+                            type="button"
+                            onClick={handleCreateList}
+                            className="py-2 px-3 bg-blue-500 hover:bg-blue-500/70 ease duration-100 text-slate-100 rounded-md"
+                        >
+                            Add list
+                        </button>
+                        <button
+                            onClick={() => setOpenCreateListForm(false)}
+                            type="button"
+                            className="text-slate-100 hover:text-slate-300 ease duration-100"
+                        >
+                            <XMarkIcon className="w-6 h-6" />
+                        </button>
+                    </div>
+                </div>
+            </Transition>
+        </div>
+    );
+};
+
+const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
     const [state, dispatch] = useStore();
     const { tasks, columns } = state;
     const [timeoutId, setTimeoutId] = useState(null);
@@ -135,20 +236,23 @@ const Board = ({ setBoard, boardId, columnOrder = [], setToast }) => {
                     return (
                         <>
                             <div ref={provided.innerRef} {...provided.droppableProps} className={cx('board_container')}>
-                                {columnOrder.length > 0 ? (
-                                    columnOrder.map((columnId, index) => {
-                                        const column = columns[columnId];
-                                        const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
+                                {columnOrder.map((columnId, index) => {
+                                    const column = columns[columnId];
+                                    const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
 
-                                        return (
-                                            <div>
-                                                <Column index={index} key={columnId} column={column} tasks={taskList} />
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <div>Create a list</div>
-                                )}
+                                    return (
+                                        <div>
+                                            <Column index={index} key={columnId} column={column} tasks={taskList} />
+                                        </div>
+                                    );
+                                })}
+
+                                <CreateListBtn
+                                    dispatch={dispatch}
+                                    boardId={boardId}
+                                    setBoard={setBoard}
+                                    setToast={setToast}
+                                />
                             </div>
                             {provided.placeholder}
                         </>
@@ -159,4 +263,4 @@ const Board = ({ setBoard, boardId, columnOrder = [], setToast }) => {
     );
 };
 
-export default Board;
+export default memo(Board);

@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { db } from '~/firebase-config';
 /* 
     Firebase Note: addDoc
@@ -7,6 +7,7 @@ import { db } from '~/firebase-config';
     -> never fire error
 */
 
+// Boards
 export const createBoard = async (data) => {
     try {
         const boardRef = doc(db, 'boards', data.title);
@@ -55,16 +56,9 @@ export const fetchBoard = async (boardId) => {
     }
 };
 
-export const createTask = async () => {};
-
+// Columns
 export const fetchColumns = async (boardId) => {
     const q = query(collection(db, 'columns'), where('reference', '==', boardId));
-    const querySnapshot = await getDocs(q);
-    const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
-    return data;
-};
-export const fetchTasks = async (boardId) => {
-    const q = query(collection(db, 'tasks'), where('boardId', '==', boardId));
     const querySnapshot = await getDocs(q);
     const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
     return data;
@@ -83,6 +77,24 @@ export const saveColumn = async (data) => {
         console.error(error.message + ' error saving column');
         return { status: 501, message: `Something went wrong. Please try again` };
     }
+};
+
+export const createColumn = async (data) => {
+    try {
+        const columnRef = doc(db, 'columns', data.id);
+        await setDoc(columnRef, data);
+    } catch (error) {
+        console.error(error.message + ' error saving board');
+        return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};
+
+// Tasks
+export const fetchTasks = async (boardId) => {
+    const q = query(collection(db, 'tasks'), where('boardId', '==', boardId));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
+    return data;
 };
 
 export const saveTask = async (data) => {

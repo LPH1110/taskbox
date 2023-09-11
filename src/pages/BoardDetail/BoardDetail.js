@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
-import { Board, BoardMenu, Button, Toast, Tooltip } from '~/components';
+import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip } from '~/components';
 import { fetchBoard } from '~/lib/actions';
 
 const cx = classNames.bind(styles);
@@ -38,17 +38,6 @@ const tabs = [
         title: 'Calendar',
     },
 ];
-
-const LazyLoad = ({ isLoading, children }) => {
-    return isLoading ? (
-        <div className="relative">
-            {children}
-            <div className="rounded-md absolute inset-0 bg-slate-300 animate-pulse"></div>
-        </div>
-    ) : (
-        children
-    );
-};
 
 function BoardDetail() {
     const { id } = useParams();
@@ -235,6 +224,7 @@ function BoardDetail() {
                         <Tab.Panel className="absolute left-0 right-0 px-6 flex justify-start flex-col flex-1">
                             {/* Board */}
                             <Board
+                                board={board}
                                 setBoard={setBoard}
                                 setToast={setToast}
                                 boardId={id}

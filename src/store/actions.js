@@ -11,7 +11,13 @@ import {
     UPDATE_COLUMN_ID,
     UPDATE_COLUMNS,
     UPDATE_TASKS,
+    UPDATE_BOARD,
 } from './constants';
+
+export const updateBoardById = (payload) => ({
+    type: UPDATE_BOARD,
+    payload,
+});
 
 export const updateColumnById = (payload) => ({
     type: UPDATE_COLUMN_ID,
