@@ -84,7 +84,7 @@ export const createColumn = async (data) => {
         const columnRef = doc(db, 'columns', data.id);
         await setDoc(columnRef, data);
     } catch (error) {
-        console.error(error.message + ' error saving board');
+        console.error(error.message + ' error create column');
         return { status: 501, message: `Something went wrong. Please try again` };
     }
 };
@@ -107,6 +107,16 @@ export const saveTask = async (data) => {
         return;
     } catch (error) {
         console.error(error.message + ' error saving task');
+        return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};
+
+export const createTask = async (data) => {
+    try {
+        const taskRef = doc(db, 'tasks', data.id);
+        await setDoc(taskRef, data);
+    } catch (error) {
+        console.error(error.message + ' error creating task');
         return { status: 501, message: `Something went wrong. Please try again` };
     }
 };

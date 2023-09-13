@@ -102,8 +102,8 @@ function Workspaces() {
                             </div>
                             <div className="avatar-group -space-x-3">
                                 {members.map((mem) => (
-                                    <div className="avatar">
-                                        <div key={mem.id} className="w-8">
+                                    <div className="avatar" key={mem.id}>
+                                        <div className="w-8">
                                             <img async src={mem.avatarURL} alt="mem-avatar" />
                                         </div>
                                     </div>

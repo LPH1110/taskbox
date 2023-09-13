@@ -12,6 +12,7 @@ import {
     UPDATE_COLUMN_ID,
     UPDATE_COLUMNS,
     UPDATE_TASKS,
+    UPDATE_TASK_ID,
 } from './constants';
 
 const initState = {
@@ -120,6 +121,14 @@ function reducer(state, action) {
     const { comments } = state;
     let board;
     switch (action.type) {
+        case UPDATE_TASK_ID:
+            return {
+                ...state,
+                tasks: {
+                    ...state.tasks,
+                    [action.payload.id]: action.payload,
+                },
+            };
         case UPDATE_TASKS:
             return {
                 ...state,

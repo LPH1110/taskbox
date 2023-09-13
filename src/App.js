@@ -5,7 +5,7 @@ import { ScrollToTop, Modal } from './components';
 
 function App() {
     return (
-        <div className="App min-h-screen">
+        <div className="App h-screen">
             <Routes>
                 {routes.map((route) => {
                     const Layout = route.layout;

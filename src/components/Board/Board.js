@@ -60,7 +60,7 @@ const CreateListBtn = ({ boardId, setBoard, setToast, dispatch }) => {
     return (
         <div className="relative">
             <button
-                className="relative w-[24rem] flexCenter min-h-[8rem] h-full rounded-xl border border-dashed bg-white/20 hover:bg-white/80 ease duration-100"
+                className="relative w-[24rem] flexCenter max-h-[8.5rem] h-full rounded-xl border border-dashed bg-white/20 hover:bg-white/80 ease duration-100"
                 type="button"
                 onClick={(e) => {
                     e.preventDefault();
@@ -205,6 +205,8 @@ const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
         }
     };
 
+    console.log('BoardId: ', boardId);
+
     useEffect(() => {
         const getData = async () => {
             const columnsResult = await fetchColumns(boardId);
@@ -215,10 +217,10 @@ const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
 
             dispatch(actions.updateColumns(columnData));
             dispatch(actions.updateTasks(taskData));
+            setIsLoading(false);
         };
 
         getData();
-        setIsLoading(false);
 
         return () => {
             clearTimeout(timeoutId);
@@ -231,31 +233,36 @@ const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
         </div>
     ) : (
         <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId={boardId} type="COLUMN">
+            <Droppable direction="horizontal" droppableId={boardId} type="COLUMN">
                 {(provided) => {
                     return (
-                        <>
-                            <div ref={provided.innerRef} {...provided.droppableProps} className={cx('board_container')}>
-                                {columnOrder.map((columnId, index) => {
-                                    const column = columns[columnId];
-                                    const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
+                        <div ref={provided.innerRef} {...provided.droppableProps} className={cx('board_container')}>
+                            {columnOrder.map((columnId, index) => {
+                                const column = columns[columnId];
+                                console.log(column?.taskIds);
+                                const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
 
-                                    return (
-                                        <div>
-                                            <Column index={index} key={columnId} column={column} tasks={taskList} />
-                                        </div>
-                                    );
-                                })}
+                                return (
+                                    <div>
+                                        <Column
+                                            boardId={boardId}
+                                            index={index}
+                                            key={columnId}
+                                            column={column}
+                                            tasks={taskList}
+                                        />
+                                    </div>
+                                );
+                            })}
 
-                                <CreateListBtn
-                                    dispatch={dispatch}
-                                    boardId={boardId}
-                                    setBoard={setBoard}
-                                    setToast={setToast}
-                                />
-                            </div>
                             {provided.placeholder}
-                        </>
+                            <CreateListBtn
+                                dispatch={dispatch}
+                                boardId={boardId}
+                                setBoard={setBoard}
+                                setToast={setToast}
+                            />
+                        </div>
                     );
                 }}
             </Droppable>
@@ -263,4 +270,4 @@ const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
     );
 };
 
-export default memo(Board);
+export default Board;

@@ -27,6 +27,8 @@ const members = [
 ];
 
 const Task = ({ task, index }) => {
+    console.log('TaskId: ', task.id);
+
     return (
         <Draggable key={task?.id} draggableId={task?.id} index={index}>
             {(provided, snapshot) => (

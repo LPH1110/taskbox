@@ -1,3 +1,3 @@
 .board_container {
-    @apply flex flex-wrap gap-3 justify-items-start;
+    @apply flex overflow-auto gap-3 justify-items-start h-full absolute inset-0;
 }

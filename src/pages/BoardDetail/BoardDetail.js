@@ -62,9 +62,10 @@ function BoardDetail() {
             const result = await fetchBoard(id);
             setBoard(result);
             setBoardTitle(result?.title);
+            console.log(result);
+            setIsLoading(false);
         };
         getBoard();
-        setIsLoading(false);
     }, [id]);
 
     const handleInputChange = (e) => {
@@ -80,9 +81,9 @@ function BoardDetail() {
     };
 
     return (
-        <section className="w-full h-screen overflow-y-auto bg-slate-100">
+        <section className="px-6 flex flex-col h-full w-full bg-slate-100">
             {/* Header */}
-            <section className="p-6 min-h-[5rem] flex items-center justify-between">
+            <section className="py-6 min-h-[5rem] flex items-center justify-between">
                 {/* Left heading */}
                 <div className="space-y-2">
                     <LazyLoad isLoading={isLoading}>
@@ -174,71 +175,14 @@ function BoardDetail() {
                     <BoardMenu data={board} />
                 </div>
             </section>
-            {/* Navigations */}
-            <section className="px-6 pb-6 mb-6 relative">
-                <Tab.Group>
-                    <Tab.List className="mb-3 py-2 border-y border-slate-200">
-                        {/* Tabs */}
-                        <div className="flex items-center justify-between">
-                            <div className="inline-block relative">
-                                {tabs.map((tab) => (
-                                    <Tab
-                                        className={cx(
-                                            'tab',
-                                            'ui-selected:text-slate-700 relative text-slate-300 py-2 px-3 outline-none font-semibold ease duration-200',
-                                        )}
-                                        key={tab.id}
-                                    >
-                                        {({ selected }) =>
-                                            selected ? (
-                                                <>
-                                                    <h4>{tab.title}</h4>
-                                                    <div className="animate-span-from-left h-1 left-0 -bottom-[5%] right-0 absolute bg-blue-500 rounded-xl"></div>
-                                                </>
-                                            ) : (
-                                                <h4>{tab.title}</h4>
-                                            )
-                                        }
-                                    </Tab>
-                                ))}
-                            </div>
-                            {/* View by */}
-                            <div className="flex items-center">
-                                <span className="mr-4 text-slate-500">View By</span>
-                                <div className="p-0.5 bg-slate-100 rounded-md flex items-center text-slate-500">
-                                    <button type="button" className="p-1 rounded-l-md bg-white">
-                                        <span>
-                                            <Squares2X2Icon className="w-5 h-5" />
-                                        </span>
-                                    </button>
-                                    <button type="button" className="ml-0.5 p-1 rounded-r-md bg-transparent">
-                                        <span>
-                                            <Bars2Icon className="w-5 h-5" />
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </Tab.List>
-                    <Tab.Panels>
-                        <Tab.Panel className="absolute left-0 right-0 px-6 flex justify-start flex-col flex-1">
-                            {/* Board */}
-                            <Board
-                                board={board}
-                                setBoard={setBoard}
-                                setToast={setToast}
-                                boardId={id}
-                                columnOrder={board?.columnOrder}
-                            />
-                        </Tab.Panel>
-                        <Tab.Panel>
-                            <div>Timeline panel</div>
-                        </Tab.Panel>
-                        <Tab.Panel>
-                            <div>Calendar panel</div>
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
+            <section style={{ overflow: 'overlay' }} className="h-full container relative">
+                <Board
+                    board={board}
+                    setBoard={setBoard}
+                    setToast={setToast}
+                    boardId={id}
+                    columnOrder={board?.columnOrder}
+                />
             </section>
             {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
         </section>
