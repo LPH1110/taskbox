@@ -10,7 +10,7 @@ const cx = classNames.bind(styles);
 
 const CreateBoardMenu = ({ setBoards, setToast }) => {
     const [openModal, setOpenModal] = useState(false);
-    const [menuHeight, setMenuHeight] = useState(window.innerHeight - 80);
+    const [menuHeight, setMenuHeight] = useState(window.innerHeight - 20);
 
     const popperRef = useRef();
 

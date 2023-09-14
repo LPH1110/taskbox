@@ -12,7 +12,7 @@ function DefaultLayout({ children }) {
                     </nav>
                 </aside>
             </section>
-            <section className="container bg-slate-100">{children}</section>
+            <section className="flex-1 bg-slate-100">{children}</section>
         </section>
     );
 }

@@ -1,0 +1,20 @@
+.task_title {
+    @apply font-semibold w-64;
+}
+
+.task_title,
+.task_description {
+    display: -webkit-box;
+    text-align: left;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
+.task_description {
+    @apply text-description w-96;
+}
+
+.task_action {
+    @apply flex gap-1 text-description hover:text-slate-700 ease-linear duration-100;
+}

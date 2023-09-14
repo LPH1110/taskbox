@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const cx = classNames.bind(styles);
 
-const CreateListBtn = ({ boardId, setBoard, setToast, dispatch }) => {
+const CreateListBtn = ({ direction, boardId, setBoard, setToast, dispatch }) => {
     const [openCreateListForm, setOpenCreateListForm] = useState(false);
     const inputRef = useRef();
     const [listTitle, setListTitle] = useState('');
@@ -60,7 +60,7 @@ const CreateListBtn = ({ boardId, setBoard, setToast, dispatch }) => {
     return (
         <div className="relative">
             <button
-                className="relative w-[24rem] flexCenter max-h-[8.5rem] h-full rounded-xl border border-dashed bg-white/20 hover:bg-white/80 ease duration-100"
+                className={direction === 'horizontal' ? cx('create_col-stack') : cx('create_col-list')}
                 type="button"
                 onClick={(e) => {
                     e.preventDefault();
@@ -110,7 +110,7 @@ const CreateListBtn = ({ boardId, setBoard, setToast, dispatch }) => {
     );
 };
 
-const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
+const Board = ({ direction = 'horizontal', board, setBoard, boardId, columnOrder = [], setToast }) => {
     const [state, dispatch] = useStore();
     const { tasks, columns } = state;
     const [timeoutId, setTimeoutId] = useState(null);
@@ -205,8 +205,6 @@ const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
         }
     };
 
-    console.log('BoardId: ', boardId);
-
     useEffect(() => {
         const getData = async () => {
             const columnsResult = await fetchColumns(boardId);
@@ -233,18 +231,24 @@ const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
         </div>
     ) : (
         <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable direction="horizontal" droppableId={boardId} type="COLUMN">
+            <Droppable direction={direction} droppableId={boardId} type="COLUMN">
                 {(provided) => {
                     return (
-                        <div ref={provided.innerRef} {...provided.droppableProps} className={cx('board_container')}>
+                        <div
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                            className={
+                                direction === 'horizontal' ? cx('board_container-stack') : cx('board_container-list')
+                            }
+                        >
                             {columnOrder.map((columnId, index) => {
                                 const column = columns[columnId];
-                                console.log(column?.taskIds);
                                 const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
 
                                 return (
-                                    <div>
+                                    <div className={`${direction === 'vertical' ? 'w-full' : 'h-full'}`}>
                                         <Column
+                                            direction={direction}
                                             boardId={boardId}
                                             index={index}
                                             key={columnId}
@@ -257,6 +261,7 @@ const Board = ({ board, setBoard, boardId, columnOrder = [], setToast }) => {
 
                             {provided.placeholder}
                             <CreateListBtn
+                                direction={direction}
                                 dispatch={dispatch}
                                 boardId={boardId}
                                 setBoard={setBoard}

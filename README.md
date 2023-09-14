@@ -8,6 +8,8 @@
 
 -   Invariant failed: Cannot find droppable entry with id [column_id]
     -   Try to restart your app
+-   Can't fetch tasks from firebase. Maybe error of using firestore getDocs
+    -   I missed a letter 'd' in boardId :v
 
 ----- IMPORTANT NOTES -----
 

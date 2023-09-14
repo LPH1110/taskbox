@@ -181,9 +181,6 @@ const BoardMenu = ({ data }) => {
                     className="hover:bg-slate-100 p-1 ease-in-out duration-200 rounded-full flex items-center"
                 >
                     <UserAvatar width="w-9" />
-                    <span className="ml-2">
-                        <ChevronDownIcon className="w-5 h-5 text-slate-400" />
-                    </span>
                 </Menu.Button>
                 <Transition
                     show={openModal}

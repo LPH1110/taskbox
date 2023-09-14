@@ -1,3 +1,15 @@
-.board_container {
-    @apply flex overflow-auto gap-3 justify-items-start h-full absolute inset-0;
+.board_container-stack {
+    @apply flex overflow-auto gap-3 justify-items-start h-full absolute inset-0 pb-6;
+}
+
+.board_container-list {
+    @apply flex flex-col overflow-auto gap-8 justify-start items-center h-full absolute inset-0 pb-12;
+}
+
+.create_col-stack {
+    @apply relative w-[24rem] flex items-center justify-center max-h-[8.5rem] h-full rounded-xl border border-dashed bg-white/20 hover:bg-white/80 ease-linear duration-100;
+}
+
+.create_col-list {
+    @apply relative w-[24rem] flex items-center justify-center h-20 max-h-[8.5rem] rounded-xl border border-dashed bg-white/20 hover:bg-white/80 ease-linear duration-100;
 }

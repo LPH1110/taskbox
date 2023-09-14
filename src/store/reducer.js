@@ -122,6 +122,7 @@ function reducer(state, action) {
     let board;
     switch (action.type) {
         case UPDATE_TASK_ID:
+            console.log('update task id fired');
             return {
                 ...state,
                 tasks: {

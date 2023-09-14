@@ -8,11 +8,12 @@ import {
     PlusIcon,
     QuestionMarkCircleIcon,
     ShareIcon,
+    Square2StackIcon,
     Squares2X2Icon,
     StarIcon as StarIconOutline,
     UserIcon,
 } from '@heroicons/react/24/outline';
-import { StarIcon as StarIconSolid, XMarkIcon } from '@heroicons/react/24/solid';
+import { Bars3Icon, StarIcon as StarIconSolid, XMarkIcon } from '@heroicons/react/24/solid';
 import classNames from 'classnames/bind';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,32 +21,38 @@ import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
 import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip } from '~/components';
-import { fetchBoard } from '~/lib/actions';
+import { fetchBoard, saveBoard } from '~/lib/actions';
+import { useDebounce } from '~/store';
 
 const cx = classNames.bind(styles);
 
-const tabs = [
-    {
-        id: uuidv4(),
-        title: 'Canban',
-    },
-    {
-        id: uuidv4(),
-        title: 'Timeline',
-    },
-    {
-        id: uuidv4(),
-        title: 'Calendar',
-    },
-];
+const ViewBy = ({ viewBy, setViewBy }) => {
+    return (
+        <div className="flex items-center gap-1">
+            <button
+                type="button"
+                className={`${viewBy === 'stack' ? 'text-blue-500' : 'text-slate-500'} p-2 rounded-md bg-white`}
+                onClick={() => setViewBy('stack')}
+            >
+                <Squares2X2Icon className="w-5 h-5" />
+            </button>
+            <button
+                type="button"
+                onClick={() => setViewBy('list')}
+                className={`${viewBy === 'list' ? 'text-blue-500' : 'text-slate-500'} p-2 rounded-md bg-white`}
+            >
+                <Bars3Icon className="w-5 h-5" />
+            </button>
+        </div>
+    );
+};
 
 function BoardDetail() {
     const { id } = useParams();
-
+    const [boardTitle, setBoardTitle] = useState('');
     const [board, setBoard] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-
-    const [boardTitle, setBoardTitle] = useState('');
+    const [viewBy, setViewBy] = useState('stack');
     const [searchKeys, setSearchKeys] = useState('');
     const [toast, setToast] = useState({
         show: false,
@@ -54,7 +61,8 @@ function BoardDetail() {
             status: '',
         },
     });
-    const inputRef = useRef();
+    const [timeoutId, setTimeoutId] = useState();
+    const boardTitleInputRef = useRef();
 
     useEffect(() => {
         setIsLoading(true);
@@ -62,32 +70,34 @@ function BoardDetail() {
             const result = await fetchBoard(id);
             setBoard(result);
             setBoardTitle(result?.title);
-            console.log(result);
             setIsLoading(false);
         };
         getBoard();
-    }, [id]);
 
-    const handleInputChange = (e) => {
-        const searchKeys = e.target.value;
-        if (!searchKeys.startsWith(' ')) {
-            setSearchKeys(searchKeys);
-        }
-    };
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [id, timeoutId]);
 
-    const handleClearSearchKeys = () => {
-        setSearchKeys('');
-        inputRef.current.focus();
+    const handleBoardTitleFocusout = (e) => {
+        const newBoard = {
+            ...board,
+            title: e.target.value,
+        };
+        saveBoard(id, newBoard);
+        setBoard(newBoard);
     };
 
     return (
-        <section className="px-6 flex flex-col h-full w-full bg-slate-100">
+        <section className="px-6 flex flex-col gap-6 h-full w-full bg-slate-100">
             {/* Header */}
-            <section className="py-6 min-h-[5rem] flex items-center justify-between">
+            <section className="pt-6 min-h-[5rem] flex items-center justify-between">
                 {/* Left heading */}
                 <div className="space-y-2">
                     <LazyLoad isLoading={isLoading}>
                         <input
+                            onBlur={handleBoardTitleFocusout}
+                            ref={boardTitleInputRef}
                             onChange={(e) => setBoardTitle(e.target.value)}
                             className="caret-blue-500 bg-transparent focus:bg-white ease duration-200 outline-none ring ring-transparent rounded-md p-1 -m-1 hover:ring-blue-400 focus:ring-blue-400 text-2xl font-semibold"
                             value={boardTitle}
@@ -164,7 +174,7 @@ function BoardDetail() {
                     {/* Notify */}
                     <Button
                         type="button"
-                        className="mx-5 relative hover:bg-slate-100 hover:text-slate-500 ease-in-out duration-200 p-2 rounded-full border border-slate-100 text-slate-400"
+                        className="mx-3 relative hover:bg-slate-100 hover:text-slate-500 ease-in-out duration-200 p-2 rounded-full border border-slate-100 text-slate-400"
                     >
                         <BellIcon className="w-5 h-5" />
                         <span className="px-2 rounded-full bg-red-400 font-semibold text-slate-100 absolute -top-[30%] -right-[30%]">
@@ -175,8 +185,17 @@ function BoardDetail() {
                     <BoardMenu data={board} />
                 </div>
             </section>
-            <section style={{ overflow: 'overlay' }} className="h-full container relative">
+            {/* View by section */}
+            <section className="flexEnd">
+                <div className="flex items-center gap-2">
+                    <h4>View by:</h4>
+                    <ViewBy setViewBy={setViewBy} viewBy={viewBy} />
+                </div>
+            </section>
+            {/* Board section */}
+            <section style={{ overflowX: 'overlay', overflowY: 'hidden' }} className="h-full w-full relative">
                 <Board
+                    direction={viewBy === 'stack' ? 'horizontal' : 'vertical'}
                     board={board}
                     setBoard={setBoard}
                     setToast={setToast}

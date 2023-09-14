@@ -1,0 +1,23 @@
+.column-stack {
+    @apply space-y-2 w-[24rem] flex flex-col gap-3 p-4 bg-white rounded-xl max-h-full;
+}
+
+.column-list {
+    @apply space-y-2 w-full flex flex-col p-4 gap-3 bg-white rounded-xl max-h-full;
+}
+
+.add_task-stack {
+    @apply text-slate-700 font-semibold w-full flex items-center p-2 rounded-md justify-center gap-2 border border-nav-border hover:bg-blue-100 ease-linear duration-100;
+}
+
+.add_task-list {
+    @apply text-slate-700 font-semibold flex items-center py-2 px-12 rounded-md justify-center gap-2 border border-nav-border hover:bg-blue-100 ease-linear duration-100;
+}
+
+.create_task_form-stack {
+    @apply bg-slate-600 rounded-md border border-nav-border p-2 space-y-2;
+}
+
+.create_task_form-list {
+    @apply bg-slate-600 w-[24rem] rounded-md border border-nav-border p-2 space-y-2;
+}

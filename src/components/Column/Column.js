@@ -6,10 +6,15 @@ import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { createTask, saveColumn } from '~/lib/actions';
 import { actions, useStore } from '~/store';
+import classNames from 'classnames/bind';
+import styles from './Column.module.scss';
+import TaskListItem from '../TaskListItem/TaskListItem';
 
-const CreateTaskBtn = ({ boardId, column }) => {
+const cx = classNames.bind(styles);
+
+const CreateTaskBtn = ({ direction, boardId, column }) => {
     const [openForm, setOpenForm] = useState(false);
-    const [, dispatch] = useStore();
+    const [state, dispatch] = useStore();
     const inputRef = useRef();
     const [taskTitle, setTaskTitle] = useState('');
 
@@ -23,7 +28,7 @@ const CreateTaskBtn = ({ boardId, column }) => {
             id: taskId,
             title: taskTitle,
             description: "Click to edit this task's description",
-            boarId: boardId,
+            boardId: boardId,
             reference: column.title,
         };
         const newColumn = {
@@ -46,13 +51,15 @@ const CreateTaskBtn = ({ boardId, column }) => {
     };
 
     return !openForm ? (
-        <button
-            type="button"
-            onClick={() => setOpenForm((prev) => !prev)}
-            className="text-slate-700 font-semibold flex items-center p-2 rounded-md w-full justify-center gap-2 border border-nav-border hover:bg-blue-100 ease duration-100"
-        >
-            Add a task
-        </button>
+        <div className="w-full">
+            <button
+                type="button"
+                onClick={() => setOpenForm((prev) => !prev)}
+                className={direction === 'horizontal' ? cx('add_task-stack') : cx('add_task-list')}
+            >
+                Add a task
+            </button>
+        </div>
     ) : (
         <Transition
             show={openForm}
@@ -63,7 +70,7 @@ const CreateTaskBtn = ({ boardId, column }) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
         >
-            <div className="bg-slate-600 rounded-md border border-nav-border p-2 space-y-2">
+            <div className={direction === 'horizontal' ? cx('create_task_form-stack') : cx('create_task_form-list')}>
                 <input
                     ref={inputRef}
                     value={taskTitle}
@@ -92,7 +99,7 @@ const CreateTaskBtn = ({ boardId, column }) => {
     );
 };
 
-const Column = ({ boardId, column, tasks = [], index }) => {
+const Column = ({ direction, boardId, column, tasks = [], index }) => {
     return (
         <Draggable key={column?.id} draggableId={column?.id} index={index}>
             {(provided) => {
@@ -101,7 +108,7 @@ const Column = ({ boardId, column, tasks = [], index }) => {
                         {...provided.dragHandleProps}
                         {...provided.draggableProps}
                         ref={provided.innerRef}
-                        className="space-y-2 w-[24rem] flex flex-col p-4 bg-white rounded-xl"
+                        className={direction === 'horizontal' ? cx('column-stack') : cx('column-list')}
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -112,23 +119,42 @@ const Column = ({ boardId, column, tasks = [], index }) => {
                                 <EllipsisVerticalIcon className="w-5 h-5" />
                             </button>
                         </div>
-                        <Droppable direction="vertical" droppableId={column?.id} type="TASK">
-                            {(provided, snapshot) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.droppableProps}
-                                    className={`${
-                                        snapshot.isDraggingOver ? 'bg-blue-100' : 'bg-transparent'
-                                    } space-y-4 rounded-md ease duration-100 h-full p-2 mb-4`}
-                                >
-                                    {tasks.map((task, index) => (
-                                        <Task task={task} index={index} />
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                        <CreateTaskBtn boardId={boardId} column={column} />
+                        {direction === 'horizontal' ? (
+                            <Droppable direction="vertical" droppableId={column?.id} type="TASK">
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                        className={`${
+                                            snapshot.isDraggingOver ? 'bg-blue-100' : 'bg-transparent'
+                                        } space-y-4 rounded-md ease duration-100 p-2 -mx-2 mb-4 overflow-y-auto`}
+                                    >
+                                        {tasks.map((task, index) => (
+                                            <Task task={task} index={index} />
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        ) : (
+                            <Droppable direction="vertical" droppableId={column?.id} type="TASK">
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                        className={`${
+                                            snapshot.isDraggingOver ? 'bg-blue-100' : 'bg-transparent'
+                                        } space-y-4 rounded-md ease duration-100 mb-4 overflow-y-auto`}
+                                    >
+                                        {tasks.map((task, index) => (
+                                            <TaskListItem task={task} index={index} />
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        )}
+                        <CreateTaskBtn direction={direction} boardId={boardId} column={column} />
                     </div>
                 );
             }}

@@ -57,3 +57,11 @@ input {
 .flexStart {
     @apply flex items-center justify-start;
 }
+
+.flexEnd {
+    @apply flex items-center justify-end;
+}
+
+.flexAround {
+    @apply flex items-center justify-around;
+}
