@@ -1,28 +1,23 @@
-import { Tab } from '@headlessui/react';
 import {
-    Bars2Icon,
-    Bars3BottomRightIcon,
+    AdjustmentsHorizontalIcon,
+    ArrowsUpDownIcon,
     BellIcon,
-    FunnelIcon,
-    MagnifyingGlassIcon,
-    PlusIcon,
+    CheckCircleIcon,
+    EllipsisVerticalIcon,
     QuestionMarkCircleIcon,
     ShareIcon,
-    Square2StackIcon,
     Squares2X2Icon,
     StarIcon as StarIconOutline,
-    UserIcon,
 } from '@heroicons/react/24/outline';
-import { Bars3Icon, StarIcon as StarIconSolid, XMarkIcon } from '@heroicons/react/24/solid';
+import { Bars3Icon, StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import classNames from 'classnames/bind';
 import { useParams } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
 import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip } from '~/components';
+import FilterButton from '~/components/Board/FilterButton';
 import { fetchBoard, saveBoard } from '~/lib/actions';
-import { useDebounce } from '~/store';
 
 const cx = classNames.bind(styles);
 
@@ -53,7 +48,6 @@ function BoardDetail() {
     const [board, setBoard] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [viewBy, setViewBy] = useState('stack');
-    const [searchKeys, setSearchKeys] = useState('');
     const [toast, setToast] = useState({
         show: false,
         body: {
@@ -61,7 +55,6 @@ function BoardDetail() {
             status: '',
         },
     });
-    const [timeoutId, setTimeoutId] = useState();
     const boardTitleInputRef = useRef();
 
     useEffect(() => {
@@ -73,11 +66,7 @@ function BoardDetail() {
             setIsLoading(false);
         };
         getBoard();
-
-        return () => {
-            clearTimeout(timeoutId);
-        };
-    }, [id, timeoutId]);
+    }, [id]);
 
     const handleBoardTitleFocusout = (e) => {
         const newBoard = {
@@ -89,7 +78,7 @@ function BoardDetail() {
     };
 
     return (
-        <section className="px-6 flex flex-col gap-6 h-full w-full bg-slate-100">
+        <section className="px-6 flex flex-col gap-4 h-full w-full bg-slate-100">
             {/* Header */}
             <section className="pt-6 min-h-[5rem] flex items-center justify-between">
                 {/* Left heading */}
@@ -190,6 +179,22 @@ function BoardDetail() {
                 <div className="flex items-center gap-2">
                     <h4>View by:</h4>
                     <ViewBy setViewBy={setViewBy} viewBy={viewBy} />
+                </div>
+            </section>
+            {/* Filters */}
+            <section className="flexEnd">
+                <div className="flex items-center gap-2">
+                    <FilterButton leftIcon={<CheckCircleIcon />} title={'All task'} />
+                    <FilterButton leftIcon={<Squares2X2Icon />} title={'Customize'} />
+                    <FilterButton leftIcon={<ArrowsUpDownIcon />} title={'Sort'} />
+                    <FilterButton leftIcon={<AdjustmentsHorizontalIcon />} title={'Filter'} />
+                    <FilterButton
+                        title={
+                            <span className="w-5 h-5">
+                                <EllipsisVerticalIcon />
+                            </span>
+                        }
+                    />
                 </div>
             </section>
             {/* Board section */}
