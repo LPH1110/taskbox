@@ -110,11 +110,10 @@ const CreateListBtn = ({ direction, boardId, setBoard, setToast, dispatch }) => 
     );
 };
 
-const Board = ({ direction = 'horizontal', board, setBoard, boardId, columnOrder = [], setToast }) => {
+const Board = ({ direction = 'horizontal', board, setBoard, columnOrder = [], setToast }) => {
     const [state, dispatch] = useStore();
     const { tasks, columns } = state;
     const [timeoutId, setTimeoutId] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
 
     const onDragEnd = (result) => {
         const { destination, type, source, draggableId } = result;
@@ -192,7 +191,7 @@ const Board = ({ direction = 'horizontal', board, setBoard, boardId, columnOrder
                             columnOrder: newOrder,
                         };
 
-                        const savingBoard = async () => await saveBoard(boardId, newBoard);
+                        const savingBoard = async () => await saveBoard(board.id, newBoard);
 
                         savingBoard();
 
@@ -207,15 +206,12 @@ const Board = ({ direction = 'horizontal', board, setBoard, boardId, columnOrder
 
     useEffect(() => {
         const getData = async () => {
-            const columnsResult = await fetchColumns(boardId);
-            const tasksResult = await fetchTasks(boardId);
-
+            const columnsResult = await fetchColumns(board.id);
+            const tasksResult = await fetchTasks(board.id);
             const columnData = convertObjFromArray(columnsResult);
             const taskData = convertObjFromArray(tasksResult);
-
             dispatch(actions.updateColumns(columnData));
             dispatch(actions.updateTasks(taskData));
-            setIsLoading(false);
         };
 
         getData();
@@ -225,13 +221,9 @@ const Board = ({ direction = 'horizontal', board, setBoard, boardId, columnOrder
         };
     }, []);
 
-    return isLoading ? (
-        <div>
-            <p className="text-description text-sm">Fetching your data...</p>
-        </div>
-    ) : (
+    return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable direction={direction} droppableId={boardId} type="COLUMN">
+            <Droppable key={board.id} direction={direction} droppableId={board.id} type="COLUMN">
                 {(provided) => {
                     return (
                         <div
@@ -249,9 +241,8 @@ const Board = ({ direction = 'horizontal', board, setBoard, boardId, columnOrder
                                     <div className={`${direction === 'vertical' ? 'w-full' : 'h-full'}`}>
                                         <Column
                                             direction={direction}
-                                            boardId={boardId}
+                                            boardId={board.id}
                                             index={index}
-                                            key={columnId}
                                             column={column}
                                             tasks={taskList}
                                         />
@@ -263,7 +254,7 @@ const Board = ({ direction = 'horizontal', board, setBoard, boardId, columnOrder
                             <CreateListBtn
                                 direction={direction}
                                 dispatch={dispatch}
-                                boardId={boardId}
+                                boardId={board.id}
                                 setBoard={setBoard}
                                 setToast={setToast}
                             />

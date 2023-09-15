@@ -87,7 +87,11 @@ function Workspaces() {
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                     {/* Boards */}
                     {boards.map((board) => (
-                        <Link className="bg-white rounded-xl p-6 space-y-4" key={board?.id} to={`/boards/${board?.id}`}>
+                        <Link
+                            className="bg-white rounded-xl p-6 space-y-4"
+                            key={board?.id}
+                            to={`/boards/${board?.title}`}
+                        >
                             <div className="flexStart gap-3">
                                 <div className="text-transparent h-full w-3 rounded-sm bg-purple-400">something</div>
                                 <h1 className="font-semibold text-lg">{board.title}</h1>

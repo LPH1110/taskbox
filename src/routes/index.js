@@ -18,7 +18,7 @@ import ProtectedRoute from './ProtectedRoute';
 
 const publicRoutes = [
     { id: uuidv4(), protected: false, path: '/', component: Home, layout: HomeLayout },
-    { id: uuidv4(), protected: true, path: '/boards/:id', component: BoardDetail, layout: DefaultLayout },
+    { id: uuidv4(), protected: true, path: '/boards/:title', component: BoardDetail, layout: DefaultLayout },
     { id: uuidv4(), protected: true, path: '/workspaces', component: Workspaces, layout: DefaultLayout },
     { id: uuidv4(), protected: true, path: '/overview', component: Overview, layout: DefaultLayout },
     { id: uuidv4(), protected: true, path: '/inbox', component: Inbox, layout: DefaultLayout },

@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
-import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip } from '~/components';
+import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip, UserAvatar } from '~/components';
 import FilterButton from '~/components/Board/FilterButton';
 import { fetchBoard, saveBoard } from '~/lib/actions';
 
@@ -43,10 +43,10 @@ const ViewBy = ({ viewBy, setViewBy }) => {
 };
 
 function BoardDetail() {
-    const { id } = useParams();
+    const { title } = useParams();
     const [boardTitle, setBoardTitle] = useState('');
     const [board, setBoard] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [viewBy, setViewBy] = useState('stack');
     const [toast, setToast] = useState({
         show: false,
@@ -58,26 +58,28 @@ function BoardDetail() {
     const boardTitleInputRef = useRef();
 
     useEffect(() => {
-        setIsLoading(true);
         const getBoard = async () => {
-            const result = await fetchBoard(id);
+            const result = await fetchBoard(title);
+            console.log(result);
             setBoard(result);
             setBoardTitle(result?.title);
             setIsLoading(false);
         };
         getBoard();
-    }, [id]);
+    }, [title]);
 
     const handleBoardTitleFocusout = (e) => {
         const newBoard = {
             ...board,
             title: e.target.value,
         };
-        saveBoard(id, newBoard);
+        saveBoard(board?.id, newBoard);
         setBoard(newBoard);
     };
 
-    return (
+    return board?.deletedAt ? (
+        <div className="text-blue-500 text-xl">404 NOT FOUND</div>
+    ) : (
         <section className="px-6 flex flex-col gap-4 h-full w-full bg-slate-100">
             {/* Header */}
             <section className="pt-6 min-h-[5rem] flex items-center justify-between">
@@ -171,7 +173,9 @@ function BoardDetail() {
                         </span>
                     </Button>
                     {/* Avatar menu */}
-                    <BoardMenu data={board} />
+                    <div className="hover:bg-slate-100 p-1 ease-in-out duration-200 rounded-full flex items-center">
+                        <UserAvatar width="w-9" />
+                    </div>
                 </div>
             </section>
             {/* View by section */}
@@ -188,25 +192,30 @@ function BoardDetail() {
                     <FilterButton leftIcon={<Squares2X2Icon />} title={'Customize'} />
                     <FilterButton leftIcon={<ArrowsUpDownIcon />} title={'Sort'} />
                     <FilterButton leftIcon={<AdjustmentsHorizontalIcon />} title={'Filter'} />
-                    <FilterButton
-                        title={
-                            <span className="w-5 h-5">
-                                <EllipsisVerticalIcon />
-                            </span>
-                        }
-                    />
+                    <BoardMenu data={board} setBoard={setBoard} setToast={setToast}>
+                        <FilterButton
+                            title={
+                                <span className="w-5 h-5">
+                                    <EllipsisVerticalIcon />
+                                </span>
+                            }
+                        />
+                    </BoardMenu>
                 </div>
             </section>
             {/* Board section */}
             <section style={{ overflowX: 'overlay', overflowY: 'hidden' }} className="h-full w-full relative">
-                <Board
-                    direction={viewBy === 'stack' ? 'horizontal' : 'vertical'}
-                    board={board}
-                    setBoard={setBoard}
-                    setToast={setToast}
-                    boardId={id}
-                    columnOrder={board?.columnOrder}
-                />
+                {isLoading ? (
+                    <div>Fetching your boards...</div>
+                ) : (
+                    <Board
+                        direction={viewBy === 'stack' ? 'horizontal' : 'vertical'}
+                        board={board}
+                        setBoard={setBoard}
+                        setToast={setToast}
+                        columnOrder={board?.columnOrder}
+                    />
+                )}
             </section>
             {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
         </section>

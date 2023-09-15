@@ -16,7 +16,7 @@ import {
     ChevronLeftIcon,
 } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
-import { Fragment, useState, useCallback } from 'react';
+import { Fragment, useState, useCallback, useEffect } from 'react';
 import { UserAvatar, Toast } from '~/components';
 import Spacer from '../Spacer/Spacer';
 import styles from './BoardMenu.module.scss';
@@ -25,6 +25,7 @@ import SettingsMenu from './SettingsMenu';
 import ActivityMenu from './ActivityMenu';
 import ArchivedMenu from './ArchivedMenu';
 import ChangeBackgroundMenu from './ChangeBackgroundMenu';
+import { saveBoard } from '~/lib/actions';
 
 const cx = classNames.bind(styles);
 
@@ -32,6 +33,8 @@ const MenuList = ({ data, setCurrentMenu }) => {
     const handleClick = (item) => {
         if (item?.path) {
             setCurrentMenu((prev) => [...prev, { title: item?.title, path: item?.path }]);
+        } else if (item?.onClick) {
+            item.onClick();
         }
     };
     return (
@@ -61,8 +64,9 @@ const MenuList = ({ data, setCurrentMenu }) => {
     );
 };
 
-const BoardMenu = ({ data }) => {
+const BoardMenu = ({ setToast, setBoard, children, data }) => {
     const [openModal, setOpenModal] = useState(false);
+    const [timeoutId, setTimeoutId] = useState();
     const [currentMenu, setCurrentMenu] = useState([
         {
             title: 'Menu',
@@ -134,6 +138,26 @@ const BoardMenu = ({ data }) => {
             id: uuidv4(),
             title: 'Close board',
             icon: <MinusIcon className="w-5 h-5" />,
+            onClick() {
+                const newBoard = {
+                    ...data,
+                    deletedAt: new Date().toString(),
+                };
+                saveBoard(data?.id, newBoard);
+                setBoard(newBoard);
+                setToast({
+                    show: true,
+                    body: {
+                        message: 'This board has been temporarily deleted.',
+                        status: 'error',
+                    },
+                });
+                setTimeoutId(
+                    setTimeout(() => {
+                        setToast((prev) => ({ ...prev, show: false }));
+                    }, 3000),
+                );
+            },
         },
     ]);
     const [toast] = useState({
@@ -173,15 +197,16 @@ const BoardMenu = ({ data }) => {
         });
     };
 
+    useEffect(() => {
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [timeoutId]);
+
     return (
         <div className="flex items-center justify-center relative z-10 flex-col">
             <Menu as="div">
-                <Menu.Button
-                    onClick={() => setOpenModal((prev) => !prev)}
-                    className="hover:bg-slate-100 p-1 ease-in-out duration-200 rounded-full flex items-center"
-                >
-                    <UserAvatar width="w-9" />
-                </Menu.Button>
+                <Menu.Button onClick={() => setOpenModal((prev) => !prev)}>{children}</Menu.Button>
                 <Transition
                     show={openModal}
                     as={Fragment}
