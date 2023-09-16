@@ -6,10 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { Toast } from '~/components';
 import CreateBoardMenu from '~/components/CreateBoardMenu/CreateBoardMenu';
 import { UserAuth } from '~/contexts/AuthContext';
-import { fetchBoards } from '~/lib/actions';
+import { fetchBoards, fetchColumns } from '~/lib/actions';
 import ClosedBoards from './ClosedBoards';
 import styles from './Workspaces.module.scss';
 import { actions, useStore } from '~/store';
+import BoardItem from './BoardItem';
 
 const cx = classNames.bind(styles);
 
@@ -67,11 +68,13 @@ function Workspaces() {
         },
     });
 
+    console.log(boards);
+
     useEffect(() => {
         const getBoards = async () => {
             try {
-                const result = await fetchBoards(user?.uid);
-                dispatch(actions.updateBoards(result));
+                const boardsResult = await fetchBoards(user?.uid);
+                dispatch(actions.updateBoards(boardsResult));
             } catch (error) {
                 console.log(error);
             }
@@ -89,39 +92,7 @@ function Workspaces() {
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                     {/* Boards */}
                     {boards.map((board) => {
-                        return (
-                            !board.deletedAt && (
-                                <Link
-                                    className="bg-white rounded-xl p-6 space-y-4"
-                                    key={board?.id}
-                                    to={`/boards/${board?.title}`}
-                                >
-                                    <div className="flexStart gap-3">
-                                        <div className="text-transparent h-full w-3 rounded-sm bg-purple-400">
-                                            something
-                                        </div>
-                                        <h1 className="font-semibold text-lg">{board.title}</h1>
-                                    </div>
-                                    <div className="space-y-1">
-                                        {statusList.map((status) => (
-                                            <div key={status.id} className="flexBetween">
-                                                <p className="text-slate-700">{status.columnTitle}</p>
-                                                <span className="text-description">{status.count}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="avatar-group -space-x-3">
-                                        {members.map((mem) => (
-                                            <div className="avatar" key={mem.id}>
-                                                <div className="w-8">
-                                                    <img async src={mem.avatarURL} alt="mem-avatar" />
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </Link>
-                            )
-                        );
+                        return !board.deletedAt && <BoardItem board={board} members={members} />;
                     })}
 
                     {/* Create Boards Button */}
