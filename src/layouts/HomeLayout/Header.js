@@ -3,7 +3,7 @@ import { Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Button, UserAvatar } from '~/components';
+import { Button, UserAvatar, UserMenu } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
 import TabPopper from './TabPopper';
 
@@ -142,8 +142,10 @@ function Header() {
             <div className="flex items-center">
                 {user ? (
                     <>
-                        <h4 className="text-slate-700 mr-2 font-semibold">Hi, {user?.displayName}</h4>
-                        <UserAvatar width="w-10" />
+                        <h4 className="text-slate-700 mr-2 font-semibold">Hi, {user?.displayName || 'taskboxer'}</h4>
+                        <UserMenu>
+                            <UserAvatar width="w-10" />
+                        </UserMenu>
                     </>
                 ) : (
                     <>

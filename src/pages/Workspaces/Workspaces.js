@@ -92,7 +92,7 @@ function Workspaces() {
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                     {/* Boards */}
                     {boards.map((board) => {
-                        return !board.deletedAt && <BoardItem board={board} members={members} />;
+                        return !board.deletedAt && <BoardItem key={board.id} board={board} members={members} />;
                     })}
 
                     {/* Create Boards Button */}

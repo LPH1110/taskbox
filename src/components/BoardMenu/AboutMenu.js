@@ -7,7 +7,10 @@ import { Link } from 'react-router-dom';
 
 const AboutMenu = ({ setCurrentMenu }) => {
     const { user } = UserAuth();
-    console.log(user);
+    const handleChangePermission = (e) => {
+        e.stopPropagation();
+        setCurrentMenu((prev) => [...prev, { title: 'Settings', path: '/settings' }]);
+    };
     return (
         <div className="flex flex-col gap-3 w-full">
             <div className="flex items-center justify-start gap-2 font-semibold">
@@ -53,7 +56,7 @@ const AboutMenu = ({ setCurrentMenu }) => {
                 <button
                     className="py-2 px-3 rounded-sm bg-slate-100 hover:bg-slate-200 ease duration-100"
                     type="button"
-                    onClick={() => setCurrentMenu((prev) => [...prev, { title: 'Settings', path: '/settings' }])}
+                    onClick={handleChangePermission}
                 >
                     Change permissions...
                 </button>

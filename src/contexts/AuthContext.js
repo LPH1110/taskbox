@@ -1,16 +1,14 @@
-import { useContext, createContext, useEffect, useState } from 'react';
 import {
     GoogleAuthProvider,
-    signInWithPopup,
-    signInWithRedirect,
-    signOut,
-    onAuthStateChanged,
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
+    onAuthStateChanged,
     sendPasswordResetEmail,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    signOut,
 } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '~/firebase-config';
-import { Spinner } from '~/components';
 
 const AuthContext = createContext();
 

@@ -41,7 +41,6 @@ function Profile() {
         }),
 
         onSubmit(data) {
-            console.log(data);
             setLoading(true);
             saveProfile(data);
             saveAction({
@@ -71,7 +70,6 @@ function Profile() {
     const saveProfile = async (data) => {
         try {
             const imageURL = await getImageURL();
-            console.log(imageURL);
             await updateProfile(user, {
                 displayName: data.displayName || user.displayName,
                 photoURL: imageURL || user.photoURL,

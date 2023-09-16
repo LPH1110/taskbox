@@ -76,7 +76,7 @@ const ClosedBoard = ({ setBoard, board, setToast }) => {
                 setTimeout(() => {
                     setToast((prev) => ({ ...prev, show: false }));
                     navigate('/workspaces');
-                }, 2000),
+                }, 1000),
             );
         }
     };

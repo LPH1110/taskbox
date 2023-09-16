@@ -90,16 +90,17 @@ function UserTab({ loading, formik, user, setToast }) {
         <Tab.Group>
             <Tab.List className="flex">
                 {tabs.map((tab) => (
-                    <Tab as={Fragment} key={tab.id}>
+                    <Tab as={Fragment}>
                         {({ selected }) => {
                             return (
                                 <Button
+                                    key={tab.id}
                                     type="button"
                                     className={
                                         selected ? 'text-blue-600 shadow-md ease duration-200' : 'text-slate-500'
                                     }
                                     size="medium"
-                                    onClick={tab.title.localeCompare('Activity') === 0 && getActivities()}
+                                    // onClick={tab.title.localeCompare('Activity') === 0 && getActivities()}
                                 >
                                     {tab.title}
                                 </Button>

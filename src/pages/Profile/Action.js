@@ -5,15 +5,13 @@ import styles from './Profile.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Action({ key, user, data }) {
+function Action({ user, data }) {
     const formatDateTime = (date) => {
         return format(date, 'MMM dd, yyyy') + ' at ' + format(date, 'HH:mm');
     };
 
-    console.log(typeof data.date);
-
     return (
-        <div key={key} className={cx('activity', 'flex items-center w-full py-2')}>
+        <div className={cx('activity', 'flex items-center w-full py-2')}>
             <div className="avatar">
                 <div className="w-8 rounded-full">
                     <img src={user?.photoURL} alt={user?.displayName} />

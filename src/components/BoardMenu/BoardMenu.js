@@ -14,7 +14,7 @@ import {
     XMarkIcon,
 } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Toast } from '~/components';
 import { saveBoard } from '~/lib/actions';
@@ -29,7 +29,8 @@ import SettingsMenu from './SettingsMenu';
 const cx = classNames.bind(styles);
 
 const MenuList = ({ data, setCurrentMenu }) => {
-    const handleClick = (item) => {
+    const handleClick = (e, item) => {
+        e.stopPropagation();
         if (item?.path) {
             setCurrentMenu((prev) => [...prev, { title: item?.title, path: item?.path }]);
         } else if (item?.onClick) {
@@ -41,7 +42,7 @@ const MenuList = ({ data, setCurrentMenu }) => {
             {data.map((item) => (
                 <Fragment key={item?.id}>
                     <Menu.Item className={cx('board_menu-item')}>
-                        <button className="items-start w-full" onClick={() => handleClick(item)}>
+                        <button className="items-start w-full" onClick={(e) => handleClick(e, item)}>
                             {item?.thumbnailURL ? (
                                 <div
                                     style={{ backgroundImage: `url(${item.thumbnailURL})` }}
@@ -66,13 +67,13 @@ const MenuList = ({ data, setCurrentMenu }) => {
 const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
     const [openModal, setOpenModal] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
-    const [menuHeight, setMenuHeight] = useState(window.innerHeight);
     const [currentMenu, setCurrentMenu] = useState([
         {
             title: 'Menu',
             path: '/',
         },
     ]);
+    const menuRef = useRef();
 
     const [boardMenu] = useState([
         {
@@ -165,6 +166,12 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
         show: false,
     });
 
+    const handleClickOutside = (e) => {
+        if (menuRef.current && !menuRef.current.contains(e.target)) {
+            setOpenModal(false);
+        }
+    };
+
     const renderMenu = () => {
         switch (currentMenu[currentMenu.length - 1]?.path) {
             case '/about':
@@ -182,7 +189,8 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
         }
     };
 
-    const handleBackMenu = () => {
+    const handleBackMenu = (e) => {
+        e.stopPropagation();
         setCurrentMenu((prev) => {
             if (prev.length > 1) {
                 const last = prev[prev.length - 1];
@@ -195,6 +203,13 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
     };
 
     useEffect(() => {
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
         return () => {
             clearTimeout(timeoutId);
         };
@@ -202,7 +217,7 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
 
     return (
         <div className="flex items-center justify-center relative z-10 flex-col">
-            <Menu as="div" className="">
+            <Menu as="div">
                 <Menu.Button onClick={() => setOpenModal((prev) => !prev)}>{children}</Menu.Button>
                 <Transition
                     show={openModal}
@@ -214,7 +229,7 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items style={{ overflow: 'overlay' }} className={cx('board_menu-items')}>
+                    <Menu.Items ref={menuRef} style={{ overflow: 'overlay' }} className={cx('board_menu-items')}>
                         {currentMenu[currentMenu.length - 1].path !== '/' && (
                             <button
                                 onClick={handleBackMenu}
