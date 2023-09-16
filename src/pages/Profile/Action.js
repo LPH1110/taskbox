@@ -10,6 +10,8 @@ function Action({ key, user, data }) {
         return format(date, 'MMM dd, yyyy') + ' at ' + format(date, 'HH:mm');
     };
 
+    console.log(typeof data.date);
+
     return (
         <div key={key} className={cx('activity', 'flex items-center w-full py-2')}>
             <div className="avatar">

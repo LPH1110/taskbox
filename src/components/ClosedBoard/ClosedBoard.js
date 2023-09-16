@@ -22,7 +22,7 @@ const ClosedBoard = ({ setBoard, board, setToast }) => {
             userId: user.uid,
             action: 'reopened',
             message: board.title,
-            date: new Date().toString(),
+            date: new Date(),
         });
 
         setToast({

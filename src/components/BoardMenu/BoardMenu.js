@@ -135,7 +135,7 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
                 setBoard((prev) => {
                     const newBoard = {
                         ...prev,
-                        deletedAt: new Date().toString(),
+                        deletedAt: new Date(),
                     };
                     const boardId = prev.id;
                     saveBoard(boardId, newBoard);
