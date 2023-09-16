@@ -8,9 +8,11 @@ import { UserAuth } from '~/contexts/AuthContext';
 import { fetchBoards, createBoard } from '~/lib/actions';
 import ComboboxWrapper from '../ComboboxWrapper';
 import FormField from '../FormField';
+import { actions, useStore } from '~/store';
 
 const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
     const { user } = UserAuth();
+    const [state, dispatch] = useStore();
     const [visibilities] = useState([
         {
             id: uuidv4(),
@@ -76,7 +78,7 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
                     },
                 });
                 const boards = await fetchBoards(user?.uid);
-                setBoards(boards);
+                dispatch(actions.updateBoards(boards));
                 setOpenModal(false);
             } else {
                 setToast({

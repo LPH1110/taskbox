@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import classNames from 'classnames/bind';
 import styles from './ClosedBoardRow.module.scss';
@@ -7,24 +7,61 @@ import { UserAuth } from '~/contexts/AuthContext';
 import { ActivityAuth } from '~/contexts/ActivityContext';
 import { Button } from '~/components';
 import { useStore, actions } from '~/store';
+import { saveBoard } from '~/lib/actions';
 
 const cx = classNames.bind(styles);
 
-function ClosedBoardRow({ data, setToast }) {
-    const [dispatch] = useStore();
+function ClosedBoardRow({ setBoards, data, setToast }) {
+    const [state, dispatch] = useStore();
     const { user } = UserAuth();
     const { saveAction } = ActivityAuth();
+    const [timeoutId, setTimeoutId] = useState();
 
     const handleReOpenBoard = (e) => {
         e.preventDefault();
-        dispatch(actions.changeBoardStatus({ boardId: data.id, closed: false }));
+        const newBoard = {
+            ...data,
+            deletedAt: null,
+        };
+
+        // update board in db
+        saveBoard(data.id, newBoard);
+
+        // update board in reducer store
+        dispatch(actions.updateBoardById(data.id, { deletedAt: null }));
+
+        // Saved yuser's activity
         saveAction({
             userId: user.uid,
             action: 'reopened',
             message: data.title,
             date: new Date(),
         });
+
+        // Show toast message when succeed
+        setToast({
+            show: true,
+            body: {
+                message: `Reopened board (${data.title}) successfully.`,
+                status: 'success',
+            },
+        });
+
+        // timeout to hide toast
+        setTimeoutId(
+            setTimeout(() => {
+                setToast((prev) => ({ ...prev, show: false }));
+            }, 3000),
+        );
     };
+
+    const handleDeleteBoard = () => {};
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [timeoutId]);
 
     return (
         <div className="py-4">
@@ -34,6 +71,7 @@ function ClosedBoardRow({ data, setToast }) {
                     <Button
                         type="button"
                         size="small"
+                        onClick={handleDeleteBoard}
                         leftIcon={<XMarkIcon className="w-5 h-5" />}
                         className="rounded-sm bg-slate-200 text-slate-700 hover:bg-slate-200/80 ease-in-out duration-200"
                     >

@@ -9,6 +9,7 @@ import { UserAuth } from '~/contexts/AuthContext';
 import { fetchBoards } from '~/lib/actions';
 import ClosedBoards from './ClosedBoards';
 import styles from './Workspaces.module.scss';
+import { actions, useStore } from '~/store';
 
 const cx = classNames.bind(styles);
 
@@ -56,7 +57,8 @@ const members = [
 
 function Workspaces() {
     const { user } = UserAuth();
-    const [boards, setBoards] = useState([]);
+    const [state, dispatch] = useStore();
+    const { boards } = state;
     const [toast, setToast] = useState({
         show: false,
         body: {
@@ -69,14 +71,14 @@ function Workspaces() {
         const getBoards = async () => {
             try {
                 const result = await fetchBoards(user?.uid);
-                setBoards(result);
+                dispatch(actions.updateBoards(result));
             } catch (error) {
                 console.log(error);
             }
         };
 
         getBoards();
-    }, [user?.uid]);
+    }, [user?.uid, dispatch]);
 
     return (
         <section className="p-6">
@@ -86,42 +88,48 @@ function Workspaces() {
                 </h1>
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                     {/* Boards */}
-                    {boards.map((board) => (
-                        <Link
-                            className="bg-white rounded-xl p-6 space-y-4"
-                            key={board?.id}
-                            to={`/boards/${board?.title}`}
-                        >
-                            <div className="flexStart gap-3">
-                                <div className="text-transparent h-full w-3 rounded-sm bg-purple-400">something</div>
-                                <h1 className="font-semibold text-lg">{board.title}</h1>
-                            </div>
-                            <div className="space-y-1">
-                                {statusList.map((status) => (
-                                    <div key={status.id} className="flexBetween">
-                                        <p className="text-slate-700">{status.columnTitle}</p>
-                                        <span className="text-description">{status.count}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="avatar-group -space-x-3">
-                                {members.map((mem) => (
-                                    <div className="avatar" key={mem.id}>
-                                        <div className="w-8">
-                                            <img async src={mem.avatarURL} alt="mem-avatar" />
+                    {boards.map((board) => {
+                        return (
+                            !board.deletedAt && (
+                                <Link
+                                    className="bg-white rounded-xl p-6 space-y-4"
+                                    key={board?.id}
+                                    to={`/boards/${board?.title}`}
+                                >
+                                    <div className="flexStart gap-3">
+                                        <div className="text-transparent h-full w-3 rounded-sm bg-purple-400">
+                                            something
                                         </div>
+                                        <h1 className="font-semibold text-lg">{board.title}</h1>
                                     </div>
-                                ))}
-                            </div>
-                        </Link>
-                    ))}
+                                    <div className="space-y-1">
+                                        {statusList.map((status) => (
+                                            <div key={status.id} className="flexBetween">
+                                                <p className="text-slate-700">{status.columnTitle}</p>
+                                                <span className="text-description">{status.count}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="avatar-group -space-x-3">
+                                        {members.map((mem) => (
+                                            <div className="avatar" key={mem.id}>
+                                                <div className="w-8">
+                                                    <img async src={mem.avatarURL} alt="mem-avatar" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Link>
+                            )
+                        );
+                    })}
 
                     {/* Create Boards Button */}
-                    <CreateBoardMenu setBoards={setBoards} setToast={setToast} />
+                    <CreateBoardMenu setToast={setToast} />
                 </section>
             </div>
             <section className="mt-12">
-                <ClosedBoards />
+                <ClosedBoards boards={boards} />
             </section>
             {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
         </section>

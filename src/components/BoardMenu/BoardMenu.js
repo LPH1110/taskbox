@@ -1,31 +1,30 @@
 import { Menu, Transition } from '@headlessui/react';
-import { v4 as uuidv4 } from 'uuid';
 import {
     ArchiveBoxIcon,
-    ChevronDownIcon,
+    ChevronLeftIcon,
     Cog6ToothIcon,
-    ExclamationCircleIcon,
-    QueueListIcon,
-    TagIcon,
-    EyeIcon,
     DocumentDuplicateIcon,
     EnvelopeIcon,
-    ShareIcon,
+    ExclamationCircleIcon,
+    EyeIcon,
     MinusIcon,
+    QueueListIcon,
+    ShareIcon,
+    TagIcon,
     XMarkIcon,
-    ChevronLeftIcon,
 } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
-import { Fragment, useState, useCallback, useEffect } from 'react';
-import { UserAvatar, Toast } from '~/components';
+import { Fragment, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { Toast } from '~/components';
+import { saveBoard } from '~/lib/actions';
 import Spacer from '../Spacer/Spacer';
-import styles from './BoardMenu.module.scss';
 import AboutMenu from './AboutMenu';
-import SettingsMenu from './SettingsMenu';
 import ActivityMenu from './ActivityMenu';
 import ArchivedMenu from './ArchivedMenu';
+import styles from './BoardMenu.module.scss';
 import ChangeBackgroundMenu from './ChangeBackgroundMenu';
-import { saveBoard } from '~/lib/actions';
+import SettingsMenu from './SettingsMenu';
 
 const cx = classNames.bind(styles);
 
@@ -64,7 +63,7 @@ const MenuList = ({ data, setCurrentMenu }) => {
     );
 };
 
-const BoardMenu = ({ setToast, setBoard, children, data }) => {
+const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
     const [openModal, setOpenModal] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const [currentMenu, setCurrentMenu] = useState([
@@ -104,12 +103,6 @@ const BoardMenu = ({ setToast, setBoard, children, data }) => {
         },
         {
             id: uuidv4(),
-            title: 'Change background',
-            path: '/change-background',
-            thumbnailURL: data?.thumbnailURL,
-        },
-        {
-            id: uuidv4(),
             title: 'Labels',
             icon: <TagIcon className="w-5 h-5" />,
             bottomSpacer: true,
@@ -139,12 +132,15 @@ const BoardMenu = ({ setToast, setBoard, children, data }) => {
             title: 'Close board',
             icon: <MinusIcon className="w-5 h-5" />,
             onClick() {
-                const newBoard = {
-                    ...data,
-                    deletedAt: new Date().toString(),
-                };
-                saveBoard(data?.id, newBoard);
-                setBoard(newBoard);
+                setBoard((prev) => {
+                    const newBoard = {
+                        ...prev,
+                        deletedAt: new Date().toString(),
+                    };
+                    const boardId = prev.id;
+                    saveBoard(boardId, newBoard);
+                    return newBoard;
+                });
                 setToast({
                     show: true,
                     body: {
@@ -160,6 +156,7 @@ const BoardMenu = ({ setToast, setBoard, children, data }) => {
             },
         },
     ]);
+
     const [toast] = useState({
         body: {
             message: '',
@@ -205,7 +202,7 @@ const BoardMenu = ({ setToast, setBoard, children, data }) => {
 
     return (
         <div className="flex items-center justify-center relative z-10 flex-col">
-            <Menu as="div">
+            <Menu as="div" className="">
                 <Menu.Button onClick={() => setOpenModal((prev) => !prev)}>{children}</Menu.Button>
                 <Transition
                     show={openModal}

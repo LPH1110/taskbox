@@ -5,9 +5,8 @@ import { useStore } from '~/store';
 import ClosedBoardRow from './ClosedBoardRow';
 import './Modal-overrides.scss';
 
-function ClosedBoards() {
+function ClosedBoards({ boards }) {
     const [state] = useStore();
-    const { boards } = state;
     const [toast, setToast] = useState({
         body: {
             message: '',
@@ -16,6 +15,16 @@ function ClosedBoards() {
         show: false,
     });
 
+    const deletedCount = () => {
+        const count = boards.reduce((acc, board) => {
+            if (board.deletedAt) {
+                return acc + 1;
+            }
+            return acc;
+        }, 0);
+        return count;
+    };
+
     return (
         <div>
             <label
@@ -23,32 +32,14 @@ function ClosedBoards() {
                 className="cursor-pointer rounded-md py-2 px-3 bg-slate-200 text-slate-700 hover:bg-slate-200/70"
             >
                 Closed boards
-                <span className="ml-1">
-                    (
-                    {Object.entries(boards).reduce((acc, [id, board]) => {
-                        if (board.closed) {
-                            return acc + 1;
-                        }
-                        return acc;
-                    }, 0)}
-                    )
-                </span>
+                <span className="ml-1">({deletedCount()})</span>
             </label>
 
             <input type="checkbox" id="closed-board-modal" className="modal-toggle" />
             <label htmlFor="closed-board-modal" className="modal">
                 <div className="modal-box w-11/12 max-w-5xl relative" onClick={(e) => e.preventDefault()}>
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold">
-                            Closed boards (
-                            {Object.entries(boards).reduce((acc, [id, board]) => {
-                                if (board.closed) {
-                                    return acc + 1;
-                                }
-                                return acc;
-                            }, 0)}
-                            )
-                        </h2>
+                        <h2 className="text-xl font-bold">Closed boards ({deletedCount()})</h2>
                         <label
                             onClick={(e) => e.stopPropagation()}
                             htmlFor="closed-board-modal"
@@ -58,8 +49,8 @@ function ClosedBoards() {
                         </label>
                     </div>
                     <div>
-                        {Object.entries(boards).map(([id, board]) =>
-                            board.closed ? <ClosedBoardRow setToast={setToast} key={id} data={{ ...board, id }} /> : '',
+                        {boards.map((board) =>
+                            board.deletedAt ? <ClosedBoardRow setToast={setToast} key={board.id} data={board} /> : '',
                         )}
                     </div>
                 </div>

@@ -1,18 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
-    ADD_NEW_BOARD,
     ADD_NEW_COMMENT_TO_TASK,
-    CHANGE_BOARD_FAVOR,
-    CHANGE_BOARD_STATUS,
-    DELETE_BOARD,
     DELETE_COMMENT_BY_ID,
-    ONCHANGE_BOARD_TITLE,
     SET_OTP_CODE,
     SET_USER_SESSION,
-    UPDATE_COLUMN_ID,
+    UPDATE_BOARDS,
     UPDATE_COLUMNS,
+    UPDATE_COLUMN_ID,
     UPDATE_TASKS,
     UPDATE_TASK_ID,
+    UPDATE_BOARD_ID,
 } from './constants';
 
 const initState = {
@@ -21,50 +18,7 @@ const initState = {
         loggedIn: false,
         info: {},
     },
-    boards: {
-        [uuidv4()]: {
-            title: 'Board 1',
-            favor: false,
-            closed: false,
-            thumbnail:
-                'https://images.unsplash.com/32/Mc8kW4x9Q3aRR3RkP5Im_IMG_4417.jpg?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        },
-        [uuidv4()]: {
-            title: 'Board 2',
-            favor: false,
-            closed: false,
-            thumbnail:
-                'https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        },
-        [uuidv4()]: {
-            title: 'Board 3',
-            favor: false,
-            closed: false,
-            thumbnail:
-                'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        },
-        [uuidv4()]: {
-            title: 'Board 4',
-            favor: false,
-            closed: false,
-            thumbnail:
-                'https://images.unsplash.com/photo-1496715976403-7e36dc43f17b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        },
-        [uuidv4()]: {
-            title: 'Board 5',
-            favor: false,
-            closed: false,
-            thumbnail:
-                'https://images.unsplash.com/photo-1472289065668-ce650ac443d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80',
-        },
-        [uuidv4()]: {
-            title: 'Board 6',
-            favor: false,
-            closed: false,
-            thumbnail:
-                'https://images.unsplash.com/photo-1563874257547-d19fbb71b46c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-        },
-    },
+    boards: [],
     comments: {
         [uuidv4()]: {
             userId: 0,
@@ -117,10 +71,29 @@ const initState = {
 };
 
 function reducer(state, action) {
-    const { boards } = state;
     const { comments } = state;
-    let board;
     switch (action.type) {
+        case UPDATE_BOARD_ID:
+            const newBoards = state.boards.map((board) => {
+                if (board.id === action.payload.id) {
+                    return {
+                        ...board,
+                        ...action.payload.opt,
+                    };
+                } else {
+                    return board;
+                }
+            });
+            console.log(newBoards);
+            return {
+                ...state,
+                boards: newBoards,
+            };
+        case UPDATE_BOARDS:
+            return {
+                ...state,
+                boards: [...action.payload],
+            };
         case UPDATE_TASK_ID:
             console.log('update task id fired');
             return {
@@ -202,80 +175,6 @@ function reducer(state, action) {
             return {
                 ...state,
                 comments: newComments,
-            };
-        case CHANGE_BOARD_STATUS:
-            board = boards[action.payload.boardId];
-
-            if (board.favor) {
-                return {
-                    ...state,
-                    boards: {
-                        ...boards,
-                        [action.payload.boardId]: {
-                            ...board,
-                            closed: action.payload.closed,
-                            favor: false,
-                        },
-                    },
-                };
-            } else {
-                return {
-                    ...state,
-                    boards: {
-                        ...boards,
-                        [action.payload.boardId]: {
-                            ...board,
-                            closed: action.payload.closed,
-                            favor: false,
-                        },
-                    },
-                };
-            }
-
-        case CHANGE_BOARD_FAVOR:
-            board = boards[action.payload.boardId];
-
-            return {
-                ...state,
-                boards: {
-                    ...boards,
-                    [action.payload.boardId]: {
-                        ...board,
-                        favor: action.payload.favor,
-                    },
-                },
-            };
-        case ADD_NEW_BOARD:
-            return {
-                ...state,
-                boards: {
-                    ...boards,
-                    [uuidv4()]: {
-                        ...action.payload,
-                    },
-                },
-            };
-        case DELETE_BOARD:
-            delete boards[action.payload.boardId];
-
-            return {
-                ...state,
-                boards: {
-                    ...boards,
-                },
-            };
-        case ONCHANGE_BOARD_TITLE:
-            board = boards[action.payload.boardId];
-
-            return {
-                ...state,
-                boards: {
-                    ...boards,
-                    [action.payload.boardId]: {
-                        ...board,
-                        title: action.payload.value,
-                    },
-                },
             };
 
         default:

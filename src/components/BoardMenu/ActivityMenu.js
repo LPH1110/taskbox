@@ -34,6 +34,8 @@ const ActivityMenu = () => {
     const { activityRef } = ActivityAuth();
     const { user } = UserAuth();
 
+    console.log(activities);
+
     useEffect(() => {
         const fetchActivities = async () => {
             try {
@@ -47,7 +49,7 @@ const ActivityMenu = () => {
         };
 
         fetchActivities();
-    }, []);
+    }, [activityRef, user.uid]);
 
     return (
         <div className="flex flex-col justify-start w-full gap-2">

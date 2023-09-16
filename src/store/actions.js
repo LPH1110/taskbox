@@ -11,18 +11,24 @@ import {
     UPDATE_COLUMN_ID,
     UPDATE_COLUMNS,
     UPDATE_TASKS,
-    UPDATE_BOARD,
     UPDATE_TASK_ID,
+    UPDATE_BOARDS,
+    UPDATE_BOARD_ID,
 } from './constants';
+
+export const updateBoards = (payload) => ({
+    type: UPDATE_BOARDS,
+    payload,
+});
 
 export const updateTaskById = (payload) => ({
     type: UPDATE_TASK_ID,
     payload,
 });
 
-export const updateBoardById = (payload) => ({
-    type: UPDATE_BOARD,
-    payload,
+export const updateBoardById = (id, opt) => ({
+    type: UPDATE_BOARD_ID,
+    payload: { id, opt },
 });
 
 export const updateColumnById = (payload) => ({

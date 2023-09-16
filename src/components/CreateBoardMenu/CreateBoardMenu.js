@@ -55,7 +55,7 @@ const CreateBoardMenu = ({ setBoards, setToast }) => {
                         }}
                         className={cx('board_menu-items')}
                     >
-                        <CreateBoardForm setBoards={setBoards} setToast={setToast} setOpenModal={setOpenModal} />
+                        <CreateBoardForm setToast={setToast} setOpenModal={setOpenModal} />
                     </Menu.Items>
                 </Transition>
             </Menu>
