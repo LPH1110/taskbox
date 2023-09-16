@@ -31,7 +31,7 @@ const CreateBoardMenu = ({ setBoards, setToast }) => {
             <Menu as="div" className="w-full h-full">
                 <Menu.Button
                     onClick={() => setOpenModal((prev) => !prev)}
-                    className="w-full h-full min-h-[12rem] flexCenter gap-2 border border-dashed hover:bg-white/60 bg-white/20 ease duration-100 rounded-xl font-semibold"
+                    className="w-full h-full min-h-[12rem] flexCenter gap-2 border border-dashed border-slate-300 hover:bg-white/60 bg-white/20 ease duration-100 rounded-xl font-semibold"
                 >
                     <span>
                         <PlusIcon className="w-5 h-5" />

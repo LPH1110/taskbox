@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { db } from '~/firebase-config';
 /* 
     Firebase Note: addDoc
@@ -64,6 +64,16 @@ export const fetchBoard = async (title) => {
         return { id: doc.id, ...doc.data() };
     } catch (error) {
         console.error(error, 'error fetching board');
+    }
+};
+
+export const deleteBoard = async (boardId) => {
+    try {
+        const boardRef = doc(db, 'boards', boardId);
+        await deleteDoc(boardRef);
+        return { status: 200, message: 'Board has been deleted successfully.' };
+    } catch (error) {
+        return { status: 501, error };
     }
 };
 

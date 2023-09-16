@@ -10,6 +10,7 @@ import {
     UPDATE_TASKS,
     UPDATE_TASK_ID,
     UPDATE_BOARD_ID,
+    DELETE_BOARD,
 } from './constants';
 
 const initState = {
@@ -73,6 +74,12 @@ const initState = {
 function reducer(state, action) {
     const { comments } = state;
     switch (action.type) {
+        case DELETE_BOARD:
+            const deletedBoards = state.boards.filter((board) => board.id !== action.payload.id);
+            return {
+                ...state,
+                boards: deletedBoards,
+            };
         case UPDATE_BOARD_ID:
             const newBoards = state.boards.map((board) => {
                 if (board.id === action.payload.id) {

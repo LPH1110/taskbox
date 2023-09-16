@@ -56,24 +56,14 @@ export const setUserSession = (payload) => ({
     payload,
 });
 
-export const changeBoardFavor = (payload) => ({
-    type: CHANGE_BOARD_FAVOR,
-    payload,
-});
-
-export const changeBoardStatus = (payload) => ({
-    type: CHANGE_BOARD_STATUS,
-    payload,
-});
-
 export const addNewBoard = (payload) => ({
     type: ADD_NEW_BOARD,
     payload,
 });
 
-export const deleteBoard = (payload) => ({
+export const deleteBoardById = (id) => ({
     type: DELETE_BOARD,
-    payload,
+    payload: { id },
 });
 
 export const onChangeBoardTitle = (payload) => ({

@@ -66,6 +66,7 @@ const MenuList = ({ data, setCurrentMenu }) => {
 const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
     const [openModal, setOpenModal] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
+    const [menuHeight, setMenuHeight] = useState(window.innerHeight);
     const [currentMenu, setCurrentMenu] = useState([
         {
             title: 'Menu',
@@ -81,7 +82,6 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
             description: 'Add description to your board',
             icon: <ExclamationCircleIcon className="w-5 h-5" />,
         },
-
         {
             id: uuidv4(),
             title: 'Activity',
@@ -214,7 +214,7 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items className={cx('board_menu-items')}>
+                    <Menu.Items style={{ overflow: 'overlay' }} className={cx('board_menu-items')}>
                         {currentMenu[currentMenu.length - 1].path !== '/' && (
                             <button
                                 onClick={handleBackMenu}

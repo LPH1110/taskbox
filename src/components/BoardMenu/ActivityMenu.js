@@ -52,7 +52,7 @@ const ActivityMenu = () => {
     }, [activityRef, user.uid]);
 
     return (
-        <div className="flex flex-col justify-start w-full gap-2">
+        <div style={{ overflow: 'overlay' }} className="flex flex-col justify-start w-full gap-2 max-h-full">
             <div className="flex items-center justify-between w-full gap-2">
                 <button
                     type="button"
@@ -70,7 +70,7 @@ const ActivityMenu = () => {
                 </button>
             </div>
             <Spacer />
-            <div className="my-2">
+            <div className="my-2 overflow-y-auto">
                 {!toggle ? <Activities data={activities} user={user} /> : <Comments data={comments} user={user} />}
             </div>
         </div>
