@@ -240,6 +240,7 @@ const Board = ({ direction = 'horizontal', board, setBoard, columnOrder = [], se
                                 return (
                                     <div className={`${direction === 'vertical' ? 'w-full' : 'h-full'}`}>
                                         <Column
+                                            setToast={setToast}
                                             direction={direction}
                                             boardId={board.id}
                                             index={index}

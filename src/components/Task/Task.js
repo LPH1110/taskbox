@@ -26,7 +26,7 @@ const members = [
     },
 ];
 
-const Task = ({ task, index }) => {
+const Task = ({ onClick, task, index }) => {
     return (
         <Draggable key={task?.id} draggableId={task?.id} index={index}>
             {(provided, snapshot) => (
@@ -34,6 +34,7 @@ const Task = ({ task, index }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     ref={provided.innerRef}
+                    onClick={onClick}
                     className="shadow-md px-3 py-4 rounded-lg border border-nav-border bg-white ease duration-100 space-y-4"
                 >
                     <div className="flexBetween">

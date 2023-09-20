@@ -65,3 +65,8 @@ input {
 .flexAround {
     @apply flex items-center justify-around;
 }
+
+// texts
+.modal-label {
+    @apply text-xl font-medium leading-6 text-gray-900;
+}

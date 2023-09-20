@@ -9,6 +9,7 @@ import { actions, useStore } from '~/store';
 import classNames from 'classnames/bind';
 import styles from './Column.module.scss';
 import TaskListItem from '../TaskListItem/TaskListItem';
+import TaskModal from '../TaskModal';
 
 const cx = classNames.bind(styles);
 
@@ -99,7 +100,9 @@ const CreateTaskBtn = ({ direction, boardId, column }) => {
     );
 };
 
-const Column = ({ direction, boardId, column, tasks = [], index }) => {
+const Column = ({ setToast, direction, boardId, column, tasks = [], index }) => {
+    const [openTaskModal, setOpenTaskModal] = useState(false);
+
     return (
         <Draggable key={column?.id} draggableId={column?.id} index={index}>
             {(provided) => {
@@ -130,7 +133,18 @@ const Column = ({ direction, boardId, column, tasks = [], index }) => {
                                         } space-y-4 rounded-md ease duration-100 p-2 -mx-2 mb-4 overflow-y-auto`}
                                     >
                                         {tasks.map((task, index) => (
-                                            <Task task={task} index={index} />
+                                            <TaskModal
+                                                setToast={setToast}
+                                                task={task}
+                                                openTaskModal={openTaskModal}
+                                                setOpenTaskModal={setOpenTaskModal}
+                                            >
+                                                <Task
+                                                    onClick={() => setOpenTaskModal(true)}
+                                                    task={task}
+                                                    index={index}
+                                                />
+                                            </TaskModal>
                                         ))}
                                         {provided.placeholder}
                                     </div>

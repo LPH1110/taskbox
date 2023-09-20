@@ -131,7 +131,7 @@ export const saveTask = async (data) => {
         if (taskSnap.exists()) {
             await setDoc(taskRef, data);
         }
-        return;
+        return { status: 200, message: 'Saved task...' };
     } catch (error) {
         console.error(error.message + ' error saving task');
         return { status: 501, message: `Something went wrong. Please try again` };
