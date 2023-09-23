@@ -43,7 +43,6 @@ const Task = ({ onClick, task, index }) => {
                             <PencilIcon className="w-4 h-4" />
                         </button>
                     </div>
-                    <p className={cx('task_description')}>{task?.description}</p>
                     <div className="flexBetween">
                         {/* Members */}
                         <div className="flexStart">

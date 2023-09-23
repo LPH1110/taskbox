@@ -19,6 +19,7 @@ import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip, UserAvatar } from '
 import FilterButton from '~/components/Board/FilterButton';
 import { fetchBoard, saveBoard } from '~/lib/actions';
 import ClosedBoard from '~/components/ClosedBoard';
+import TaskModal from '~/components/TaskModal';
 
 const cx = classNames.bind(styles);
 
@@ -48,6 +49,10 @@ function BoardDetail() {
     const [boardTitle, setBoardTitle] = useState('');
     const [board, setBoard] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const [openTaskModal, setOpenTaskModal] = useState({
+        show: false,
+        task: {},
+    });
     const [viewBy, setViewBy] = useState('stack');
     const [toast, setToast] = useState({
         show: false,
@@ -57,7 +62,6 @@ function BoardDetail() {
         },
     });
 
-    console.log(board);
     const boardTitleInputRef = useRef();
 
     useEffect(() => {
@@ -213,6 +217,7 @@ function BoardDetail() {
                             <div>Fetching your boards...</div>
                         ) : (
                             <Board
+                                setOpenTaskModal={setOpenTaskModal}
                                 direction={viewBy === 'stack' ? 'horizontal' : 'vertical'}
                                 board={board}
                                 setBoard={setBoard}
@@ -224,6 +229,7 @@ function BoardDetail() {
                 </section>
             )}
             {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
+            <TaskModal setToast={setToast} openTaskModal={openTaskModal} setOpenTaskModal={setOpenTaskModal} />
         </div>
     );
 }

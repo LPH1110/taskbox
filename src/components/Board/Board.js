@@ -110,7 +110,7 @@ const CreateListBtn = ({ direction, boardId, setBoard, setToast, dispatch }) => 
     );
 };
 
-const Board = ({ direction = 'horizontal', board, setBoard, columnOrder = [], setToast }) => {
+const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, columnOrder = [], setToast }) => {
     const [state, dispatch] = useStore();
     const { tasks, columns } = state;
     const [timeoutId, setTimeoutId] = useState(null);
@@ -240,6 +240,7 @@ const Board = ({ direction = 'horizontal', board, setBoard, columnOrder = [], se
                                 return (
                                     <div className={`${direction === 'vertical' ? 'w-full' : 'h-full'}`}>
                                         <Column
+                                            setOpenTaskModal={setOpenTaskModal}
                                             setToast={setToast}
                                             direction={direction}
                                             boardId={board.id}

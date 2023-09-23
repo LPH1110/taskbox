@@ -125,6 +125,7 @@ export const fetchTasks = async (boardId) => {
 };
 
 export const saveTask = async (data) => {
+    console.log(data);
     try {
         const taskRef = doc(db, 'tasks', data.id);
         const taskSnap = await getDoc(taskRef);

@@ -1,15 +1,14 @@
-import { EllipsisVerticalIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
-import Task from '../Task/Task';
 import { Transition } from '@headlessui/react';
+import { EllipsisVerticalIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import classNames from 'classnames/bind';
 import { useEffect, useRef, useState } from 'react';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { v4 as uuidv4 } from 'uuid';
 import { createTask, saveColumn } from '~/lib/actions';
 import { actions, useStore } from '~/store';
-import classNames from 'classnames/bind';
-import styles from './Column.module.scss';
+import Task from '../Task/Task';
 import TaskListItem from '../TaskListItem/TaskListItem';
-import TaskModal from '../TaskModal';
+import styles from './Column.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -28,7 +27,7 @@ const CreateTaskBtn = ({ direction, boardId, column }) => {
         const newTask = {
             id: taskId,
             title: taskTitle,
-            description: "Click to edit this task's description",
+            description: "<p>Click to edit this task's description</p>",
             boardId: boardId,
             reference: column.title,
         };
@@ -100,9 +99,7 @@ const CreateTaskBtn = ({ direction, boardId, column }) => {
     );
 };
 
-const Column = ({ setToast, direction, boardId, column, tasks = [], index }) => {
-    const [openTaskModal, setOpenTaskModal] = useState(false);
-
+const Column = ({ setOpenTaskModal, setToast, direction, boardId, column, tasks = [], index }) => {
     return (
         <Draggable key={column?.id} draggableId={column?.id} index={index}>
             {(provided) => {
@@ -133,18 +130,16 @@ const Column = ({ setToast, direction, boardId, column, tasks = [], index }) => 
                                         } space-y-4 rounded-md ease duration-100 p-2 -mx-2 mb-4 overflow-y-auto`}
                                     >
                                         {tasks.map((task, index) => (
-                                            <TaskModal
-                                                setToast={setToast}
+                                            <Task
+                                                onClick={() =>
+                                                    setOpenTaskModal({
+                                                        show: true,
+                                                        task: task,
+                                                    })
+                                                }
                                                 task={task}
-                                                openTaskModal={openTaskModal}
-                                                setOpenTaskModal={setOpenTaskModal}
-                                            >
-                                                <Task
-                                                    onClick={() => setOpenTaskModal(true)}
-                                                    task={task}
-                                                    index={index}
-                                                />
-                                            </TaskModal>
+                                                index={index}
+                                            />
                                         ))}
                                         {provided.placeholder}
                                     </div>
