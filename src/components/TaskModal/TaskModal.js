@@ -11,10 +11,12 @@ import {
 } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { saveTask } from '~/lib/actions';
+import { UserAuth } from '~/contexts/AuthContext';
+import { createComment, fetchComments, saveTask } from '~/lib/actions';
+import { actions, useStore } from '~/store';
+import Comment from '../Comment';
 import RichTextEditor from '../RichTextEditor';
 import UserAvatar from '../UserAvatar';
-import { actions, useStore } from '~/store';
 
 const Description = ({ setOpenCommentEditor, description, setOpenDescEditor }) => {
     const descriptionRef = useRef();
@@ -41,11 +43,11 @@ const Description = ({ setOpenCommentEditor, description, setOpenDescEditor }) =
 };
 
 const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
-    const [attachs, setAttachs] = useState([]);
+    const { user } = UserAuth();
+    const [comments, setComments] = useState([]);
     const [timeoutId, setTimeoutId] = useState();
     const [openDescEditor, setOpenDescEditor] = useState(false);
     const [openCommentEditor, setOpenCommentEditor] = useState(false);
-    const [currentComment, setCurrentComment] = useState('');
     const [, dispatch] = useStore();
 
     const descRef = useRef();
@@ -91,6 +93,50 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
             }, 2000),
         );
     };
+
+    const handleSaveComment = async (data) => {
+        console.log(data);
+        const comment = {
+            content: data,
+            userId: user?.uid,
+            photoURL: user?.photoURL,
+            displayName: user?.displayName,
+            taskId: openTaskModal.task.id,
+            createdAt: new Date(),
+        };
+
+        const result = await createComment(comment);
+        if (result.status === 200) {
+            setToast({
+                show: true,
+                body: {
+                    message: result.message,
+                    status: 'success',
+                },
+            });
+
+            const res = await fetchComments(openTaskModal.task.id);
+            setComments(res || []);
+
+            setOpenCommentEditor(false);
+            setTimeoutId(
+                setTimeout(() => {
+                    setToast((prev) => ({ ...prev, show: false }));
+                }, 2000),
+            );
+        }
+    };
+
+    useEffect(() => {
+        if (openTaskModal.task.id) {
+            const getComments = async () => {
+                const result = await fetchComments(openTaskModal.task.id);
+                setComments(result || []);
+            };
+
+            getComments();
+        }
+    }, [openTaskModal.task]);
 
     useEffect(() => {
         return () => clearTimeout(timeoutId);
@@ -189,7 +235,7 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                                     <span>
                                         <Bars3BottomLeftIcon className="w-5 h-5" />
                                     </span>
-                                    <div className="space-y-3 w-full pr-6">
+                                    <div className="space-y-3 w-full">
                                         <h4 className="modal-label">Description</h4>
 
                                         {openDescEditor ? (
@@ -229,39 +275,32 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                                     </div>
                                 </div>
                                 {/* Comments */}
-                                <div className="flex gap-1 pr-6">
-                                    <UserAvatar />
-                                    {openCommentEditor ? (
-                                        <div className="space-y-2">
-                                            <RichTextEditor value={currentComment} setValue={setCurrentComment} />
-
-                                            <div className="flexStart gap-1">
-                                                <button
-                                                    type="button"
-                                                    className="py-1 px-3 rounded-sm bg-blue-400 text-white hover:bg-blue-400/80 ease duration-200"
-                                                >
-                                                    Save
-                                                </button>
-                                                <button
-                                                    onClick={() => setOpenCommentEditor(false)}
-                                                    type="button"
-                                                    className="py-1 px-3 rounded-sm hover:bg-slate-100 ease duration-200"
-                                                >
-                                                    Cancel
-                                                </button>
+                                <div className="space-y-6">
+                                    <div className="flex gap-2">
+                                        <UserAvatar />
+                                        {openCommentEditor ? (
+                                            <RichTextEditor
+                                                openCommentEditor={openCommentEditor}
+                                                onSave={handleSaveComment}
+                                                onClose={(e) => setOpenCommentEditor(false)}
+                                            />
+                                        ) : (
+                                            <div
+                                                onClick={() => {
+                                                    setOpenCommentEditor(true);
+                                                    setOpenDescEditor(false);
+                                                }}
+                                                className="flex items-center justify-start px-4 rounded-md bg-slate-50 w-full hover:bg-slate-100 ease duration-200"
+                                            >
+                                                <p className="text-description">Add a comments...</p>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div
-                                            onClick={() => {
-                                                setOpenCommentEditor(true);
-                                                setOpenDescEditor(false);
-                                            }}
-                                            className="flex items-center justify-start px-4 rounded-md bg-slate-50 w-full hover:bg-slate-100 ease duration-200"
-                                        >
-                                            <p className="text-description">Add a comments...</p>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        {comments.map((comment) => (
+                                            <Comment key={comment.id} data={comment} />
+                                        ))}
+                                    </div>
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>

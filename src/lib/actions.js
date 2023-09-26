@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc, where } from 'firebase/firestore';
 import { db } from '~/firebase-config';
 /* 
     Firebase Note: addDoc
@@ -146,5 +146,39 @@ export const createTask = async (data) => {
     } catch (error) {
         console.error(error.message + ' error creating task');
         return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};
+
+// Comments
+
+export const deleteComment = async (commentId) => {
+    try {
+        const commentRef = doc(db, 'comments', commentId);
+        await deleteDoc(commentRef);
+        return { status: 200, message: 'Comment has been deleted successfully.' };
+    } catch (error) {
+        return { status: 501, error };
+    }
+};
+
+export const createComment = async (data) => {
+    try {
+        const commentRef = collection(db, 'comments');
+        await addDoc(commentRef, data);
+        return { status: 200, message: `Create comment successfully!` };
+    } catch (error) {
+        console.error(error.message + ' error creating task');
+        return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};
+export const fetchComments = async (taskId) => {
+    try {
+        console.log(taskId);
+        const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'), where('taskId', '==', taskId));
+        const querySnapshot = await getDocs(q);
+        const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
+        return data;
+    } catch (error) {
+        console.error(error.message, 'error fetching comments');
     }
 };

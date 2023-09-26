@@ -113,10 +113,7 @@ const ClosedBoard = ({ setBoard, board, setToast }) => {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <div
-                        onClick={handleDeleteBoard}
-                        className="min-w-[20rem] bg-slate-600 rounded-md absolute top-full text-white p-4 flexCenter flex-col gap-2"
-                    >
+                    <div className="min-w-[20rem] bg-slate-600 rounded-md absolute top-full text-white p-4 flexCenter flex-col gap-2">
                         <h4>Permanently delete?</h4>
                         <Spacer />
                         <p>
@@ -125,6 +122,7 @@ const ClosedBoard = ({ setBoard, board, setToast }) => {
                         </p>
                         <Button
                             size="small"
+                            onClick={handleDeleteBoard}
                             className="rounded-sm w-full p-2 bg-red-400 text-white hover:bg-red-400/80 ease duration-100"
                         >
                             {isLoading ? 'Deleting...' : 'Delete'}
