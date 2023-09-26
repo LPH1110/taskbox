@@ -167,7 +167,7 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all space-y-6">
+                            <Dialog.Panel className="w-full max-w-3xl transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all space-y-6">
                                 <div className="flexBetween">
                                     <Dialog.Title as="h3" className="modal-label">
                                         {openTaskModal.task?.title}
@@ -298,7 +298,7 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         {comments.map((comment) => (
-                                            <Comment key={comment.id} data={comment} />
+                                            <Comment setComments={setComments} key={comment.id} data={comment} />
                                         ))}
                                     </div>
                                 </div>

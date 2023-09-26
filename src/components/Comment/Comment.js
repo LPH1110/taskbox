@@ -5,9 +5,10 @@ import styles from './Comment.module.scss';
 import Spacer from '../Spacer';
 import { Transition } from '@headlessui/react';
 import Button from '../Button';
+import { deleteComment, fetchComments } from '~/lib/actions';
 const cx = classNames.bind(styles);
 
-const Comment = ({ data }) => {
+const Comment = ({ setComments, data }) => {
     const commentRef = useRef();
     const [openConfirmDel, setOpenConfirmDel] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -19,8 +20,12 @@ const Comment = ({ data }) => {
         }
     }, []);
 
-    const handleDeleteBoard = (e) => {
-        e.stopPropagation();
+    const handleDeleteBoard = async (e) => {
+        const { taskId } = data;
+
+        await deleteComment(data.id);
+        const result = await fetchComments(taskId);
+        setComments(result);
     };
 
     const getTimeElapsed = () => {
@@ -59,7 +64,7 @@ const Comment = ({ data }) => {
                     <button className={cx('comment_action')} type="button">
                         Edit
                     </button>
-                    <div className="relative">
+                    <div className="">
                         <button
                             onClick={() => setOpenConfirmDel((prev) => !prev)}
                             type="button"
@@ -77,7 +82,7 @@ const Comment = ({ data }) => {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                         >
-                            <div className="w-[20rem] bg-slate-600 rounded-md absolute bottom-0 text-white p-4 flexCenter flex-col gap-2">
+                            <div className="w-[20rem] bg-slate-600 rounded-md fixed text-white p-4 flexCenter flex-col gap-2">
                                 <h4>Permanently delete?</h4>
                                 <Spacer />
                                 <p>
