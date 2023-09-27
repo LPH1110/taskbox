@@ -171,6 +171,21 @@ export const createComment = async (data) => {
         return { status: 501, message: `Something went wrong. Please try again` };
     }
 };
+
+export const saveComment = async (data) => {
+    console.log(data);
+    try {
+        const commentRef = doc(db, 'comments', data.id);
+        const commentSnap = await getDoc(commentRef);
+        if (commentSnap.exists()) {
+            await setDoc(commentRef, data);
+        }
+        return { status: 200, message: 'Saved comment...' };
+    } catch (error) {
+        console.error(error.message + ' error saving comment');
+        return { status: 501, message: `Something went wrong. Please try again` };
+    }
+};
 export const fetchComments = async (taskId) => {
     try {
         console.log(taskId);

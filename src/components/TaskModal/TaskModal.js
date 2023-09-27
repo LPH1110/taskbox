@@ -277,7 +277,9 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                                 {/* Comments */}
                                 <div className="space-y-6">
                                     <div className="flex gap-2">
-                                        <UserAvatar />
+                                        <div>
+                                            <UserAvatar />
+                                        </div>
                                         {openCommentEditor ? (
                                             <RichTextEditor
                                                 openCommentEditor={openCommentEditor}
@@ -298,7 +300,7 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         {comments.map((comment) => (
-                                            <Comment setComments={setComments} key={comment.id} data={comment} />
+                                            <Comment setComments={setComments} key={comment.id} comment={comment} />
                                         ))}
                                     </div>
                                 </div>

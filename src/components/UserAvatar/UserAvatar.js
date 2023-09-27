@@ -1,6 +1,6 @@
 import { UserAuth } from '~/contexts/AuthContext';
 
-const UserAvatar = ({ photoURL, width, className = '' }) => {
+const UserAvatar = ({ photoURL, width, height = 'h-10', className = '' }) => {
     const { user } = UserAuth();
     let classes = `avatar p-1 rounded-full hover:bg-blue-100 ease-in-out duration-200 cursor-pointer`;
     return (
