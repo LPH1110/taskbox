@@ -68,8 +68,6 @@ function Workspaces() {
         },
     });
 
-    console.log(boards);
-
     useEffect(() => {
         const getBoards = async () => {
             try {

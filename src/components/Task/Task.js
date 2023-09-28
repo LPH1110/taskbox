@@ -6,6 +6,7 @@ import styles from './Task.module.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { countCommentsByTaskId } from '~/lib/actions';
 import { useStore } from '~/store';
+import { countComments } from '~/lib/helpers';
 
 const cx = classNames.bind(styles);
 
@@ -31,16 +32,6 @@ const members = [
 const Task = ({ onClick, task, index }) => {
     const [state, dispatch] = useStore();
     const { comments } = state;
-
-    const countComments = () => {
-        return Object.entries(comments).reduce((total, [id, comment]) => {
-            if (comment.taskId === task.id) {
-                return total + 1;
-            } else {
-                return total;
-            }
-        }, 0);
-    };
 
     return (
         <Draggable key={task?.id} draggableId={task?.id} index={index}>
@@ -82,7 +73,7 @@ const Task = ({ onClick, task, index }) => {
                         <div className="flex items-center gap-2">
                             <button type="button" className={cx('task_action')}>
                                 <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
-                                <p>{countComments()}</p>
+                                <p>{countComments({ list: comments, opt: { key: 'taskId', value: task.id } })}</p>
                             </button>
                             <button type="button" className={cx('task_action')}>
                                 <PaperClipIcon className="w-5 h-5" />

@@ -42,7 +42,7 @@ function Profile() {
 
         onSubmit(data) {
             setLoading(true);
-            saveProfile(data);
+            // saveProfile(data);
             saveAction({
                 userId: user.uid,
                 action: 'updated',

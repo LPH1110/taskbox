@@ -43,7 +43,7 @@ const Description = ({ setOpenCommentEditor, description, setOpenDescEditor }) =
     );
 };
 
-const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
+const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
     const { user } = UserAuth();
     const [timeoutId, setTimeoutId] = useState();
     const [openDescEditor, setOpenDescEditor] = useState(false);
@@ -103,6 +103,7 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
             photoURL: user?.photoURL,
             displayName: user?.displayName,
             taskId: openTaskModal.task.id,
+            boardId: board?.id,
             createdAt: new Date(),
         };
 

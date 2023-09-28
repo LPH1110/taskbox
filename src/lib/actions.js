@@ -68,9 +68,13 @@ export const fetchBoard = async (title) => {
 };
 
 export const deleteBoard = async (boardId) => {
+    console.log(boardId);
     try {
         const boardRef = doc(db, 'boards', boardId);
-        await deleteDoc(boardRef);
+        deleteDoc(boardRef);
+        deleteColumnsByBoardId(boardId);
+        deleteTasksByBoardId(boardId);
+        deleteCommentsByBoardId(boardId);
         return { status: 200, message: 'Board has been deleted successfully.' };
     } catch (error) {
         return { status: 501, error };
@@ -78,6 +82,16 @@ export const deleteBoard = async (boardId) => {
 };
 
 // Columns
+export const deleteColumnsByBoardId = async (boardId) => {
+    try {
+        const q = query(collection(db, 'columns'), where('reference', '==', boardId));
+        const colSnap = await getDocs(q);
+        Promise.all(colSnap.docs.map((doc) => deleteDoc(doc.ref)));
+    } catch (error) {
+        console.error(error.message + ' error deleting columns');
+    }
+};
+
 export const fetchColumns = async (boardId) => {
     console.log(boardId);
     const q = query(collection(db, 'columns'), where('reference', '==', boardId));
@@ -111,6 +125,16 @@ export const createColumn = async (data) => {
 };
 
 // Tasks
+export const deleteTasksByBoardId = async (boardId) => {
+    try {
+        const q = query(collection(db, 'tasks'), where('boardId', '==', boardId));
+        const colSnap = await getDocs(q);
+        Promise.all(colSnap.docs.map((doc) => deleteDoc(doc.ref)));
+    } catch (error) {
+        console.error(error.message + ' error deleting tasks');
+    }
+};
+
 export const fetchTasks = async (boardId) => {
     try {
         console.log(boardId);
@@ -150,6 +174,15 @@ export const createTask = async (data) => {
 };
 
 // Comments
+export const deleteCommentsByBoardId = async (boardId) => {
+    try {
+        const q = query(collection(db, 'comments'), where('boardId', '==', boardId));
+        const colSnap = await getDocs(q);
+        Promise.all(colSnap.docs.map((doc) => deleteDoc(doc.ref)));
+    } catch (error) {
+        console.error(error.message + ' error deleting comments');
+    }
+};
 
 export const countCommentsByTaskId = async (taskId) => {
     try {

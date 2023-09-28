@@ -6,6 +6,7 @@ import styles from './TaskListItem.module.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { countCommentsByTaskId } from '~/lib/actions';
 import { useStore } from '~/store';
+import { countComments } from '~/lib/helpers';
 
 const cx = classNames.bind(styles);
 
@@ -32,16 +33,6 @@ const TaskListItem = ({ onClick, task, index }) => {
     const [state] = useStore();
     const { comments } = state;
     const descRef = useRef();
-
-    const countComments = () => {
-        return Object.entries(comments).reduce((total, [id, comment]) => {
-            if (comment.taskId === task.id) {
-                return total + 1;
-            } else {
-                return total;
-            }
-        }, 0);
-    };
 
     useEffect(() => {
         const descElement = descRef.current;
@@ -88,7 +79,9 @@ const TaskListItem = ({ onClick, task, index }) => {
                         {/* Task actions */}
                         <div className="flex items-center gap-12">
                             <button type="button" className={cx('task_action')}>
-                                <p>{countComments()} comments</p>
+                                <p>
+                                    {countComments({ list: comments, opt: { key: 'taskId', value: task.id } })} comments
+                                </p>
                             </button>
                             <button type="button" className={cx('task_action')}>
                                 <p>5 files</p>

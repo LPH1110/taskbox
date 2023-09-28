@@ -229,7 +229,12 @@ function BoardDetail() {
                 </section>
             )}
             {toast.show && <Toast placement="bottom-end" message={toast.body.message} status={toast.body.status} />}
-            <TaskModal setToast={setToast} openTaskModal={openTaskModal} setOpenTaskModal={setOpenTaskModal} />
+            <TaskModal
+                board={board}
+                setToast={setToast}
+                openTaskModal={openTaskModal}
+                setOpenTaskModal={setOpenTaskModal}
+            />
         </div>
     );
 }
