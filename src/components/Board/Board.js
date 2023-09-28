@@ -1,7 +1,15 @@
 import classNames from 'classnames/bind';
 import { useEffect, useRef, useState, memo } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { fetchColumns, fetchTasks, createBoard, saveColumn, saveBoard, createColumn } from '~/lib/actions';
+import {
+    fetchColumns,
+    fetchTasks,
+    createBoard,
+    saveColumn,
+    saveBoard,
+    createColumn,
+    fetchComments,
+} from '~/lib/actions';
 import { convertArrayFromObj, convertObjFromArray } from '~/lib/helpers';
 import { actions, useStore } from '~/store';
 import Column from '../Column/Column';
@@ -9,6 +17,7 @@ import styles from './Board.module.scss';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Transition } from '@headlessui/react';
 import { v4 as uuidv4 } from 'uuid';
+import { UserAuth } from '~/contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 
@@ -113,6 +122,7 @@ const CreateListBtn = ({ direction, boardId, setBoard, setToast, dispatch }) => 
 const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, columnOrder = [], setToast }) => {
     const [state, dispatch] = useStore();
     const { tasks, columns } = state;
+    const { user } = UserAuth();
     const [timeoutId, setTimeoutId] = useState(null);
 
     const onDragEnd = (result) => {
@@ -205,16 +215,23 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
     };
 
     useEffect(() => {
-        const getData = async () => {
-            const columnsResult = await fetchColumns(board.id);
-            const tasksResult = await fetchTasks(board.id);
-            const columnData = convertObjFromArray(columnsResult);
-            const taskData = convertObjFromArray(tasksResult);
-            dispatch(actions.updateColumns(columnData));
-            dispatch(actions.updateTasks(taskData));
-        };
+        if (user) {
+            const getData = async () => {
+                const columnsResult = await fetchColumns(board.id);
+                const tasksResult = await fetchTasks(board.id);
+                const commentsResult = await fetchComments(user.uid);
 
-        getData();
+                const columnData = convertObjFromArray(columnsResult);
+                const taskData = convertObjFromArray(tasksResult);
+                const commentData = convertObjFromArray(commentsResult);
+
+                dispatch(actions.updateComments(commentData || {}));
+                dispatch(actions.updateColumns(columnData));
+                dispatch(actions.updateTasks(taskData));
+            };
+
+            getData();
+        }
 
         return () => {
             clearTimeout(timeoutId);

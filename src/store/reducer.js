@@ -11,6 +11,8 @@ import {
     UPDATE_TASK_ID,
     UPDATE_BOARD_ID,
     DELETE_BOARD,
+    UPDATE_COMMENTS,
+    DELETE_COMMENT,
 } from './constants';
 
 const initState = {
@@ -20,40 +22,6 @@ const initState = {
         info: {},
     },
     boards: [],
-    comments: {
-        [uuidv4()]: {
-            userId: 0,
-            userName: '@TrungNguyen',
-            content: 'Tui thấy nó lạ lắm á mọi người =))',
-            reported: false,
-            userThumbnail:
-                'https://res.cloudinary.com/dzzv49yec/image/upload/v1670092118/taskbox-assets/avatar2_fssdbw.jpg',
-        },
-        [uuidv4()]: {
-            userId: 1,
-            userName: '@HanhKhung',
-            content: 'Thật là một task thú vị',
-            reported: false,
-            userThumbnail:
-                'https://res.cloudinary.com/dzzv49yec/image/upload/v1670092118/taskbox-assets/avatar4_n1nbbs.jpg',
-        },
-        [uuidv4()]: {
-            userId: 2,
-            userName: '@HongNgoc',
-            content: 'Xi xi ba bla pa ra pẻng',
-            reported: false,
-            userThumbnail:
-                'https://res.cloudinary.com/dzzv49yec/image/upload/v1670092118/taskbox-assets/avatar3_clufwp.jpg',
-        },
-        [uuidv4()]: {
-            userId: 3,
-            userName: '@PhamHue',
-            content: 'Siu nhân xanh biến hìnhhhh',
-            reported: false,
-            userThumbnail:
-                'https://res.cloudinary.com/dzzv49yec/image/upload/v1670050964/taskbox-assets/avatar1_ilyzbz.jpg',
-        },
-    },
     columns: {
         'column-1': {
             id: 'column-1',
@@ -61,6 +29,7 @@ const initState = {
             taskIds: [],
         },
     },
+    comments: {},
     tasks: {
         'task-1': {
             id: 'task-1',
@@ -72,8 +41,40 @@ const initState = {
 };
 
 function reducer(state, action) {
-    const { comments } = state;
+    let newComments;
     switch (action.type) {
+        case ADD_NEW_COMMENT_TO_TASK:
+            if (state.comments[action.payload.id]) {
+                // update comment
+                newComments = state.comments;
+                newComments[action.payload.id] = {
+                    ...action.payload,
+                };
+                return {
+                    ...state,
+                    comments: newComments,
+                };
+            } else {
+                return {
+                    ...state,
+                    comments: {
+                        [action.payload.id]: { ...action.payload },
+                        ...state.comments,
+                    },
+                };
+            }
+        case DELETE_COMMENT:
+            newComments = state.comments;
+            delete newComments[action.payload];
+            return {
+                ...state,
+                comments: newComments,
+            };
+        case UPDATE_COMMENTS:
+            return {
+                ...state,
+                comments: action.payload,
+            };
         case DELETE_BOARD:
             const deletedBoards = state.boards.filter((board) => board.id !== action.payload.id);
             return {
@@ -91,7 +92,6 @@ function reducer(state, action) {
                     return board;
                 }
             });
-            console.log(newBoards);
             return {
                 ...state,
                 boards: newBoards,
@@ -102,7 +102,6 @@ function reducer(state, action) {
                 boards: [...action.payload],
             };
         case UPDATE_TASK_ID:
-            console.log('update task id fired');
             return {
                 ...state,
                 tasks: {
@@ -146,42 +145,6 @@ function reducer(state, action) {
                         ...action.payload.info,
                     },
                 },
-            };
-        case DELETE_COMMENT_BY_ID:
-            delete comments[action.payload.commentId];
-
-            return {
-                ...state,
-                comments: {
-                    ...comments,
-                },
-            };
-        case ADD_NEW_COMMENT_TO_TASK:
-            let newComments = Object.entries(comments);
-            const { userId, userName, userThumbnail, content } = action.payload;
-
-            newComments.splice(0, 0, [
-                uuidv4(),
-                {
-                    userId,
-                    userName,
-                    userThumbnail,
-                    content,
-                    reported: false,
-                },
-            ]);
-
-            newComments = newComments.reduce(
-                (acc, [id, comment]) => ({
-                    ...acc,
-                    [id]: comment,
-                }),
-                {},
-            );
-
-            return {
-                ...state,
-                comments: newComments,
             };
 
         default:

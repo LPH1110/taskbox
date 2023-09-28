@@ -5,7 +5,7 @@ import { useState } from 'react';
 const RichTextEditor = ({ initial, onSave, onClose }) => {
     const [value, setValue] = useState(initial);
     return (
-        <div className="space-y-2">
+        <div className="space-y-2 w-full">
             <CKEditor
                 editor={ClassicEditor}
                 data={value}

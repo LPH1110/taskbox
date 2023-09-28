@@ -12,11 +12,12 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { UserAuth } from '~/contexts/AuthContext';
-import { createComment, fetchComments, saveTask } from '~/lib/actions';
+import { createComment, saveComment, saveTask } from '~/lib/actions';
 import { actions, useStore } from '~/store';
 import Comment from '../Comment';
 import RichTextEditor from '../RichTextEditor';
 import UserAvatar from '../UserAvatar';
+import { v4 as uuidv4 } from 'uuid';
 
 const Description = ({ setOpenCommentEditor, description, setOpenDescEditor }) => {
     const descriptionRef = useRef();
@@ -44,11 +45,11 @@ const Description = ({ setOpenCommentEditor, description, setOpenDescEditor }) =
 
 const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
     const { user } = UserAuth();
-    const [comments, setComments] = useState([]);
     const [timeoutId, setTimeoutId] = useState();
     const [openDescEditor, setOpenDescEditor] = useState(false);
     const [openCommentEditor, setOpenCommentEditor] = useState(false);
-    const [, dispatch] = useStore();
+    const [state, dispatch] = useStore();
+    const { comments } = state;
 
     const descRef = useRef();
 
@@ -95,8 +96,8 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
     };
 
     const handleSaveComment = async (data) => {
-        console.log(data);
         const comment = {
+            id: uuidv4(),
             content: data,
             userId: user?.uid,
             photoURL: user?.photoURL,
@@ -105,7 +106,8 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
             createdAt: new Date(),
         };
 
-        const result = await createComment(comment);
+        const result = await saveComment(comment);
+        dispatch(actions.addNewCommentToTask(comment));
         if (result.status === 200) {
             setToast({
                 show: true,
@@ -114,9 +116,6 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                     status: 'success',
                 },
             });
-
-            const res = await fetchComments(openTaskModal.task.id);
-            setComments(res || []);
 
             setOpenCommentEditor(false);
             setTimeoutId(
@@ -127,16 +126,13 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
         }
     };
 
-    useEffect(() => {
-        if (openTaskModal.task.id) {
-            const getComments = async () => {
-                const result = await fetchComments(openTaskModal.task.id);
-                setComments(result || []);
-            };
+    const filteredComments = () => {
+        const list = Object.entries(comments);
+        const filtered = list.filter(([, comment]) => comment.taskId === openTaskModal.task.id) || [];
+        return filtered;
+    };
 
-            getComments();
-        }
-    }, [openTaskModal.task]);
+    console.log();
 
     useEffect(() => {
         return () => clearTimeout(timeoutId);
@@ -299,8 +295,8 @@ const TaskModal = ({ setToast, openTaskModal, setOpenTaskModal }) => {
                                         )}
                                     </div>
                                     <div className="flex flex-col gap-2">
-                                        {comments.map((comment) => (
-                                            <Comment setComments={setComments} key={comment.id} comment={comment} />
+                                        {filteredComments().map(([id, comment]) => (
+                                            <Comment key={comment.id} comment={comment} />
                                         ))}
                                     </div>
                                 </div>

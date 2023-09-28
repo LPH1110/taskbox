@@ -156,7 +156,16 @@ const Column = ({ setOpenTaskModal, setToast, direction, boardId, column, tasks 
                                         } space-y-4 rounded-md ease duration-100 mb-4 overflow-y-auto`}
                                     >
                                         {tasks.map((task, index) => (
-                                            <TaskListItem task={task} index={index} />
+                                            <TaskListItem
+                                                onClick={() =>
+                                                    setOpenTaskModal({
+                                                        show: true,
+                                                        task: task,
+                                                    })
+                                                }
+                                                task={task}
+                                                index={index}
+                                            />
                                         ))}
                                         {provided.placeholder}
                                     </div>

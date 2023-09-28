@@ -1,9 +1,11 @@
 import { Draggable } from 'react-beautiful-dnd';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChatBubbleLeftEllipsisIcon, PaperClipIcon, PencilIcon, PlusSmallIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import styles from './TaskListItem.module.scss';
 import { v4 as uuidv4 } from 'uuid';
+import { countCommentsByTaskId } from '~/lib/actions';
+import { useStore } from '~/store';
 
 const cx = classNames.bind(styles);
 
@@ -26,7 +28,28 @@ const members = [
     },
 ];
 
-const TaskListItem = ({ task, index }) => {
+const TaskListItem = ({ onClick, task, index }) => {
+    const [state] = useStore();
+    const { comments } = state;
+    const descRef = useRef();
+
+    const countComments = () => {
+        return Object.entries(comments).reduce((total, [id, comment]) => {
+            if (comment.taskId === task.id) {
+                return total + 1;
+            } else {
+                return total;
+            }
+        }, 0);
+    };
+
+    useEffect(() => {
+        const descElement = descRef.current;
+        if (descElement) {
+            descElement.innerHTML = task?.description;
+        }
+    }, []);
+
     return (
         <Draggable key={task?.id} draggableId={task?.id} index={index}>
             {(provided, snapshot) => (
@@ -34,13 +57,16 @@ const TaskListItem = ({ task, index }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     ref={provided.innerRef}
+                    onClick={onClick}
                     className="shadow-md px-4 py-6 rounded-lg border border-nav-border bg-white ease duration-100 space-y-4"
                 >
                     <div className="flexAround gap-4">
                         {/* Task title */}
                         <h4 className={cx('task_title')}>{task?.title}</h4>
                         {/* Task description */}
-                        <p className={cx('task_description')}>{task?.description}</p>
+                        <p ref={descRef} className={cx('task_description')}>
+                            {task?.description}
+                        </p>
                         {/* Task members */}
                         <div className="flexCenter">
                             <div className="avatar-group -space-x-3">
@@ -62,7 +88,7 @@ const TaskListItem = ({ task, index }) => {
                         {/* Task actions */}
                         <div className="flex items-center gap-12">
                             <button type="button" className={cx('task_action')}>
-                                <p>25 comments</p>
+                                <p>{countComments()} comments</p>
                             </button>
                             <button type="button" className={cx('task_action')}>
                                 <p>5 files</p>

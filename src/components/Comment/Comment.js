@@ -7,13 +7,15 @@ import { Transition } from '@headlessui/react';
 import Button from '../Button';
 import { deleteComment, fetchComments, saveComment } from '~/lib/actions';
 import RichTextEditor from '../RichTextEditor';
+import { actions, useStore } from '~/store';
 const cx = classNames.bind(styles);
 
-const Comment = ({ setComments, comment }) => {
+const Comment = ({ comment }) => {
     const commentRef = useRef();
     const [openConfirmDel, setOpenConfirmDel] = useState(false);
     const [openEditor, setOpenEditor] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [, dispatch] = useStore();
 
     useEffect(() => {
         const element = commentRef.current;
@@ -22,17 +24,19 @@ const Comment = ({ setComments, comment }) => {
         }
     }, [openEditor]);
 
-    const handleDeleteBoard = async (e) => {
-        const { taskId } = comment;
-
+    const handleDeleteComment = async (e) => {
         await deleteComment(comment.id);
-        const result = await fetchComments(taskId);
-        setComments(result);
+        dispatch(actions.deleteCommentById(comment.id));
     };
 
     const getTimeElapsed = () => {
         const now = new Date();
-        let diff = now - comment?.createdAt.toDate();
+        let diff;
+        if (comment?.createdAt instanceof Date) {
+            diff = now - comment?.createdAt;
+        } else {
+            diff = now - comment?.createdAt.toDate();
+        }
         // convert to seconds
         let seconds = Math.floor(diff / 1000);
 
@@ -60,8 +64,7 @@ const Comment = ({ setComments, comment }) => {
             content: data,
         };
         await saveComment(newComment);
-        const res = await fetchComments(comment.taskId);
-        setComments(res || []);
+        dispatch(actions.addNewCommentToTask(newComment));
         setOpenEditor(false);
     };
 
@@ -88,7 +91,9 @@ const Comment = ({ setComments, comment }) => {
                             </button>
                             <div className="">
                                 <button
-                                    onClick={() => setOpenConfirmDel((prev) => !prev)}
+                                    onClick={() => {
+                                        setOpenConfirmDel((prev) => !prev);
+                                    }}
                                     type="button"
                                     className={cx('comment_action')}
                                 >
@@ -113,7 +118,7 @@ const Comment = ({ setComments, comment }) => {
                                         </p>
                                         <Button
                                             size="small"
-                                            onClick={handleDeleteBoard}
+                                            onClick={handleDeleteComment}
                                             className="rounded-sm w-full p-2 bg-red-400 text-white hover:bg-red-400/80 ease duration-100"
                                         >
                                             {isLoading ? 'Deleting...' : 'Delete'}

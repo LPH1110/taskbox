@@ -151,6 +151,18 @@ export const createTask = async (data) => {
 
 // Comments
 
+export const countCommentsByTaskId = async (taskId) => {
+    try {
+        console.log(taskId);
+        const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'), where('taskId', '==', taskId));
+        const querySnapshot = await getDocs(q);
+        const size = querySnapshot.size;
+        return size;
+    } catch (error) {
+        console.error(error.message, 'error counting comments');
+    }
+};
+
 export const deleteComment = async (commentId) => {
     try {
         const commentRef = doc(db, 'comments', commentId);
@@ -176,24 +188,21 @@ export const saveComment = async (data) => {
     console.log(data);
     try {
         const commentRef = doc(db, 'comments', data.id);
-        const commentSnap = await getDoc(commentRef);
-        if (commentSnap.exists()) {
-            await setDoc(commentRef, data);
-        }
+        await setDoc(commentRef, data);
         return { status: 200, message: 'Saved comment...' };
     } catch (error) {
         console.error(error.message + ' error saving comment');
         return { status: 501, message: `Something went wrong. Please try again` };
     }
 };
-export const fetchComments = async (taskId) => {
+export const fetchComments = async (userId) => {
     try {
-        console.log(taskId);
-        const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'), where('taskId', '==', taskId));
+        console.log(userId);
+        const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'), where('userId', '==', userId));
         const querySnapshot = await getDocs(q);
         const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
         return data;
     } catch (error) {
-        console.error(error.message, 'error fetching comments');
+        console.error(error.message, 'error fetching comment');
     }
 };

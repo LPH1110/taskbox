@@ -1,20 +1,29 @@
 import {
-    CHANGE_BOARD_STATUS,
-    CHANGE_BOARD_FAVOR,
     ADD_NEW_BOARD,
-    DELETE_BOARD,
-    ONCHANGE_BOARD_TITLE,
     ADD_NEW_COMMENT_TO_TASK,
-    DELETE_COMMENT_BY_ID,
-    SET_USER_SESSION,
+    DELETE_BOARD,
+    DELETE_COMMENT,
+    ONCHANGE_BOARD_TITLE,
     SET_OTP_CODE,
-    UPDATE_COLUMN_ID,
-    UPDATE_COLUMNS,
-    UPDATE_TASKS,
-    UPDATE_TASK_ID,
+    SET_USER_SESSION,
     UPDATE_BOARDS,
     UPDATE_BOARD_ID,
+    UPDATE_COLUMNS,
+    UPDATE_COLUMN_ID,
+    UPDATE_COMMENTS,
+    UPDATE_TASKS,
+    UPDATE_TASK_ID,
 } from './constants';
+
+export const deleteCommentById = (payload) => ({
+    type: DELETE_COMMENT,
+    payload,
+});
+
+export const updateComments = (payload) => ({
+    type: UPDATE_COMMENTS,
+    payload,
+});
 
 export const updateBoards = (payload) => ({
     type: UPDATE_BOARDS,
@@ -73,10 +82,5 @@ export const onChangeBoardTitle = (payload) => ({
 
 export const addNewCommentToTask = (payload) => ({
     type: ADD_NEW_COMMENT_TO_TASK,
-    payload,
-});
-
-export const deleteCommentById = (payload) => ({
-    type: DELETE_COMMENT_BY_ID,
     payload,
 });

@@ -14,3 +14,5 @@ export const UPDATE_BOARD = 'update_board';
 export const UPDATE_TASK_ID = 'update_task_id';
 export const UPDATE_BOARDS = 'update_boards';
 export const UPDATE_BOARD_ID = 'update_board_id';
+export const UPDATE_COMMENTS = 'update_comments';
+export const DELETE_COMMENT = 'delete_comment';
