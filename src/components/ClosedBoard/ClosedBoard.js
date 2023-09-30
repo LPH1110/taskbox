@@ -7,6 +7,7 @@ import { deleteBoard, saveBoard } from '~/lib/actions';
 import { actions, useStore } from '~/store';
 import Spacer from '../Spacer';
 import Button from '../Button';
+import DelConfirmPopper from '../DelConfirmPopper/DelConfirmPopper';
 
 const ClosedBoard = ({ setBoard, board, setToast }) => {
     const [, dispatch] = useStore();
@@ -95,7 +96,12 @@ const ClosedBoard = ({ setBoard, board, setToast }) => {
             >
                 Reopen board
             </button>
-            <div className="relative">
+            <DelConfirmPopper
+                handleDelete={handleDeleteBoard}
+                isLoading={isLoading}
+                openConfirmDel={openConfirmDel}
+                setOpenConfirmDel={setOpenConfirmDel}
+            >
                 <button
                     onClick={() => setOpenConfirmDel((prev) => !prev)}
                     type="button"
@@ -103,33 +109,7 @@ const ClosedBoard = ({ setBoard, board, setToast }) => {
                 >
                     Permanently delete board
                 </button>
-                <Transition
-                    show={openConfirmDel}
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                >
-                    <div className="min-w-[20rem] bg-slate-600 rounded-md absolute top-full text-white p-4 flexCenter flex-col gap-2">
-                        <h4>Permanently delete?</h4>
-                        <Spacer />
-                        <p>
-                            All lists, cards and actions will be deleted, and you won't be able to re-open the board.
-                            There is no undo.
-                        </p>
-                        <Button
-                            size="small"
-                            onClick={handleDeleteBoard}
-                            className="rounded-sm w-full p-2 bg-red-400 text-white hover:bg-red-400/80 ease duration-100"
-                        >
-                            {isLoading ? 'Deleting...' : 'Delete'}
-                        </Button>
-                    </div>
-                </Transition>
-            </div>
+            </DelConfirmPopper>
         </div>
     );
 };

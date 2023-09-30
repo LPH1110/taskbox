@@ -217,8 +217,8 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
     useEffect(() => {
         if (user) {
             const getData = async () => {
-                const columnsResult = await fetchColumns(board.id);
-                const tasksResult = await fetchTasks(board.id);
+                const columnsResult = await fetchColumns(board?.id);
+                const tasksResult = await fetchTasks(board?.id);
                 const commentsResult = await fetchComments(user.uid);
 
                 const columnData = convertObjFromArray(columnsResult);
@@ -240,7 +240,7 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable key={board.id} direction={direction} droppableId={board.id} type="COLUMN">
+            <Droppable key={board?.id} direction={direction} droppableId={board?.id} type="COLUMN">
                 {(provided) => {
                     return (
                         <div
@@ -260,7 +260,7 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
                                             setOpenTaskModal={setOpenTaskModal}
                                             setToast={setToast}
                                             direction={direction}
-                                            boardId={board.id}
+                                            boardId={board?.id}
                                             index={index}
                                             column={column}
                                             tasks={taskList}
@@ -273,7 +273,7 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
                             <CreateListBtn
                                 direction={direction}
                                 dispatch={dispatch}
-                                boardId={board.id}
+                                boardId={board?.id}
                                 setBoard={setBoard}
                                 setToast={setToast}
                             />

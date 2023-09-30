@@ -17,9 +17,9 @@ import styles from './BoardDetail.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip, UserAvatar } from '~/components';
 import FilterButton from '~/components/Board/FilterButton';
-import { fetchBoard, saveBoard } from '~/lib/actions';
 import ClosedBoard from '~/components/ClosedBoard';
 import TaskModal from '~/components/TaskModal';
+import { fetchBoard, saveBoard } from '~/lib/actions';
 
 const cx = classNames.bind(styles);
 
@@ -67,12 +67,14 @@ function BoardDetail() {
     useEffect(() => {
         const getBoard = async () => {
             const result = await fetchBoard(title);
-            setBoard(result);
-            setBoardTitle(result?.title);
-            setIsLoading(false);
+            if (result) {
+                setBoard(result);
+                setBoardTitle(result?.title);
+                setIsLoading(false);
+            }
         };
         getBoard();
-    }, [title]);
+    }, []);
 
     const handleBoardTitleFocusout = (e) => {
         const newBoard = {
