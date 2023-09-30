@@ -26,7 +26,7 @@ const Button = forwardRef(
                 }
             });
         } else {
-            props.type = type | 'button';
+            props.type = type || 'button';
         }
 
         const classes = cx(

@@ -2,7 +2,7 @@ import React from 'react';
 
 const FormField = ({ name, value, handleChange, touched, errors, label, placeholder = '', required = false }) => {
     return (
-        <section className="flex flex-col mb-2">
+        <section className="flex flex-col mb-2 w-full">
             {label && (
                 <label className="text-slate-600 font-semibold" htmlFor="email">
                     {label} {required && <span className="text-red-500">*</span>}

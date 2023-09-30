@@ -17,3 +17,5 @@ export { default as Board } from './Board';
 export { default as LazyLoad } from './LazyLoad';
 export { default as UserMenu } from './UserMenu';
 export { default as DelConfirmPopper } from './DelConfirmPopper';
+export { default as ShareModal } from './ShareModal';
+export { default as LineInput } from './LineInput';

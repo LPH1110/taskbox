@@ -8,10 +8,10 @@ import { db } from '~/firebase-config';
 */
 
 // Helpers
-const ifBoardExists = async (title) => {
+const ifBoardExists = async (userId, title) => {
     console.log(title);
     const boards = collection(db, 'boards');
-    const q = query(boards, where('title', '==', title));
+    const q = query(boards, where('creatorId', '==', userId), where('title', '==', title));
     const snapshot = await getDocs(q);
     return snapshot.docs.length > 0;
 };
@@ -19,12 +19,18 @@ const ifBoardExists = async (title) => {
 // Boards
 export const createBoard = async (data) => {
     try {
-        const res = await ifBoardExists(data.title);
+        const res = await ifBoardExists(data.creatorId, data.title);
         if (res) {
             return { status: 502, message: `This board has already been created.` };
         } else {
             const boards = collection(db, 'boards');
-            await addDoc(boards, data);
+            const result = await addDoc(boards, data);
+            const doc = await getDoc(result);
+            await createAssignee({
+                userId: data.creatorId,
+                boardId: doc.id,
+                permission: 'admin',
+            });
             return { status: 200, message: `Successfully created board (${data.title})` };
         }
     } catch (error) {
@@ -75,6 +81,7 @@ export const deleteBoard = async (boardId) => {
         deleteColumnsByBoardId(boardId);
         deleteTasksByBoardId(boardId);
         deleteCommentsByBoardId(boardId);
+        deleteAssignees(boardId);
         return { status: 200, message: 'Board has been deleted successfully.' };
     } catch (error) {
         return { status: 501, error };
@@ -237,5 +244,25 @@ export const fetchComments = async (userId) => {
         return data;
     } catch (error) {
         console.error(error.message, 'error fetching comment');
+    }
+};
+
+// Assignees
+export const createAssignee = async (data) => {
+    try {
+        const assigneeRef = collection(db, 'assignees');
+        await addDoc(assigneeRef, data);
+    } catch (error) {
+        console.error(error, 'error creating assignee');
+    }
+};
+export const updateAssignee = async () => {};
+export const deleteAssignees = async (boardId) => {
+    try {
+        const q = query(collection(db, 'assignees'), where('boardId', '==', boardId));
+        const snapshot = await getDocs(q);
+        Promise.all(snapshot.docs.map((doc) => deleteDoc(doc.ref)));
+    } catch (error) {
+        console.error(error, 'error deleting assignee');
     }
 };

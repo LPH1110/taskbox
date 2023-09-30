@@ -1,12 +1,9 @@
-import { Transition } from '@headlessui/react';
-import React, { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActivityAuth } from '~/contexts/ActivityContext';
 import { UserAuth } from '~/contexts/AuthContext';
 import { deleteBoard, saveBoard } from '~/lib/actions';
 import { actions, useStore } from '~/store';
-import Spacer from '../Spacer';
-import Button from '../Button';
 import DelConfirmPopper from '../DelConfirmPopper/DelConfirmPopper';
 
 const ClosedBoard = ({ setBoard, board, setToast }) => {

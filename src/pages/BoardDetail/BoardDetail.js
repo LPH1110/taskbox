@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
-import { Board, BoardMenu, Button, LazyLoad, Toast, Tooltip, UserAvatar } from '~/components';
+import { Board, BoardMenu, Button, LazyLoad, ShareModal, Toast, Tooltip, UserAvatar } from '~/components';
 import FilterButton from '~/components/Board/FilterButton';
 import ClosedBoard from '~/components/ClosedBoard';
 import TaskModal from '~/components/TaskModal';
@@ -53,6 +53,7 @@ function BoardDetail() {
         show: false,
         task: {},
     });
+    const [openShareModal, setOpenShareModal] = useState(false);
     const [viewBy, setViewBy] = useState('stack');
     const [toast, setToast] = useState({
         show: false,
@@ -113,7 +114,7 @@ function BoardDetail() {
                                         <QuestionMarkCircleIcon className="w-5 h-5" />
                                     </span>
                                 </Tooltip>
-                                <Button type="button">
+                                <Button>
                                     <span>
                                         {board && !board.favor ? (
                                             <StarIconOutline className="w-5 h-5" />
@@ -167,6 +168,7 @@ function BoardDetail() {
                                     className="hover:bg-blue-100/30 py-2 hover:text-blue-500  ease-in-out duration-200 bg-blue-100/50 text-blue-600 font-semibold rounded-md"
                                     type="button"
                                     size="small"
+                                    onClick={() => setOpenShareModal((prev) => !prev)}
                                     leftIcon={<ShareIcon className="w-4 h-4" />}
                                 >
                                     Share
@@ -237,6 +239,7 @@ function BoardDetail() {
                 openTaskModal={openTaskModal}
                 setOpenTaskModal={setOpenTaskModal}
             />
+            <ShareModal modalTitle="Share board" show={openShareModal} setShow={setOpenShareModal} />
         </div>
     );
 }
