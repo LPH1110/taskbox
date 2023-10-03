@@ -13,6 +13,8 @@ import {
     DELETE_BOARD,
     UPDATE_COMMENTS,
     DELETE_COMMENT,
+    UPDATE_SHARED_BOARDS,
+    DELETE_SHARED_BOARD,
 } from './constants';
 
 const initState = {
@@ -22,6 +24,7 @@ const initState = {
         info: {},
     },
     boards: [],
+    sharedBoards: [],
     columns: {
         'column-1': {
             id: 'column-1',
@@ -42,7 +45,19 @@ const initState = {
 
 function reducer(state, action) {
     let newComments;
+    let newSharedBoards;
     switch (action.type) {
+        case DELETE_SHARED_BOARD:
+            newSharedBoards = state.sharedBoards.filter((board) => board.id !== action.payload.id);
+            return {
+                ...state,
+                sharedBoards: newSharedBoards,
+            };
+        case UPDATE_SHARED_BOARDS:
+            return {
+                ...state,
+                sharedBoards: [...action.payload],
+            };
         case ADD_NEW_COMMENT_TO_TASK:
             if (state.comments[action.payload.id]) {
                 // update comment

@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '~/firebase-config';
+import { fetchUsers, saveUser } from '~/lib/actions';
 
 const AuthContext = createContext();
 
@@ -20,6 +21,7 @@ export const AuthContextProvider = ({ children }) => {
             setUser(currentUser);
             console.log('User', currentUser);
             if (currentUser) {
+                saveUser(currentUser);
                 localStorage.setItem(currentUser.email, currentUser.uid);
             }
         });

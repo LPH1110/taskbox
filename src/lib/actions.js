@@ -8,18 +8,55 @@ import { db } from '~/firebase-config';
 */
 
 // Helpers
-const ifBoardExists = async (userId, title) => {
+const ifBoardExists = async (email, title) => {
     console.log(title);
     const boards = collection(db, 'boards');
-    const q = query(boards, where('creatorId', '==', userId), where('title', '==', title));
+    const q = query(boards, where('creator', '==', email), where('title', '==', title));
     const snapshot = await getDocs(q);
     return snapshot.docs.length > 0;
 };
 
-// Boards
-export const createBoard = async (data) => {
+// Users
+export const fetchUserInfo = async (email) => {
     try {
-        const res = await ifBoardExists(data.creatorId, data.title);
+        const userRef = doc(db, 'users', email);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            return userSnap.data();
+        }
+    } catch (error) {
+        console.error(error, 'error fetching user info');
+    }
+};
+export const saveUser = async (data) => {
+    try {
+        const userRef = doc(db, 'users', data.email);
+        let dataObj = Object.assign({}, data);
+        await setDoc(userRef, {
+            email: dataObj.email,
+            displayName: dataObj.displayName,
+            photoURL: dataObj.photoURL,
+        });
+    } catch (error) {
+        console.error(error, 'error saving user');
+    }
+};
+export const fetchUsers = async () => {
+    try {
+        const userRef = collection(db, 'users');
+        const snapshot = await getDocs(userRef);
+        const data = snapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data() }], []);
+        console.log(data);
+    } catch (error) {
+        console.error(error, 'error saving user');
+    }
+};
+
+// Boards
+export const createBoard = async (data, user) => {
+    try {
+        const res = await ifBoardExists(data.creator, data.title);
         if (res) {
             return { status: 502, message: `This board has already been created.` };
         } else {
@@ -27,9 +64,13 @@ export const createBoard = async (data) => {
             const result = await addDoc(boards, data);
             const doc = await getDoc(result);
             await createAssignee({
-                userId: data.creatorId,
+                user: {
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    displayName: user.displayName,
+                },
                 boardId: doc.id,
-                permission: 'admin',
+                role: 'admin',
             });
             return { status: 200, message: `Successfully created board (${data.title})` };
         }
@@ -53,12 +94,35 @@ export const saveBoard = async (boardId, data) => {
     }
 };
 
-export const fetchBoards = async (userId) => {
-    console.log(userId);
-    const q = query(collection(db, 'boards'), where('creatorId', '==', userId));
+export const fetchBoards = async (email) => {
+    console.log(email);
+    const q = query(collection(db, 'boards'), where('creator', '==', email));
     const querySnapshot = await getDocs(q);
     const list = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
     return list;
+};
+
+export const fetchSharedBoards = async (email) => {
+    console.info('Fetch shared boards: ', email);
+    try {
+        const assigneesRef = collection(db, 'assignees');
+        const q = query(assigneesRef, where('user.email', '==', email));
+        const snapshot = await getDocs(q);
+        const list = snapshot.docs.reduce(async (acc, document) => {
+            let { boardId } = document.data();
+            let boardRef = doc(db, 'boards', boardId);
+            let boardData = await getDoc(boardRef);
+            let newDoc = {
+                id: boardData.id,
+                ...boardData.data(),
+            };
+            return [...acc, newDoc];
+        }, []);
+
+        return list;
+    } catch (error) {
+        console.error(error, 'error fetching shared boards');
+    }
 };
 
 export const fetchBoard = async (title) => {
@@ -85,6 +149,21 @@ export const deleteBoard = async (boardId) => {
         return { status: 200, message: 'Board has been deleted successfully.' };
     } catch (error) {
         return { status: 501, error };
+    }
+};
+
+export const leavingBoard = async ({ email, boardId }) => {
+    console.info(`Leaving the board: [user: ${email}, board: ${boardId}]`);
+    try {
+        const q = query(collection(db, 'assignees'), where('boardId', '==', boardId), where('user.email', '==', email));
+        const snapshot = await getDocs(q);
+        snapshot.docs.forEach(async (doc) => {
+            if (doc.exists()) {
+                await deleteDoc(doc.ref);
+            }
+        });
+    } catch (error) {
+        console.error(error, 'error leaving board');
     }
 };
 
@@ -235,10 +314,10 @@ export const saveComment = async (data) => {
         return { status: 501, message: `Something went wrong. Please try again` };
     }
 };
-export const fetchComments = async (userId) => {
+export const fetchComments = async (boardId) => {
     try {
-        console.log(userId);
-        const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'), where('userId', '==', userId));
+        console.log(boardId);
+        const q = query(collection(db, 'comments'), orderBy('createdAt', 'desc'), where('boardId', '==', boardId));
         const querySnapshot = await getDocs(q);
         const data = querySnapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
         return data;
@@ -248,6 +327,17 @@ export const fetchComments = async (userId) => {
 };
 
 // Assignees
+export const fetchAssignees = async (boardId) => {
+    console.log(boardId);
+    try {
+        const q = query(collection(db, 'assignees'), where('boardId', '==', boardId));
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.reduce((acc, doc) => [...acc, { ...doc.data(), id: doc.id }], []);
+        return data;
+    } catch (error) {
+        console.error(error, 'error fetching assignees');
+    }
+};
 export const createAssignee = async (data) => {
     try {
         const assigneeRef = collection(db, 'assignees');
@@ -257,6 +347,7 @@ export const createAssignee = async (data) => {
     }
 };
 export const updateAssignee = async () => {};
+
 export const deleteAssignees = async (boardId) => {
     try {
         const q = query(collection(db, 'assignees'), where('boardId', '==', boardId));

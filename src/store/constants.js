@@ -16,3 +16,5 @@ export const UPDATE_BOARDS = 'update_boards';
 export const UPDATE_BOARD_ID = 'update_board_id';
 export const UPDATE_COMMENTS = 'update_comments';
 export const DELETE_COMMENT = 'delete_comment';
+export const UPDATE_SHARED_BOARDS = 'update_shared_boards';
+export const DELETE_SHARED_BOARD = 'delete_shared_board';

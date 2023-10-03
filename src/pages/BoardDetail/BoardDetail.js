@@ -19,7 +19,9 @@ import { Board, BoardMenu, Button, LazyLoad, ShareModal, Toast, Tooltip, UserAva
 import FilterButton from '~/components/Board/FilterButton';
 import ClosedBoard from '~/components/ClosedBoard';
 import TaskModal from '~/components/TaskModal';
-import { fetchBoard, saveBoard } from '~/lib/actions';
+import { fetchBoard, leavingBoard, saveBoard } from '~/lib/actions';
+import { UserAuth } from '~/contexts/AuthContext';
+import { actions, useStore } from '~/store';
 
 const cx = classNames.bind(styles);
 
@@ -46,6 +48,8 @@ const ViewBy = ({ viewBy, setViewBy }) => {
 
 function BoardDetail() {
     const { title } = useParams();
+    const { user } = UserAuth();
+    const [, dispatch] = useStore();
     const [boardTitle, setBoardTitle] = useState('');
     const [board, setBoard] = useState({});
     const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +66,7 @@ function BoardDetail() {
             status: '',
         },
     });
+    const [timeoutId, setTimeoutId] = useState();
 
     const boardTitleInputRef = useRef();
 
@@ -76,6 +81,10 @@ function BoardDetail() {
         };
         getBoard();
     }, []);
+
+    useEffect(() => {
+        return () => clearTimeout(timeoutId);
+    }, [timeoutId]);
 
     const handleBoardTitleFocusout = (e) => {
         const newBoard = {
@@ -204,14 +213,15 @@ function BoardDetail() {
                             <FilterButton leftIcon={<Squares2X2Icon />} title={'Customize'} />
                             <FilterButton leftIcon={<ArrowsUpDownIcon />} title={'Sort'} />
                             <FilterButton leftIcon={<AdjustmentsHorizontalIcon />} title={'Filter'} />
-                            <BoardMenu data={board} setBoard={setBoard} setToast={setToast}>
-                                <FilterButton
-                                    title={
-                                        <span className="w-5 h-5">
-                                            <EllipsisVerticalIcon />
-                                        </span>
-                                    }
-                                />
+                            <BoardMenu
+                                setToast={setToast}
+                                setBoard={setBoard}
+                                board={board}
+                                admin={user?.email === board?.creator}
+                            >
+                                <div className="w-5 h-5">
+                                    <EllipsisVerticalIcon />
+                                </div>
                             </BoardMenu>
                         </div>
                     </section>
@@ -239,7 +249,7 @@ function BoardDetail() {
                 openTaskModal={openTaskModal}
                 setOpenTaskModal={setOpenTaskModal}
             />
-            <ShareModal modalTitle="Share board" show={openShareModal} setShow={setOpenShareModal} />
+            <ShareModal board={board} modalTitle="Share board" show={openShareModal} setShow={setOpenShareModal} />
         </div>
     );
 }

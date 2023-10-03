@@ -219,7 +219,7 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
             const getData = async () => {
                 const columnsResult = await fetchColumns(board?.id);
                 const tasksResult = await fetchTasks(board?.id);
-                const commentsResult = await fetchComments(user.uid);
+                const commentsResult = await fetchComments(board?.id);
 
                 const columnData = convertObjFromArray(columnsResult);
                 const taskData = convertObjFromArray(tasksResult);

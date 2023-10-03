@@ -99,7 +99,7 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
         const comment = {
             id: uuidv4(),
             content: data,
-            userId: user?.uid,
+            email: user?.email,
             photoURL: user?.photoURL,
             displayName: user?.displayName,
             taskId: openTaskModal.task.id,
@@ -132,8 +132,6 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
         const filtered = list.filter(([, comment]) => comment.taskId === openTaskModal.task.id) || [];
         return filtered;
     };
-
-    console.log();
 
     useEffect(() => {
         return () => clearTimeout(timeoutId);
@@ -297,7 +295,11 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         {filteredComments().map(([id, comment]) => (
-                                            <Comment key={comment.id} comment={comment} />
+                                            <Comment
+                                                admin={user?.email === board?.creator}
+                                                key={comment.id}
+                                                comment={comment}
+                                            />
                                         ))}
                                     </div>
                                 </div>

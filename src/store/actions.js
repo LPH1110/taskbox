@@ -13,7 +13,14 @@ import {
     UPDATE_COMMENTS,
     UPDATE_TASKS,
     UPDATE_TASK_ID,
+    UPDATE_SHARED_BOARDS,
+    DELETE_SHARED_BOARD,
 } from './constants';
+
+export const deleteSharedBoard = (id) => ({
+    type: DELETE_SHARED_BOARD,
+    payload: { id },
+});
 
 export const deleteCommentById = (payload) => ({
     type: DELETE_COMMENT,
@@ -82,5 +89,10 @@ export const onChangeBoardTitle = (payload) => ({
 
 export const addNewCommentToTask = (payload) => ({
     type: ADD_NEW_COMMENT_TO_TASK,
+    payload,
+});
+
+export const updateSharedBoards = (payload) => ({
+    type: UPDATE_SHARED_BOARDS,
     payload,
 });

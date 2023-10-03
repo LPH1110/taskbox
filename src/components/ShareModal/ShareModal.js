@@ -1,22 +1,36 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/solid';
-import React, { useState } from 'react';
-import { Fragment } from 'react';
-import Button from '../Button';
-import LineInput from '../LineInput';
 import { LinkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/solid';
+import { Fragment, useEffect, useState } from 'react';
+import { createAssignee, fetchAssignees, fetchUserInfo } from '~/lib/actions';
+import LineInput from '../LineInput';
+import UserAvatar from '../UserAvatar';
 
-const ShareModal = ({ show, setShow, modalTitle }) => {
+const ShareModal = ({ board, show, setShow, modalTitle }) => {
     const [memberName, setMemberName] = useState('');
     const [created, setCreated] = useState(false);
+    const [assignees, setAssignees] = useState([]);
 
     const handleChange = (name, value) => {
-        console.log(value);
         setMemberName(value);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        // create new assignee
+        const info = await fetchUserInfo(memberName);
+        const newAssignee = {
+            user: {
+                email: info.email,
+                photoURL: info.photoURL,
+                displayName: info.displayName,
+            },
+            boardId: board.id,
+            role: 'member',
+        };
+        await createAssignee(newAssignee);
+        setAssignees((prev) => [newAssignee, ...prev]);
+        setMemberName('');
     };
 
     const handleCreateLink = () => {
@@ -26,6 +40,18 @@ const ShareModal = ({ show, setShow, modalTitle }) => {
     const handleCopyLink = () => {
         console.log('copied');
     };
+
+    useEffect(() => {
+        if (show) {
+            const getAssignees = async () => {
+                const result = await fetchAssignees(board.id);
+                setAssignees(result || []);
+            };
+
+            getAssignees();
+        }
+    }, [show]);
+
     return (
         <Transition show={show} as={Fragment}>
             <Dialog onClose={() => setShow(false)} as="div" className="relative z-10">
@@ -93,6 +119,22 @@ const ShareModal = ({ show, setShow, modalTitle }) => {
                                             </button>
                                         )}
                                     </div>
+                                </div>
+                                <div className="space-y-2">
+                                    {assignees.map((assignee) => (
+                                        <div key={assignee.id} className="flexBetween">
+                                            <div className="flex gap-2">
+                                                <UserAvatar photoURL={assignee.user.photoURL} />
+                                                <div>
+                                                    <h4>{assignee.user.displayName}</h4>
+                                                    <p className="text-sm text-description">@phuhaole</p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p>{assignee.role}</p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>

@@ -17,7 +17,7 @@ import classNames from 'classnames/bind';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Toast } from '~/components';
-import { saveBoard } from '~/lib/actions';
+import { leavingBoard, saveBoard } from '~/lib/actions';
 import Spacer from '../Spacer/Spacer';
 import AboutMenu from './AboutMenu';
 import ActivityMenu from './ActivityMenu';
@@ -25,6 +25,9 @@ import ArchivedMenu from './ArchivedMenu';
 import styles from './BoardMenu.module.scss';
 import ChangeBackgroundMenu from './ChangeBackgroundMenu';
 import SettingsMenu from './SettingsMenu';
+import { UserAuth } from '~/contexts/AuthContext';
+import { actions, useStore } from '~/store';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -42,7 +45,7 @@ const MenuList = ({ data, setCurrentMenu }) => {
             {data.map((item) => (
                 <Fragment key={item?.id}>
                     <Menu.Item className={cx('board_menu-item')}>
-                        <button className="items-start w-full" onClick={(e) => handleClick(e, item)}>
+                        <button type="button" className="items-start w-full" onClick={(e) => handleClick(e, item)}>
                             {item?.thumbnailURL ? (
                                 <div
                                     style={{ backgroundImage: `url(${item.thumbnailURL})` }}
@@ -64,7 +67,8 @@ const MenuList = ({ data, setCurrentMenu }) => {
     );
 };
 
-const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
+const BoardMenu = ({ children, admin, board, setBoard, setToast }) => {
+    const { user } = UserAuth();
     const [openModal, setOpenModal] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const [currentMenu, setCurrentMenu] = useState([
@@ -74,6 +78,7 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
         },
     ]);
     const menuRef = useRef();
+    const navigate = useNavigate();
 
     const [boardMenu] = useState([
         {
@@ -128,34 +133,6 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
             title: 'Print, export, and share',
             icon: <ShareIcon className="w-5 h-5" />,
         },
-        {
-            id: uuidv4(),
-            title: 'Close board',
-            icon: <MinusIcon className="w-5 h-5" />,
-            onClick() {
-                setBoard((prev) => {
-                    const newBoard = {
-                        ...prev,
-                        deletedAt: new Date(),
-                    };
-                    const boardId = prev.id;
-                    saveBoard(boardId, newBoard);
-                    return newBoard;
-                });
-                setToast({
-                    show: true,
-                    body: {
-                        message: 'This board has been temporarily deleted.',
-                        status: 'error',
-                    },
-                });
-                setTimeoutId(
-                    setTimeout(() => {
-                        setToast((prev) => ({ ...prev, show: false }));
-                    }, 3000),
-                );
-            },
-        },
     ]);
 
     const [toast] = useState({
@@ -170,6 +147,33 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
         if (menuRef.current && !menuRef.current.contains(e.target)) {
             setOpenModal(false);
         }
+    };
+
+    const handleCloseBoard = () => {
+        console.log('closing board', board);
+        const newBoard = {
+            ...board,
+            deletedAt: new Date(),
+        };
+        setBoard(newBoard);
+        saveBoard(board?.id, newBoard);
+        setToast({
+            show: true,
+            body: {
+                message: 'This board has been temporarily deleted.',
+                status: 'error',
+            },
+        });
+        setTimeoutId(
+            setTimeout(() => {
+                setToast((prev) => ({ ...prev, show: false }));
+            }, 3000),
+        );
+    };
+
+    const handleLeavingBoard = () => {
+        leavingBoard({ email: user?.email, boardId: board?.id });
+        navigate('/workspaces');
     };
 
     const renderMenu = () => {
@@ -218,7 +222,9 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
     return (
         <div className="flex items-center justify-center relative z-10 flex-col">
             <Menu as="div">
-                <Menu.Button onClick={() => setOpenModal((prev) => !prev)}>{children}</Menu.Button>
+                <Menu.Button type="button" onClick={() => setOpenModal((prev) => !prev)}>
+                    {children}
+                </Menu.Button>
                 <Transition
                     show={openModal}
                     as={Fragment}
@@ -250,7 +256,36 @@ const BoardMenu = ({ setToast, setBoard, children, setBoards }) => {
                             {currentMenu[currentMenu.length - 1].title}
                         </h4>
                         <Spacer />
-                        <div className="flex flex-col items-start w-full">{renderMenu()}</div>
+                        <div className="flex flex-col items-start w-full">
+                            {renderMenu()}
+                            {currentMenu[currentMenu.length - 1].path === '/' && (
+                                <Menu.Item className={cx('board_menu-item')}>
+                                    {admin ? (
+                                        <button onClick={handleCloseBoard} type="button" className="items-start w-full">
+                                            <span>
+                                                <XMarkIcon className="w-5 h-5" />
+                                            </span>
+                                            <div className="text-left">
+                                                <h4>Close board</h4>
+                                            </div>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleLeavingBoard}
+                                            type="button"
+                                            className="items-start w-full"
+                                        >
+                                            <span>
+                                                <XMarkIcon className="w-5 h-5" />
+                                            </span>
+                                            <div className="text-left">
+                                                <h4>Leaving board</h4>
+                                            </div>
+                                        </button>
+                                    )}
+                                </Menu.Item>
+                            )}
+                        </div>
                     </Menu.Items>
                 </Transition>
             </Menu>

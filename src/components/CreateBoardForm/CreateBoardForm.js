@@ -59,7 +59,7 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
             setForm((prev) => ({ ...prev, errors: { boardTitle: 'Board title is required' } }));
         } else {
             const data = {
-                creatorId: user?.uid,
+                creator: user?.email,
                 title: form.boardTitle,
                 visibility: {
                     title: visibility.title,
@@ -68,7 +68,7 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
                 thumbnailURL: currentThumb?.urls?.full || currentThumb.thumbnailURL,
                 columnOrder: [],
             };
-            const result = await createBoard(data);
+            const result = await createBoard(data, user);
             if (result?.status === 200) {
                 setToast({
                     show: true,
