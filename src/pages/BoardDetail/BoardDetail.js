@@ -19,8 +19,8 @@ import { Board, BoardMenu, Button, LazyLoad, ShareModal, Toast, Tooltip, UserAva
 import FilterButton from '~/components/Board/FilterButton';
 import ClosedBoard from '~/components/ClosedBoard';
 import TaskModal from '~/components/TaskModal';
-import { fetchBoard, leavingBoard, saveBoard } from '~/lib/actions';
 import { UserAuth } from '~/contexts/AuthContext';
+import { fetchAssignees, fetchBoard, saveBoard } from '~/lib/actions';
 import { actions, useStore } from '~/store';
 
 const cx = classNames.bind(styles);
@@ -49,7 +49,8 @@ const ViewBy = ({ viewBy, setViewBy }) => {
 function BoardDetail() {
     const { title } = useParams();
     const { user } = UserAuth();
-    const [, dispatch] = useStore();
+    const [state, dispatch] = useStore();
+    const { assignees } = state;
     const [boardTitle, setBoardTitle] = useState('');
     const [board, setBoard] = useState({});
     const [isLoading, setIsLoading] = useState(true);
@@ -73,9 +74,11 @@ function BoardDetail() {
     useEffect(() => {
         const getBoard = async () => {
             const result = await fetchBoard(title);
-            if (result) {
+            const assignees = await fetchAssignees(result?.id);
+            if (result && assignees) {
                 setBoard(result);
                 setBoardTitle(result?.title);
+                dispatch(actions.updateAssignees(assignees));
                 setIsLoading(false);
             }
         };
@@ -140,35 +143,20 @@ function BoardDetail() {
                             {/* Avatar Group */}
                             <Button type="button" className="mr-3">
                                 <div className="avatar-group -space-x-4">
-                                    <div className="avatar">
-                                        <div className="w-9">
-                                            <img
-                                                alt="member avatar"
-                                                src="https://res.cloudinary.com/dzzv49yec/image/upload/v1670092118/taskbox-assets/avatar4_n1nbbs.jpg"
-                                            />
+                                    {assignees?.slice(0, 2).map((assignee) => (
+                                        <div key={assignee?.id} className="avatar">
+                                            <div className="w-9">
+                                                <img alt="member avatar" src={assignee?.user?.photoURL} />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="avatar">
-                                        <div className="w-9">
-                                            <img
-                                                alt="member avatar"
-                                                src="https://res.cloudinary.com/dzzv49yec/image/upload/v1670092118/taskbox-assets/avatar2_fssdbw.jpg"
-                                            />
+                                    ))}
+                                    {assignees.length > 3 && (
+                                        <div className="avatar placeholder">
+                                            <div className="w-9 bg-blue-100 text-blue-600 font-semibold">
+                                                <span>{assignees.length - 3}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="avatar">
-                                        <div className="w-9">
-                                            <img
-                                                alt="member avatar"
-                                                src="https://res.cloudinary.com/dzzv49yec/image/upload/v1670092118/taskbox-assets/avatar3_clufwp.jpg"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="avatar placeholder">
-                                        <div className="w-9 bg-blue-100 text-blue-600 font-semibold">
-                                            <span>+99</span>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             </Button>
                             {/* Sharing */}
@@ -219,8 +207,8 @@ function BoardDetail() {
                                 board={board}
                                 admin={user?.email === board?.creator}
                             >
-                                <div className="w-5 h-5">
-                                    <EllipsisVerticalIcon />
+                                <div className="text-slate-500 hover:text-slate-700 py-2 px-3 flex items-center gap-2 bg-white rounded-md hover:bg-blue-100/50 ease duration-100">
+                                    <EllipsisVerticalIcon className="w-5 h-5" />
                                 </div>
                             </BoardMenu>
                         </div>
@@ -249,7 +237,13 @@ function BoardDetail() {
                 openTaskModal={openTaskModal}
                 setOpenTaskModal={setOpenTaskModal}
             />
-            <ShareModal board={board} modalTitle="Share board" show={openShareModal} setShow={setOpenShareModal} />
+            <ShareModal
+                setToast={setToast}
+                board={board}
+                modalTitle="Share board"
+                show={openShareModal}
+                setShow={setOpenShareModal}
+            />
         </div>
     );
 }

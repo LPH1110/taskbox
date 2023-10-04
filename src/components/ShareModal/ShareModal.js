@@ -2,15 +2,18 @@ import { Dialog, Transition } from '@headlessui/react';
 import { LinkIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Fragment, useEffect, useState } from 'react';
-import { createAssignee, fetchAssignees, fetchUserInfo } from '~/lib/actions';
+import { createAssignee, fetchUserInfo } from '~/lib/actions';
+import { actions, useStore } from '~/store';
 import LineInput from '../LineInput';
 import UserAvatar from '../UserAvatar';
 
-const ShareModal = ({ board, show, setShow, modalTitle }) => {
+const ShareModal = ({ setToast, board, show, setShow, modalTitle }) => {
     const [memberName, setMemberName] = useState('');
     const [created, setCreated] = useState(false);
-    const [assignees, setAssignees] = useState([]);
+    const [timeoutId, setTimeoutId] = useState();
 
+    const [state, dispatch] = useStore();
+    const { assignees } = state;
     const handleChange = (name, value) => {
         setMemberName(value);
     };
@@ -19,18 +22,39 @@ const ShareModal = ({ board, show, setShow, modalTitle }) => {
         e.preventDefault();
         // create new assignee
         const info = await fetchUserInfo(memberName);
-        const newAssignee = {
-            user: {
-                email: info.email,
-                photoURL: info.photoURL,
-                displayName: info.displayName,
-            },
-            boardId: board.id,
-            role: 'member',
-        };
-        await createAssignee(newAssignee);
-        setAssignees((prev) => [newAssignee, ...prev]);
-        setMemberName('');
+        if (!info?.error) {
+            const newAssignee = {
+                user: {
+                    email: info?.email,
+                    photoURL: info?.photoURL,
+                    displayName: info?.displayName,
+                },
+                boardId: board?.id,
+                role: 'member',
+            };
+            const result = await createAssignee(newAssignee);
+            if (!result?.error) {
+                const newList = [newAssignee, ...assignees];
+                dispatch(actions.updateAssignees(newList));
+                setMemberName('');
+            }
+        } else {
+            setToast({
+                show: true,
+                body: {
+                    message: info.error,
+                    status: 'error',
+                },
+            });
+            setTimeoutId(
+                setTimeout(() => {
+                    setToast((prev) => ({
+                        show: false,
+                        ...prev,
+                    }));
+                }, 2000),
+            );
+        }
     };
 
     const handleCreateLink = () => {
@@ -42,15 +66,8 @@ const ShareModal = ({ board, show, setShow, modalTitle }) => {
     };
 
     useEffect(() => {
-        if (show) {
-            const getAssignees = async () => {
-                const result = await fetchAssignees(board.id);
-                setAssignees(result || []);
-            };
-
-            getAssignees();
-        }
-    }, [show]);
+        return () => clearTimeout(timeoutId);
+    }, [timeoutId]);
 
     return (
         <Transition show={show} as={Fragment}>

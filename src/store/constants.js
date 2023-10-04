@@ -18,3 +18,4 @@ export const UPDATE_COMMENTS = 'update_comments';
 export const DELETE_COMMENT = 'delete_comment';
 export const UPDATE_SHARED_BOARDS = 'update_shared_boards';
 export const DELETE_SHARED_BOARD = 'delete_shared_board';
+export const UPDATE_ASSIGNEES = 'update_assignees';

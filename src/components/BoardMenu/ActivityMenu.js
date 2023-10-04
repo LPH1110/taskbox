@@ -52,7 +52,7 @@ const ActivityMenu = () => {
     }, [activityRef, user.uid]);
 
     return (
-        <div style={{ overflow: 'overlay' }} className="flex flex-col justify-start w-full gap-2 max-h-full">
+        <div className="flex flex-col justify-start w-full gap-2 max-h-full">
             <div className="flex items-center justify-between w-full gap-2">
                 <button
                     type="button"

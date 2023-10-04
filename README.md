@@ -2,6 +2,7 @@
 
 -   501: Server failures
 -   502: Document has been existed in DB, can't re-create
+-   504: Document doesn't exists
 -   200: request successfully
 
 ----- REACT_BEAUTIFUL_DND ERRORS -----

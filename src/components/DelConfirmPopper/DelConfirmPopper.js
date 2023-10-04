@@ -3,7 +3,21 @@ import React, { Fragment, useEffect, useRef } from 'react';
 import Spacer from '../Spacer';
 import Button from '../Button';
 
-const DelConfirmPopper = ({ children, handleDelete, isLoading, openConfirmDel, setOpenConfirmDel }) => {
+const config = {
+    title: 'Permanently delete?',
+    description:
+        "All lists, cards and actions will be deleted, and you won't be able to re-open the board. There is no undo.",
+};
+
+const DelConfirmPopper = ({
+    children,
+    handleDelete,
+    isLoading,
+    openConfirmDel,
+    setOpenConfirmDel,
+    title,
+    description,
+}) => {
     const popperRef = useRef();
 
     const handleClickOutside = (e) => {
@@ -37,12 +51,9 @@ const DelConfirmPopper = ({ children, handleDelete, isLoading, openConfirmDel, s
                     ref={popperRef}
                     className="min-w-[20rem] bg-slate-600 rounded-md absolute top-[120%] text-white p-4 flexCenter flex-col gap-2"
                 >
-                    <h4>Permanently delete?</h4>
+                    <h4>{config.title}</h4>
                     <Spacer />
-                    <p>
-                        All lists, cards and actions will be deleted, and you won't be able to re-open the board. There
-                        is no undo.
-                    </p>
+                    <p>{config.description}</p>
                     <Button
                         size="small"
                         onClick={handleDelete}

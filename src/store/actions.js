@@ -15,7 +15,13 @@ import {
     UPDATE_TASK_ID,
     UPDATE_SHARED_BOARDS,
     DELETE_SHARED_BOARD,
+    UPDATE_ASSIGNEES,
 } from './constants';
+
+export const updateAssignees = (payload) => ({
+    type: UPDATE_ASSIGNEES,
+    payload,
+});
 
 export const deleteSharedBoard = (id) => ({
     type: DELETE_SHARED_BOARD,

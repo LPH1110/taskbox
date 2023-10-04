@@ -1,5 +1,5 @@
 .board_menu-items {
-    @apply border border-nav-border bg-white min-w-[22.5rem] max-h-[38rem] rounded-lg p-4 flex flex-col items-center justify-start absolute shadow-xl right-[3rem] -top-[4rem] gap-3;
+    @apply overflow-hidden border border-nav-border bg-white min-w-[22.5rem] max-h-[38rem] rounded-lg p-4 flex flex-col items-center justify-start absolute shadow-xl right-[3rem] -top-[4rem] gap-3;
 }
 
 .board_menu-item {

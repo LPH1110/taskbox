@@ -24,6 +24,8 @@ export const fetchUserInfo = async (email) => {
 
         if (userSnap.exists()) {
             return userSnap.data();
+        } else {
+            return { error: "User doesn't exist" };
         }
     } catch (error) {
         console.error(error, 'error fetching user info');
@@ -327,6 +329,19 @@ export const fetchComments = async (boardId) => {
 };
 
 // Assignees
+export const ifAssigneeExists = async (data) => {
+    try {
+        const q = query(
+            collection(db, 'assignees'),
+            where('user.email', '==', data.user.email),
+            where('boardId', '==', data.boardId),
+        );
+        const snapshot = await getDocs(q);
+        return snapshot.docs.length > 0;
+    } catch (error) {
+        console.error(error);
+    }
+};
 export const fetchAssignees = async (boardId) => {
     console.log(boardId);
     try {
@@ -340,8 +355,13 @@ export const fetchAssignees = async (boardId) => {
 };
 export const createAssignee = async (data) => {
     try {
-        const assigneeRef = collection(db, 'assignees');
-        await addDoc(assigneeRef, data);
+        if (!ifAssigneeExists(data)) {
+            const assigneeRef = collection(db, 'assignees');
+            await addDoc(assigneeRef, data);
+            return { status: 200 };
+        } else {
+            return { error: 'The user has been shared!' };
+        }
     } catch (error) {
         console.error(error, 'error creating assignee');
     }

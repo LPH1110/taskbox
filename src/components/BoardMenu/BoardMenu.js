@@ -16,7 +16,7 @@ import {
 import classNames from 'classnames/bind';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Toast } from '~/components';
+import { DelConfirmPopper, Toast } from '~/components';
 import { leavingBoard, saveBoard } from '~/lib/actions';
 import Spacer from '../Spacer/Spacer';
 import AboutMenu from './AboutMenu';
@@ -70,6 +70,7 @@ const MenuList = ({ data, setCurrentMenu }) => {
 const BoardMenu = ({ children, admin, board, setBoard, setToast }) => {
     const { user } = UserAuth();
     const [openModal, setOpenModal] = useState(false);
+    const [openCloseConfirm, setOpenCloseConfirm] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const [currentMenu, setCurrentMenu] = useState([
         {
