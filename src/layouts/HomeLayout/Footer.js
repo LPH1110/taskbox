@@ -148,12 +148,15 @@ function Footer() {
     return (
         <section className="px-12 col-span-12">
             {/* Navigations */}
-            <div className="grid grid-cols-6 gap-x-6 py-12 mb-12">
-                <div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 py-12 mb-12">
+                <div className="flex flex-col items-start">
                     <Button size="small" href="/" className="flex mr-2 justify-start">
                         <span className="font-semibold text-4xl text-blue-600">T</span>
                         <p className="text-xl">askbox</p>
                     </Button>
+                    <p className="text-sm text-description px-4">
+                        This is a sample span description. Please do not mind it.
+                    </p>
                 </div>
                 {footNavigations.map((nav) => (
                     <div key={nav.id}>
@@ -176,7 +179,7 @@ function Footer() {
                 <div className="flex items-center">
                     <Button
                         size="small"
-                        className="font-semibold text-slate-700 hover:text-slate-500 ease duration-200"
+                        className="hidden lg:flex font-semibold text-slate-700 hover:text-slate-500 ease duration-200"
                         leftIcon={<GlobeAltIcon className="w-4 h-4" />}
                         rightIcon={<ChevronDownIcon className="w-4 h-4" />}
                     >

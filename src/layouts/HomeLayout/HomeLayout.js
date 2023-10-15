@@ -6,7 +6,7 @@ function HomeLayout({ children }) {
     return (
         <section className="grid grid-cols-12 h-screen w-full">
             <Header />
-            <section className="mt-20 col-span-12">{children}</section>
+            <section className="mt-20 col-span-12 container mx-auto">{children}</section>
             <Footer />
         </section>
     );

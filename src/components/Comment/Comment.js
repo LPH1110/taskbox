@@ -11,7 +11,7 @@ import { actions, useStore } from '~/store';
 import { UserAuth } from '~/contexts/AuthContext';
 const cx = classNames.bind(styles);
 
-const Comment = ({ comment, admin }) => {
+const Comment = ({ comment, admin, setCommentEditor }) => {
     const commentRef = useRef();
     const { user } = UserAuth();
     const [openConfirmDel, setOpenConfirmDel] = useState(false);
@@ -32,7 +32,10 @@ const Comment = ({ comment, admin }) => {
     };
 
     const handleReply = () => {
-        console.log('Replying comment: ', comment?.email);
+        setCommentEditor((prev) => ({
+            show: true,
+            initial: `<a href="#/profile" class="text-description bg-blue-100"><i>Replying ${comment?.email}</i></a><br>`,
+        }));
     };
 
     const getTimeElapsed = () => {
@@ -52,14 +55,21 @@ const Comment = ({ comment, admin }) => {
         // convert to hours
         let hours = Math.floor(minutes / 60);
 
+        // convert to days
+        let days = Math.floor(hours / 24);
+
         if (seconds < 60) {
             return 'a few seconds ago';
         } else if (minutes < 60) {
             return `${minutes} minutes ago`;
         } else if (hours < 2) {
             return 'an hour ago';
-        } else {
+        } else if (hours < 24) {
             return `${hours} hours ago`;
+        } else if (days < 2) {
+            return `a day ago`;
+        } else {
+            return `${days} days ago`;
         }
     };
 

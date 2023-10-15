@@ -49,8 +49,8 @@ const ShareModal = ({ setToast, board, show, setShow, modalTitle }) => {
             setTimeoutId(
                 setTimeout(() => {
                     setToast((prev) => ({
-                        show: false,
                         ...prev,
+                        show: false,
                     }));
                 }, 2000),
             );

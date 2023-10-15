@@ -1,9 +1,11 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const RichTextEditor = ({ initial, onSave, onClose }) => {
+const RichTextEditor = ({ initial = '', onSave, onClose }) => {
     const [value, setValue] = useState(initial);
+    console.log(value);
+
     return (
         <div className="space-y-2 w-full">
             <CKEditor

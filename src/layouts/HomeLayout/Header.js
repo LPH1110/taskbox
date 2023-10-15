@@ -72,7 +72,8 @@ function Header() {
                     <span className="font-semibold text-4xl text-blue-600">T</span>
                     <p className="text-xl">askbox</p>
                 </Button>
-                <div className="flex items-center">
+                {/* Tabs */}
+                <div className="hidden lg:flex items-center">
                     <Button
                         size="small"
                         className={
@@ -142,7 +143,9 @@ function Header() {
             <div className="flex items-center">
                 {user ? (
                     <>
-                        <h4 className="text-slate-700 mr-2 font-semibold">Hi, {user?.displayName || 'taskboxer'}</h4>
+                        <h4 className="text-slate-700 mr-2 font-semibold hidden lg:block">
+                            Hi, {user?.displayName || 'taskboxer'}
+                        </h4>
                         <UserMenu>
                             <UserAvatar width="w-10" />
                         </UserMenu>

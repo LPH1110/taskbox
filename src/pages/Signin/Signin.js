@@ -72,7 +72,7 @@ function Signin() {
     });
 
     return (
-        <section className="h-screen grid grid-cols-2">
+        <section className="h-full grid grid-cols-1 lg:grid-cols-2">
             <section className="flex items-center justify-center">
                 <section className="w-[60%] flex flex-col items-start justify-between">
                     <div className="w-full mt-8">
@@ -131,7 +131,7 @@ function Signin() {
                                     <span className="text-red-400">{formik.errors.password}</span>
                                 ) : null}
                             </section>
-                            <div className="flex justify-between items-center my-4">
+                            <div className="space-y-4 sm:space-y-0 sm:flex justify-between items-center my-4">
                                 <div>
                                     <label className="flex items-center relative">
                                         <input
@@ -157,7 +157,7 @@ function Signin() {
                                         <span className="text-slate-500">Remember for 30 days</span>
                                     </label>
                                 </div>
-                                <div>
+                                <div className="flexEnd">
                                     <Button
                                         onClick={handleForgotPassword}
                                         className="text-blue-500 hover:text-blue-400 ease duration-200"
@@ -189,7 +189,7 @@ function Signin() {
                     </div>
                 </section>
             </section>
-            <section className="bg-blue-500"></section>
+            <section className="hidden lg:block bg-blue-500"></section>
             <Tooltip placement="right-start" message="Go back to home">
                 <Button
                     className="my-4 ease duration-200 text-slate-400 hover:text-slate-700 absolute top-0 left-0"

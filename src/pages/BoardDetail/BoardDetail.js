@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
-import { Board, BoardMenu, Button, LazyLoad, ShareModal, Toast, Tooltip, UserAvatar } from '~/components';
+import { Board, BoardMenu, Button, LazyLoad, ShareModal, Toast, Tooltip, UserAvatar, UserMenu } from '~/components';
 import FilterButton from '~/components/Board/FilterButton';
 import ClosedBoard from '~/components/ClosedBoard';
 import TaskModal from '~/components/TaskModal';
@@ -182,9 +182,11 @@ function BoardDetail() {
                                 </span>
                             </Button>
                             {/* Avatar menu */}
-                            <div className="hover:bg-slate-100 p-1 ease-in-out duration-200 rounded-full flex items-center">
-                                <UserAvatar width="w-9" />
-                            </div>
+                            <UserMenu>
+                                <div className="hover:bg-slate-100 p-1 ease-in-out duration-200 rounded-full flex items-center">
+                                    <UserAvatar width="w-9" />
+                                </div>
+                            </UserMenu>
                         </div>
                     </section>
                     {/* View by section */}

@@ -19,6 +19,16 @@ const UserMenu = ({ children }) => {
         }
     };
 
+    const handleSwitchAccount = async () => {
+        try {
+            await googleSignIn();
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setOpenMenu(false);
+        }
+    };
+
     useEffect(() => {
         document.addEventListener('click', handleClickOutside);
 
@@ -42,7 +52,7 @@ const UserMenu = ({ children }) => {
             >
                 <Menu.Items
                     ref={menuRef}
-                    className="min-w-[12rem] absolute right-0 mt-2 bg-white shadow-md rounded-xl p-4 flex flex-col"
+                    className="min-w-[12rem] z-50 absolute right-0 mt-2 bg-white shadow-md rounded-xl p-4 flex flex-col"
                 >
                     <Menu.Item>
                         <Link to="/profile" className={cx('menu-item')}>
@@ -60,7 +70,7 @@ const UserMenu = ({ children }) => {
                         </Link>
                     </Menu.Item>
                     <Menu.Item>
-                        <button className={cx('menu-item')} type="button">
+                        <button onClick={handleSwitchAccount} className={cx('menu-item')} type="button">
                             Switch account
                         </button>
                     </Menu.Item>

@@ -19,7 +19,7 @@ import RichTextEditor from '../RichTextEditor';
 import UserAvatar from '../UserAvatar';
 import { v4 as uuidv4 } from 'uuid';
 
-const Description = ({ setOpenCommentEditor, description, setOpenDescEditor }) => {
+const Description = ({ setCommentEditor, description, setOpenDescEditor }) => {
     const descriptionRef = useRef();
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const Description = ({ setOpenCommentEditor, description, setOpenDescEditor }) =
             ref={descriptionRef}
             onClick={(e) => {
                 setOpenDescEditor(true);
-                setOpenCommentEditor(false);
+                setCommentEditor((prev) => ({ ...prev, show: false }));
             }}
             className="text-description bg-slate-50 rounded-md w-full p-4 hover:bg-slate-100 ease duration-200"
         ></div>
@@ -47,7 +47,10 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
     const { user } = UserAuth();
     const [timeoutId, setTimeoutId] = useState();
     const [openDescEditor, setOpenDescEditor] = useState(false);
-    const [openCommentEditor, setOpenCommentEditor] = useState(false);
+    const [commentEditor, setCommentEditor] = useState({
+        show: false,
+        initial: '',
+    });
     const [state, dispatch] = useStore();
     const { comments } = state;
 
@@ -118,7 +121,7 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
                 },
             });
 
-            setOpenCommentEditor(false);
+            setCommentEditor((prev) => ({ ...prev, show: false }));
             setTimeoutId(
                 setTimeout(() => {
                     setToast((prev) => ({ ...prev, show: false }));
@@ -244,7 +247,7 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
                                             <Description
                                                 description={openTaskModal.task.description}
                                                 setOpenDescEditor={setOpenDescEditor}
-                                                setOpenCommentEditor={setOpenCommentEditor}
+                                                setCommentEditor={setCommentEditor}
                                             />
                                         )}
                                     </div>
@@ -275,16 +278,18 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
                                         <div>
                                             <UserAvatar />
                                         </div>
-                                        {openCommentEditor ? (
+                                        {commentEditor.show ? (
                                             <RichTextEditor
-                                                openCommentEditor={openCommentEditor}
+                                                initial={commentEditor?.initial}
                                                 onSave={handleSaveComment}
-                                                onClose={(e) => setOpenCommentEditor(false)}
+                                                onClose={(e) =>
+                                                    setCommentEditor((prev) => ({ initial: '', show: false }))
+                                                }
                                             />
                                         ) : (
                                             <div
                                                 onClick={() => {
-                                                    setOpenCommentEditor(true);
+                                                    setCommentEditor((prev) => ({ ...prev, show: true }));
                                                     setOpenDescEditor(false);
                                                 }}
                                                 className="flex items-center justify-start px-4 rounded-md bg-slate-50 w-full hover:bg-slate-100 ease duration-200"
@@ -296,9 +301,10 @@ const TaskModal = ({ board, setToast, openTaskModal, setOpenTaskModal }) => {
                                     <div className="flex flex-col gap-2">
                                         {filteredComments().map(([id, comment]) => (
                                             <Comment
-                                                admin={user?.email === board?.creator}
+                                                admin={user?.email === board?.creator || user?.email === comment?.email}
                                                 key={comment.id}
                                                 comment={comment}
+                                                setCommentEditor={setCommentEditor}
                                             />
                                         ))}
                                     </div>
