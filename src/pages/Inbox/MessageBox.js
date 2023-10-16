@@ -9,21 +9,22 @@ import { useState } from 'react';
 
 const cx = classNames.bind(styles);
 
-function MessageBox() {
+function MessageBox({ data, onClick }) {
     const { user } = UserAuth();
     const [tagged, setTagged] = useState(false);
+    console.log(data);
 
     const handleTagged = (e) => {
         setTagged(!tagged);
     };
 
     return (
-        <div className={cx('cell', 'px-2 bg-slate-50 cursor-pointer ease duration-200')}>
-            <div className="flex items-start px-2 py-3">
+        <div onClick={onClick} className={cx('cell')}>
+            <div className="flex items-start px-2 py-4">
                 {/* Avatar */}
                 <div className="avatar rounded-full cursor-pointer mr-3">
                     <div className="w-9 rounded-full">
-                        <img src={user?.photoURL} />
+                        <img src={user?.photoURL} alt="user avatar" />
                     </div>
                 </div>
                 {/* Box description */}

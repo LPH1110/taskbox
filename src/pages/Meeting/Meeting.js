@@ -17,25 +17,13 @@ import MeetingCard from './MeetingCard';
 import classNames from 'classnames/bind';
 import styles from './Meeting.module.scss';
 import { UserAuth } from '~/contexts/AuthContext';
+import SearchInput from '~/components/SearchInput';
 
 const cx = classNames.bind(styles);
 
 function Meeting() {
     const [searchKeys, setSearchKeys] = useState('');
-    const inputRef = useRef();
     const { user } = UserAuth();
-
-    const handleInputChange = (e) => {
-        const searchKeys = e.target.value;
-        if (!searchKeys.startsWith(' ')) {
-            setSearchKeys(searchKeys);
-        }
-    };
-
-    const handleClearSearchKeys = () => {
-        setSearchKeys('');
-        inputRef.current.focus();
-    };
 
     return (
         <section className="h-full">
@@ -73,48 +61,7 @@ function Meeting() {
                 </section>
                 {/* Filter section */}
                 <section className="border-t boder-slate-100/10 py-4 flex items-center justify-between">
-                    {/* Search bar */}
-                    <div className="flex items-center">
-                        <div className="mr-2 ease duration-200 focus-within:ring-blue-500 ring ring-slate-100 flex items-center p-1.5 bg-slate-100 rounded-md">
-                            <Button
-                                type="button"
-                                className={searchKeys.length > 0 ? 'text-slate-600 mr-2' : 'text-slate-400 mr-2'}
-                            >
-                                <MagnifyingGlassIcon className="w-5 h-5" />
-                            </Button>
-                            <input
-                                ref={inputRef}
-                                value={searchKeys}
-                                onChange={(e) => handleInputChange(e)}
-                                placeholder="Search a meeting..."
-                                className="text-slate-600 bg-transparent outline-none"
-                            />
-                            {searchKeys.length > 0 ? (
-                                <span onClick={handleClearSearchKeys}>
-                                    <XMarkIcon className="w-4 h-4 ml-2" />
-                                </span>
-                            ) : (
-                                <span className="w-4 h-4 ml-2"></span>
-                            )}
-                        </div>
-                        {/* import/export */}
-                        <div className="flex items-center">
-                            <Button
-                                className="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-500 ease-in-out duration-200"
-                                leftIcon={<FunnelIcon className="w-5 h-5" />}
-                                type="button"
-                            >
-                                Filters
-                            </Button>
-                            <Button
-                                className="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-500 ease-in-out duration-200"
-                                leftIcon={<ArrowsUpDownIcon className="w-5 h-5" />}
-                                type="button"
-                            >
-                                import/export
-                            </Button>
-                        </div>
-                    </div>
+                    <SearchInput value={searchKeys} setValue={setSearchKeys} />
                     {/* View by */}
                     <div className="flex items-center">
                         <span className="mr-4 text-slate-500">View By</span>

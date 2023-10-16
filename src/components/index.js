@@ -19,3 +19,4 @@ export { default as UserMenu } from './UserMenu';
 export { default as DelConfirmPopper } from './DelConfirmPopper';
 export { default as ShareModal } from './ShareModal';
 export { default as LineInput } from './LineInput';
+export { default as SearchInput } from './SearchInput';

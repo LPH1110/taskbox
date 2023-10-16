@@ -7,6 +7,14 @@
     overflow: hidden;
 }
 
+.header_action {
+    @apply text-description;
+}
+
+.cell {
+    @apply px-2 cursor-pointer ease-linear duration-200 hover:bg-slate-50 rounded-md;
+}
+
 .cell + .cell {
     border-top-width: 1px;
     border-color: rgb(226 232 240);
@@ -17,8 +25,6 @@
 }
 
 .cell:hover {
-    background-color: rgb(255 255 255);
-
     .cell-tag {
         display: inline-block;
     }

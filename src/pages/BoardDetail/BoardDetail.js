@@ -105,7 +105,7 @@ function BoardDetail() {
             ) : (
                 <section className="px-6 flex flex-col gap-4 h-full w-full bg-slate-100">
                     {/* Header */}
-                    <section className="pt-6 min-h-[5rem] flex items-center justify-between">
+                    <header className="header pt-6">
                         {/* Left heading */}
                         <div className="space-y-2">
                             <LazyLoad isLoading={isLoading}>
@@ -188,7 +188,7 @@ function BoardDetail() {
                                 </div>
                             </UserMenu>
                         </div>
-                    </section>
+                    </header>
                     {/* View by section */}
                     <section className="flexEnd">
                         <div className="flex items-center gap-2">

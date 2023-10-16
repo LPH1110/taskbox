@@ -70,3 +70,7 @@ input {
 .modal-label {
     @apply text-xl font-medium leading-6 text-gray-900;
 }
+// page header
+.header {
+    @apply min-h-[5rem] flexBetween;
+}
