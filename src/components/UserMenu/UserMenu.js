@@ -26,6 +26,7 @@ const UserMenu = ({ children }) => {
             console.log(error);
         } finally {
             setOpenMenu(false);
+            window.location.reload(false);
         }
     };
 

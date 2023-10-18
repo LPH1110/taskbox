@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Inbox.module.scss';
 import { TagIcon as TagOutlineIcon } from '@heroicons/react/24/outline';
@@ -6,31 +6,53 @@ import { TagIcon as TagSolidIcon } from '@heroicons/react/24/solid';
 
 import { UserAuth } from '~/contexts/AuthContext';
 import { useState } from 'react';
+import { fetchUserInfo } from '~/lib';
+import { LazyLoad } from '~/components';
 
 const cx = classNames.bind(styles);
 
 function MessageBox({ data, onClick }) {
     const { user } = UserAuth();
     const [tagged, setTagged] = useState(false);
-    console.log(data);
+    const [isLoading, setIsLoading] = useState(true);
+    const [receiver, setReceiver] = useState();
+
+    const { emails } = data;
+    const filteredEmails = emails.filter((email) => email !== user?.email);
 
     const handleTagged = (e) => {
         setTagged(!tagged);
     };
 
+    useEffect(() => {
+        const getReceiverInfo = async () => {
+            const res = await fetchUserInfo(filteredEmails[0]);
+            if (res.error) {
+                console.log(res.error);
+            } else {
+                setReceiver(res);
+                setIsLoading(false);
+            }
+        };
+
+        getReceiverInfo();
+    }, []);
+
     return (
-        <div onClick={onClick} className={cx('cell')}>
+        <div onClick={() => onClick(data)} className={cx('cell')}>
             <div className="flex items-start px-2 py-4">
                 {/* Avatar */}
-                <div className="avatar rounded-full cursor-pointer mr-3">
-                    <div className="w-9 rounded-full">
-                        <img src={user?.photoURL} alt="user avatar" />
+                <LazyLoad isLoading={isLoading}>
+                    <div className="avatar rounded-full cursor-pointer mr-3">
+                        <div className="w-9 rounded-full">
+                            <img src={receiver?.photoURL} alt="user avatar" />
+                        </div>
                     </div>
-                </div>
+                </LazyLoad>
                 {/* Box description */}
-                <div>
+                <div className="space-y-2 w-full">
                     <div className="flex justify-between">
-                        <h4 className="text-slate-700">Andrew Cano</h4>
+                        <h4 className="text-slate-700 font-semibold">{receiver?.displayName}</h4>
                         <div className="flex items-center">
                             <button
                                 onClick={handleTagged}
@@ -38,15 +60,12 @@ function MessageBox({ data, onClick }) {
                             >
                                 {tagged ? <TagSolidIcon className="w-4 h-4" /> : <TagOutlineIcon className="w-4 h-4" />}
                             </button>
-                            <p className="text-slate-500">Jul 10, 10:32 AM</p>
+                            <p className="text-slate-500">10:32 AM</p>
                         </div>
                     </div>
-                    <h3 className="font-semibold py-1 text-md">Report - Chatto project</h3>
+
                     <p className={cx('cell-desc', 'text-slate-500, text-sm')}>
-                        Hello, Orlando. Please see the project status in the pdf I attached. The project looks good, and
-                        we are confident that we will complete it on time. Also we have provided completed Hi-fi design.
-                        Do you have any feedbacks or comments more? If not, then we can make up and finish everything.
-                        Let us know as soon as possible. Thanks in advance. Regards, Andrew Cano.
+                        {data.messages[data.messages.length - 1].text}
                     </p>
                 </div>
             </div>
