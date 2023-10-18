@@ -19,6 +19,7 @@ function MessageBox({ data, onClick }) {
 
     const { emails } = data;
     const filteredEmails = emails.filter((email) => email !== user?.email);
+    const lastMessage = data.messages[data.messages.length - 1];
 
     const handleTagged = (e) => {
         setTagged(!tagged);
@@ -65,6 +66,7 @@ function MessageBox({ data, onClick }) {
                     </div>
 
                     <p className={cx('cell-desc', 'text-slate-500, text-sm')}>
+                        {lastMessage?.senderEmail === user?.email ? 'You: ' : 'Other: '}{' '}
                         {data.messages[data.messages.length - 1].text}
                     </p>
                 </div>

@@ -29,14 +29,17 @@ function Inbox() {
     };
 
     useEffect(() => {
-        const getConversations = async () => {
-            const res = await fetchConversations({ email: user?.email });
-            const converted = convertObjFromArray(res);
-            console.log(converted);
-            setInboxes(converted);
-        };
-        getConversations();
-    }, [user?.email]);
+        if (user) {
+            const getConversations = async () => {
+                const res = await fetchConversations({ email: user?.email });
+                const converted = convertObjFromArray(res);
+                console.log(converted);
+
+                setInboxes(converted);
+            };
+            getConversations();
+        }
+    }, [user]);
 
     return (
         <div className="flex flex-col h-full">
@@ -65,8 +68,8 @@ function Inbox() {
                 {/* Left */}
                 <div className="h-full bg-white rounded-lg w-1/4 hidden lg:block">
                     <div style={{ overflow: 'overlay' }}>
-                        {inboxes?.length > 0 ? (
-                            Object.entries(inboxes).map(([inbox, id]) => (
+                        {inboxes ? (
+                            Object.entries(inboxes).map(([id, inbox]) => (
                                 <MessageBox onClick={handleEnterChat} data={inbox} key={inbox?.id} />
                             ))
                         ) : (
