@@ -10,6 +10,7 @@ import {
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '~/firebase-config';
 import { saveUser } from '~/lib/actions';
+import updateActiveStatus from '~/lib/api/updateActiveStatus';
 
 const AuthContext = createContext();
 
@@ -20,8 +21,10 @@ export const AuthContextProvider = ({ children }) => {
         const unsubsribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             console.log('User', currentUser);
+
             if (currentUser) {
                 saveUser(currentUser);
+                updateActiveStatus({ email: currentUser?.email, online: true });
                 localStorage.setItem(currentUser.email, currentUser.uid);
             }
         });
@@ -42,6 +45,8 @@ export const AuthContextProvider = ({ children }) => {
     };
 
     const logOut = () => {
+        console.log(user);
+        updateActiveStatus({ email: user?.email, online: false });
         signOut(auth);
     };
 

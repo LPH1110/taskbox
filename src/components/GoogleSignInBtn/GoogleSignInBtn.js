@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '~/contexts/AuthContext';
 
 import { Button, Spinner } from '~/components';
+import updateActiveStatus from '~/lib/api/updateActiveStatus';
 
 function GoogleSignInBtn({ setToast }) {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ function GoogleSignInBtn({ setToast }) {
     useEffect(() => {
         if (user != null) {
             setShowSpinner(false);
+            updateActiveStatus({ email: user?.email, online: true });
             navigate('/');
         }
     }, [user]);
@@ -19,7 +21,7 @@ function GoogleSignInBtn({ setToast }) {
     const handleGoogleSignIn = async () => {
         setShowSpinner(true);
         try {
-            const res = await googleSignIn();
+            await googleSignIn();
         } catch (e) {
             console.error(e);
             setToast({

@@ -25,6 +25,37 @@ function MessageBox({ data, onClick }) {
         setTagged(!tagged);
     };
 
+    const getTimeElapsed = () => {
+        const now = new Date();
+        let diff;
+        if (lastMessage?.createdAt instanceof Date) {
+            diff = now - lastMessage?.createdAt;
+        } else {
+            diff = now - lastMessage?.createdAt.toDate();
+        }
+        // convert to seconds
+        let seconds = Math.floor(diff / 1000);
+
+        // convert to minutes
+        let minutes = Math.floor(seconds / 60);
+
+        // convert to hours
+        let hours = Math.floor(minutes / 60);
+
+        // convert to days
+        let days = Math.floor(hours / 24);
+
+        if (seconds < 60) {
+            return `just now`;
+        } else if (minutes < 60) {
+            return `${minutes} minutes`;
+        } else if (hours < 24) {
+            return `${hours} hours`;
+        } else {
+            return `${days} days`;
+        }
+    };
+
     useEffect(() => {
         const getReceiverInfo = async () => {
             const res = await fetchUserInfo(filteredEmails[0]);
@@ -61,7 +92,7 @@ function MessageBox({ data, onClick }) {
                             >
                                 {tagged ? <TagSolidIcon className="w-4 h-4" /> : <TagOutlineIcon className="w-4 h-4" />}
                             </button>
-                            <p className="text-slate-500">10:32 AM</p>
+                            <p className="text-slate-500 text-sm">{getTimeElapsed()}</p>
                         </div>
                     </div>
 

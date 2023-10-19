@@ -1,18 +1,15 @@
 import { BellIcon, ChatBubbleBottomCenterIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './Inbox.module.scss';
 
-import { Button, SearchInput, UserAvatar, UserMenu } from '~/components';
-import MessageBox from './MessageBox';
-import { fetchConversations } from '~/lib';
-import { UserAuth } from '~/contexts/AuthContext';
-import ChatRoom from './ChatRoom';
-import { Transition } from '@headlessui/react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '~/firebase-config';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/solid';
+import { SearchInput, UserAvatar, UserMenu } from '~/components';
+import { UserAuth } from '~/contexts/AuthContext';
+import { fetchConversations } from '~/lib';
 import { convertObjFromArray } from '~/lib/helpers';
+import ChatRoom from './ChatRoom';
+import MessageBox from './MessageBox';
 
 const cx = classNames.bind(styles);
 
@@ -21,7 +18,7 @@ function Inbox() {
     const [searchKeys, setSearchKeys] = useState('');
     const [enteredChat, setEnteredChat] = useState(false);
     const [currentRoom, setCurrentRoom] = useState();
-    const [inboxes, setInboxes] = useState([]);
+    const [inboxes, setInboxes] = useState({});
 
     const handleEnterChat = (inbox) => {
         setEnteredChat(true);
@@ -29,7 +26,7 @@ function Inbox() {
     };
 
     useEffect(() => {
-        if (user) {
+        if (user?.email) {
             const getConversations = async () => {
                 const res = await fetchConversations({ email: user?.email });
                 const converted = convertObjFromArray(res);
@@ -67,8 +64,8 @@ function Inbox() {
             <div style={{ height: 'calc(100vh - 80px)' }} className="p-6 flexBetween gap-6 flex-1 overflow-hidden">
                 {/* Left */}
                 <div className="h-full bg-white rounded-lg w-1/4 hidden lg:block">
-                    <div style={{ overflow: 'overlay' }}>
-                        {inboxes ? (
+                    <div className="h-full" style={{ overflow: 'overlay' }}>
+                        {Object.keys(inboxes).length > 0 ? (
                             Object.entries(inboxes).map(([id, inbox]) => (
                                 <MessageBox onClick={handleEnterChat} data={inbox} key={inbox?.id} />
                             ))
@@ -90,20 +87,6 @@ function Inbox() {
                 {/* Right */}
                 {enteredChat && (
                     <div className="h-full w-full flex flex-col">
-                        <div className="mb-3 bg-transparent rounded-lg flex justify-between items-start ">
-                            <div className="flex gap-2">
-                                <UserAvatar />
-                                <div>
-                                    <h4 className="font-semibold">Amber Harly</h4>
-                                    <p className="text-sm text-description flexCenter gap-2">
-                                        <div className="w-3 h-3 rounded-full bg-emerald-400"></div>Active now
-                                    </p>
-                                </div>
-                            </div>
-                            <button type="button" className="p-2">
-                                <EllipsisVerticalIcon className="w-6 h-6" />
-                            </button>
-                        </div>
                         <ChatRoom
                             currentRoom={currentRoom}
                             setInboxes={setInboxes}

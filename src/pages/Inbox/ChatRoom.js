@@ -1,9 +1,9 @@
-import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
-import { useEffect, useRef, useState } from 'react';
-import { Button } from '~/components';
+import { EllipsisVerticalIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Button, UserAvatar } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
-import { addMessageToRoom } from '~/lib';
+import { addMessageToRoom, fetchUserInfo } from '~/lib';
 import { db } from '~/firebase-config';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { FaceSmileIcon, PaperClipIcon } from '@heroicons/react/24/outline';
@@ -12,6 +12,10 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, messages = [] }) =>
     const { user } = UserAuth();
     const [text, setText] = useState('');
     const chatRef = useRef();
+    const [receiver, setReceiver] = useState();
+
+    const { emails } = currentRoom;
+    const filteredEmails = emails.filter((email) => email !== user?.email);
 
     const scrollToBottom = () => {
         // scroll to bottom
@@ -35,25 +39,87 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, messages = [] }) =>
                 const newState = {
                     ...prev,
                 };
-                console.log(prev);
-                return prev;
+                newState[currentRoom.id].messages = newList;
+                console.log(newState);
+                return newState;
             });
             addMessageToRoom({ roomId: currentRoom?.id, data: newList });
             setText('');
         }
     };
 
+    const getTimeElapsed = useCallback((message) => {
+        const now = new Date();
+        let diff;
+        if (message?.createdAt instanceof Date) {
+            diff = now - message?.createdAt;
+        } else {
+            diff = now - message?.createdAt.toDate();
+        }
+        // convert to seconds
+        let seconds = Math.floor(diff / 1000);
+
+        // convert to minutes
+        let minutes = Math.floor(seconds / 60);
+
+        // convert to hours
+        let hours = Math.floor(minutes / 60);
+
+        // convert to days
+        let days = Math.floor(hours / 24);
+
+        if (seconds < 60) {
+            return `${seconds} seconds`;
+        } else if (minutes < 60) {
+            return `${minutes} minutes`;
+        } else if (hours < 24) {
+            return `${hours} hours`;
+        } else {
+            return `${days} days`;
+        }
+    }, []);
+
     useEffect(() => {
         scrollToBottom();
         const unsub = onSnapshot(doc(db, 'rooms', currentRoom?.id), (doc) => {
             setCurrentRoom({ id: doc.id, ...doc.data() });
         });
+        const getReceiverInfo = async () => {
+            const res = await fetchUserInfo(filteredEmails[0]);
+            if (res.error) {
+                console.log(res.error);
+            } else {
+                setReceiver(res);
+            }
+        };
+
+        getReceiverInfo();
 
         return () => unsub();
     }, []);
 
     return (
         <>
+            <div className="mb-3 bg-transparent rounded-lg flex justify-between items-start ">
+                <div className="flex gap-2">
+                    <UserAvatar photoURL={receiver?.photoURL} />
+                    <div>
+                        <h4 className="font-semibold">{receiver?.displayName}</h4>
+                        <p className="text-sm text-description flex items-center gap-2">
+                            {receiver?.is_online ? (
+                                <>
+                                    <div className="w-3 h-3 rounded-full bg-emerald-400"></div> Active now
+                                </>
+                            ) : (
+                                <p>Offline</p>
+                            )}
+                        </p>
+                    </div>
+                </div>
+                <button type="button" className="p-2">
+                    <EllipsisVerticalIcon className="w-6 h-6" />
+                </button>
+            </div>
             <div
                 style={{ scrollBehavior: 'smooth', overflow: 'overlay' }}
                 ref={chatRef}
@@ -77,9 +143,6 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, messages = [] }) =>
                                     } rounded-md`}
                                 >
                                     {message?.text}
-                                </p>
-                                <p className={`${admin ? 'text-right' : 'text-left'} text-sm text-slate-400`}>
-                                    6 hours ago
                                 </p>
                             </div>
                             {admin && (
