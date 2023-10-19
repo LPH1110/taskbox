@@ -1,4 +1,4 @@
-import { EllipsisVerticalIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { ChevronLeftIcon, EllipsisVerticalIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, UserAvatar } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
@@ -6,9 +6,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { addMessageToRoom, fetchUserInfo } from '~/lib';
 import { db } from '~/firebase-config';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { FaceSmileIcon, PaperClipIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, FaceSmileIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 
-const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, messages = [] }) => {
+const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, setEnteredChat, messages = [] }) => {
     const { user } = UserAuth();
     const [text, setText] = useState('');
     const chatRef = useRef();
@@ -48,37 +48,6 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, messages = [] }) =>
         }
     };
 
-    const getTimeElapsed = useCallback((message) => {
-        const now = new Date();
-        let diff;
-        if (message?.createdAt instanceof Date) {
-            diff = now - message?.createdAt;
-        } else {
-            diff = now - message?.createdAt.toDate();
-        }
-        // convert to seconds
-        let seconds = Math.floor(diff / 1000);
-
-        // convert to minutes
-        let minutes = Math.floor(seconds / 60);
-
-        // convert to hours
-        let hours = Math.floor(minutes / 60);
-
-        // convert to days
-        let days = Math.floor(hours / 24);
-
-        if (seconds < 60) {
-            return `${seconds} seconds`;
-        } else if (minutes < 60) {
-            return `${minutes} minutes`;
-        } else if (hours < 24) {
-            return `${hours} hours`;
-        } else {
-            return `${days} days`;
-        }
-    }, []);
-
     useEffect(() => {
         scrollToBottom();
         const unsub = onSnapshot(doc(db, 'rooms', currentRoom?.id), (doc) => {
@@ -99,9 +68,12 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, messages = [] }) =>
     }, []);
 
     return (
-        <>
+        <div className="h-full w-full flex flex-col">
             <div className="mb-3 bg-transparent rounded-lg flex justify-between items-start ">
                 <div className="flex gap-2">
+                    <button type="button" onClick={() => setEnteredChat(false)}>
+                        <ChevronLeftIcon className="w-6 h-6" />
+                    </button>
                     <UserAvatar photoURL={receiver?.photoURL} />
                     <div>
                         <h4 className="font-semibold">{receiver?.displayName}</h4>
@@ -168,23 +140,23 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, messages = [] }) =>
                         onClick={handleSendMessage}
                         className="text-slate-500 hover:text-slate-500/80 ease duration-200"
                     >
-                        <PaperClipIcon className="w-5 h-5" />
+                        <PaperClipIcon className="w-6 h-6" />
                     </Button>
                     <Button
                         onClick={handleSendMessage}
                         className="text-slate-500 hover:text-slate-500/80 ease duration-200"
                     >
-                        <FaceSmileIcon className="w-5 h-5" />
+                        <FaceSmileIcon className="w-6 h-6" />
                     </Button>
                     <Button
                         onClick={handleSendMessage}
                         className="text-blue-500 hover:text-blue-500/80 ease duration-200"
                     >
-                        <PaperAirplaneIcon className="w-5 h-5" />
+                        <PaperAirplaneIcon className="w-6 h-6" />
                     </Button>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

@@ -1,9 +1,14 @@
-import { BellIcon, ChatBubbleBottomCenterIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import {
+    BellIcon,
+    ChatBubbleBottomCenterIcon,
+    MagnifyingGlassIcon,
+    QuestionMarkCircleIcon,
+} from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import { useEffect, useState } from 'react';
 import styles from './Inbox.module.scss';
 
-import { EllipsisVerticalIcon } from '@heroicons/react/24/solid';
+import { Bars3Icon } from '@heroicons/react/24/solid';
 import { SearchInput, UserAvatar, UserMenu } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
 import { fetchConversations } from '~/lib';
@@ -12,6 +17,32 @@ import ChatRoom from './ChatRoom';
 import MessageBox from './MessageBox';
 
 const cx = classNames.bind(styles);
+
+const Inboxes = ({ inboxes, handleEnterChat }) => {
+    return (
+        <div className="h-full bg-white rounded-lg lg:w-1/4 w-full">
+            <div className="h-full" style={{ overflow: 'overlay' }}>
+                {Object.keys(inboxes).length > 0 ? (
+                    Object.entries(inboxes).map(([id, inbox]) => (
+                        <MessageBox onClick={handleEnterChat} data={inbox} key={inbox?.id} />
+                    ))
+                ) : (
+                    <div className="h-full flex-1 flexCenter flex-col gap-4 p-4">
+                        <img
+                            className="w-16 h-16"
+                            src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+                            alt="msg_not_found"
+                        />
+                        <p className="text-center text-description text-lg">
+                            Message empty? <br />
+                            Let's start a conversation...
+                        </p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 function Inbox() {
     const { user } = UserAuth();
@@ -42,8 +73,31 @@ function Inbox() {
         <div className="flex flex-col h-full">
             {/* Header */}
             <header className="header bg-white px-6">
-                <SearchInput value={searchKeys} setValue={setSearchKeys} placeholder="Search a message..." />
-                <div className="flexBetween gap-5">
+                <SearchInput
+                    className="hidden lg:flex items-center"
+                    value={searchKeys}
+                    setValue={setSearchKeys}
+                    placeholder="Search a message..."
+                />
+
+                <div className="flex lg:hidden items-center justify-between gap-5 w-full">
+                    <button type="button" className={cx('header_action')}>
+                        <Bars3Icon className="w-6 h-6" />
+                    </button>
+                    <button type="button" className={cx('header_action')}>
+                        <MagnifyingGlassIcon className="w-6 h-6" />
+                    </button>
+                    <button type="button" className={cx('header_action')}>
+                        <BellIcon className="w-6 h-6" />
+                    </button>
+                    {/* Avatar menu */}
+                    <UserMenu>
+                        <div className="hover:bg-slate-100 p-1 ease-in-out duration-200 rounded-full flex items-center">
+                            <UserAvatar width="w-9" />
+                        </div>
+                    </UserMenu>
+                </div>
+                <div className="hidden lg:flex items-center justify-between gap-5">
                     <button type="button" className={cx('header_action')}>
                         <BellIcon className="w-6 h-6" />
                     </button>
@@ -62,38 +116,16 @@ function Inbox() {
                 </div>
             </header>
             <div style={{ height: 'calc(100vh - 80px)' }} className="p-6 flexBetween gap-6 flex-1 overflow-hidden">
-                {/* Left */}
-                <div className="h-full bg-white rounded-lg w-1/4 hidden lg:block">
-                    <div className="h-full" style={{ overflow: 'overlay' }}>
-                        {Object.keys(inboxes).length > 0 ? (
-                            Object.entries(inboxes).map(([id, inbox]) => (
-                                <MessageBox onClick={handleEnterChat} data={inbox} key={inbox?.id} />
-                            ))
-                        ) : (
-                            <div className="h-full flex-1 flexCenter flex-col gap-4 p-4">
-                                <img
-                                    className="w-16 h-16"
-                                    src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
-                                    alt="msg_not_found"
-                                />
-                                <p className="text-center text-description text-lg">
-                                    Message empty? <br />
-                                    Let's start a conversation...
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-                {/* Right */}
-                {enteredChat && (
-                    <div className="h-full w-full flex flex-col">
-                        <ChatRoom
-                            currentRoom={currentRoom}
-                            setInboxes={setInboxes}
-                            setCurrentRoom={setCurrentRoom}
-                            messages={currentRoom?.messages}
-                        />
-                    </div>
+                {!enteredChat ? (
+                    <Inboxes inboxes={inboxes} handleEnterChat={handleEnterChat} />
+                ) : (
+                    <ChatRoom
+                        currentRoom={currentRoom}
+                        setInboxes={setInboxes}
+                        setCurrentRoom={setCurrentRoom}
+                        setEnteredChat={setEnteredChat}
+                        messages={currentRoom?.messages}
+                    />
                 )}
             </div>
         </div>

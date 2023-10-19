@@ -84,29 +84,31 @@ const ClosedBoard = ({ setBoard, board, setToast }) => {
     }, [timeoutId]);
 
     return (
-        <div className="relative flexCenter flex-col rounded-xl w-[24rem] p-12 shadow-md gap-6 bg-white">
-            <h1 className="text-2xl font-semibold">{board.title} is closed</h1>
-            <button
-                onClick={handleReopenBoard}
-                type="button"
-                className="p-2 rounded-md bg-blue-500 hover:bg-blue-500/80 text-white ease duration-100"
-            >
-                Reopen board
-            </button>
-            <DelConfirmPopper
-                handleDelete={handleDeleteBoard}
-                isLoading={isLoading}
-                openConfirmDel={openConfirmDel}
-                setOpenConfirmDel={setOpenConfirmDel}
-            >
+        <div className="h-full flex items-center justify-center">
+            <div className="relative flexCenter flex-col rounded-xl w-[24rem] p-12 shadow-md gap-6 bg-white">
+                <h1 className="text-2xl font-semibold">{board.title} is closed</h1>
                 <button
-                    onClick={() => setOpenConfirmDel((prev) => !prev)}
+                    onClick={handleReopenBoard}
                     type="button"
-                    className="relative text-description hover:text-blue-500 hover:underline ease duration-100"
+                    className="p-2 rounded-md bg-blue-500 hover:bg-blue-500/80 text-white ease duration-100"
                 >
-                    Permanently delete board
+                    Reopen board
                 </button>
-            </DelConfirmPopper>
+                <DelConfirmPopper
+                    handleDelete={handleDeleteBoard}
+                    isLoading={isLoading}
+                    openConfirmDel={openConfirmDel}
+                    setOpenConfirmDel={setOpenConfirmDel}
+                >
+                    <button
+                        onClick={() => setOpenConfirmDel((prev) => !prev)}
+                        type="button"
+                        className="relative text-description hover:text-blue-500 hover:underline ease duration-100"
+                    >
+                        Permanently delete board
+                    </button>
+                </DelConfirmPopper>
+            </div>
         </div>
     );
 };

@@ -239,49 +239,53 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
     }, []);
 
     return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable key={board?.id} direction={direction} droppableId={board?.id} type="COLUMN">
-                {(provided) => {
-                    return (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className={
-                                direction === 'horizontal' ? cx('board_container-stack') : cx('board_container-list')
-                            }
-                        >
-                            {columnOrder.map((columnId, index) => {
-                                const column = columns[columnId];
-                                const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
+        <div className="h-[85%] relative">
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable key={board?.id} direction={direction} droppableId={board?.id} type="COLUMN">
+                    {(provided) => {
+                        return (
+                            <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                className={
+                                    direction === 'horizontal'
+                                        ? cx('board_container-stack')
+                                        : cx('board_container-list')
+                                }
+                            >
+                                {columnOrder.map((columnId, index) => {
+                                    const column = columns[columnId];
+                                    const taskList = column?.taskIds?.map((taskId) => tasks[taskId]);
 
-                                return (
-                                    <div className={`${direction === 'vertical' ? 'w-full' : 'h-full'}`}>
-                                        <Column
-                                            setOpenTaskModal={setOpenTaskModal}
-                                            setToast={setToast}
-                                            direction={direction}
-                                            boardId={board?.id}
-                                            index={index}
-                                            column={column}
-                                            tasks={taskList}
-                                        />
-                                    </div>
-                                );
-                            })}
+                                    return (
+                                        <div className={`${direction === 'vertical' ? 'w-full' : 'h-full'}`}>
+                                            <Column
+                                                setOpenTaskModal={setOpenTaskModal}
+                                                setToast={setToast}
+                                                direction={direction}
+                                                boardId={board?.id}
+                                                index={index}
+                                                column={column}
+                                                tasks={taskList}
+                                            />
+                                        </div>
+                                    );
+                                })}
 
-                            {provided.placeholder}
-                            <CreateListBtn
-                                direction={direction}
-                                dispatch={dispatch}
-                                boardId={board?.id}
-                                setBoard={setBoard}
-                                setToast={setToast}
-                            />
-                        </div>
-                    );
-                }}
-            </Droppable>
-        </DragDropContext>
+                                {provided.placeholder}
+                                <CreateListBtn
+                                    direction={direction}
+                                    dispatch={dispatch}
+                                    boardId={board?.id}
+                                    setBoard={setBoard}
+                                    setToast={setToast}
+                                />
+                            </div>
+                        );
+                    }}
+                </Droppable>
+            </DragDropContext>
+        </div>
     );
 };
 
