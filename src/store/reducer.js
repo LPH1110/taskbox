@@ -1,5 +1,6 @@
 import {
     ADD_NEW_COMMENT_TO_TASK,
+    ADD_NEW_BOARD,
     DELETE_BOARD,
     DELETE_COMMENT,
     DELETE_SHARED_BOARD,
@@ -47,6 +48,11 @@ function reducer(state, action) {
     let newComments;
     let newSharedBoards;
     switch (action.type) {
+        case ADD_NEW_BOARD:
+            return {
+                ...state,
+                boards: [action.payload, ...state.boards],
+            };
         case UPDATE_ASSIGNEES:
             return {
                 ...state,

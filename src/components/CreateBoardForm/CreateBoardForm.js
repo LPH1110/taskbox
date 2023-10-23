@@ -77,8 +77,7 @@ const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
                         status: 'success',
                     },
                 });
-                const boards = await fetchBoards(user?.uid);
-                dispatch(actions.updateBoards(boards));
+                dispatch(actions.addNewBoard(result.data));
                 setOpenModal(false);
             } else {
                 setToast({

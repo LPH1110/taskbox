@@ -1,21 +1,36 @@
+import { FaceSmileIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon, EllipsisVerticalIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { ref, uploadBytes } from 'firebase/storage';
+import { useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Button, UserAvatar } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
-import { v4 as uuidv4 } from 'uuid';
+import { db, storage } from '~/firebase-config';
 import { addMessageToRoom, fetchUserInfo } from '~/lib';
-import { db } from '~/firebase-config';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { ArrowLeftIcon, FaceSmileIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 
 const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, setEnteredChat, messages = [] }) => {
     const { user } = UserAuth();
     const [text, setText] = useState('');
     const chatRef = useRef();
     const [receiver, setReceiver] = useState();
+    const [uploadedFile, setUploadedFile] = useState(null);
 
     const { emails } = currentRoom;
     const filteredEmails = emails.filter((email) => email !== user?.email);
+
+    const uploadFile = async (e) => {
+        try {
+            const file = e.target.files[0];
+            if (file) {
+                const fileRef = ref(storage, `files/${file.name + uuidv4()}`);
+                console.log(fileRef);
+                const res = await uploadBytes(fileRef, file);
+            }
+        } catch (error) {
+            console.error('Failed to upload file', error);
+        }
+    };
 
     const scrollToBottom = () => {
         // scroll to bottom
@@ -33,6 +48,7 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, setEnteredChat, mes
                 photoURL: user?.photoURL,
                 senderEmail: user?.email,
                 text: text,
+                type: 'text',
             };
             const newList = [...messages, newMessage];
             setInboxes((prev) => {
@@ -135,17 +151,21 @@ const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, setEnteredChat, mes
                     placeholder="Type your message..."
                     className="w-full text-slate-600 bg-transparent outline-none"
                 />
-                <div className="flex">
-                    <Button
-                        onClick={handleSendMessage}
+                <div className="flex gap-2">
+                    <label
+                        htmlFor="chat_file_upload"
                         className="text-slate-500 hover:text-slate-500/80 ease duration-200"
                     >
                         <PaperClipIcon className="w-6 h-6" />
-                    </Button>
-                    <Button
-                        onClick={handleSendMessage}
-                        className="text-slate-500 hover:text-slate-500/80 ease duration-200"
-                    >
+                    </label>
+                    <input
+                        className="hidden"
+                        name="chat_file_upload"
+                        id="chat_file_upload"
+                        type="file"
+                        onChange={uploadFile}
+                    />
+                    <Button className="text-slate-500 hover:text-slate-500/80 ease duration-200">
                         <FaceSmileIcon className="w-6 h-6" />
                     </Button>
                     <Button

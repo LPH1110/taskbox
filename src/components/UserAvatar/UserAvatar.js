@@ -6,7 +6,14 @@ const UserAvatar = ({ photoURL, width, height = 'h-10', className = '' }) => {
     return (
         <div className={classes}>
             <div className={`${width ? width : 'w-10 h-10'} rounded-full`}>
-                <img src={photoURL || user?.photoURL} alt="user avatar" />
+                <img
+                    src={
+                        photoURL ||
+                        user?.photoURL ||
+                        'https://th.bing.com/th/id/OIP.fqSvfYQB0rQ-6EG_oqvonQHaHa?pid=ImgDet&rs=1'
+                    }
+                    alt="user avatar"
+                />
             </div>
         </div>
     );

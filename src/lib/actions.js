@@ -43,6 +43,7 @@ export const fetchUsers = async () => {
 
 // Boards
 export const createBoard = async (data, user) => {
+    console.log(data);
     try {
         const res = await ifBoardExists(data.creator, data.title);
         if (res) {
@@ -60,7 +61,11 @@ export const createBoard = async (data, user) => {
                 boardId: doc.id,
                 role: 'admin',
             });
-            return { status: 200, message: `Successfully created board (${data.title})` };
+            return {
+                status: 200,
+                message: `Successfully created board (${data.title})`,
+                data: { id: doc.id, ...doc.data() },
+            };
         }
     } catch (error) {
         console.error(error.message + ' error saving board');

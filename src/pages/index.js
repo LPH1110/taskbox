@@ -11,3 +11,4 @@ export { default as Signup } from './Signup';
 export { default as ForgotPassword } from './ForgotPassword';
 export { default as Profile } from './Profile';
 export { default as NotFound } from './NotFound';
+export { default as UndevelopedSite } from './UndevelopedSite';

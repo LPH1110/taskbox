@@ -15,7 +15,18 @@ import { useParams } from 'react-router-dom';
 import styles from './BoardDetail.module.scss';
 
 import { useEffect, useRef, useState } from 'react';
-import { Board, BoardMenu, Button, LazyLoad, ShareModal, Toast, Tooltip, UserAvatar, UserMenu } from '~/components';
+import {
+    Board,
+    BoardMenu,
+    Button,
+    LazyLoad,
+    MobileHeadBar,
+    ShareModal,
+    Toast,
+    Tooltip,
+    UserAvatar,
+    UserMenu,
+} from '~/components';
 import FilterButton from '~/components/Board/FilterButton';
 import ClosedBoard from '~/components/ClosedBoard';
 import TaskModal from '~/components/TaskModal';
@@ -104,9 +115,10 @@ function BoardDetail() {
                 <ClosedBoard setBoard={setBoard} board={board} setToast={setToast} />
             ) : (
                 <>
-                    <div className="px-6 flex flex-col gap-4">
+                    <div className="flex flex-col gap-4">
                         {/* Header */}
-                        <header className="header pt-6">
+                        <MobileHeadBar />
+                        <header className="px-6 header pt-6">
                             {/* Left heading */}
                             <div className="space-y-2">
                                 <LazyLoad isLoading={isLoading}>
@@ -192,14 +204,14 @@ function BoardDetail() {
                             </div>
                         </header>
                         {/* View by div */}
-                        <div className="flexEnd">
+                        <div className="px-6 flexEnd">
                             <div className="flex items-center gap-2">
                                 <h4>View by:</h4>
                                 <ViewBy setViewBy={setViewBy} viewBy={viewBy} />
                             </div>
                         </div>
                         {/* Filters */}
-                        <div className="hidden lg:flex items-center justify-end">
+                        <div className="px-6 hidden lg:flex items-center justify-end">
                             <div className="flex items-center gap-2">
                                 <FilterButton leftIcon={<CheckCircleIcon />} title={'All task'} />
                                 <FilterButton leftIcon={<Squares2X2Icon />} title={'Customize'} />
@@ -218,7 +230,7 @@ function BoardDetail() {
                             </div>
                         </div>
                         {/* Mobile filter */}
-                        <div className="flex lg:hidden items-center justify-end">
+                        <div className="px-6 flex lg:hidden items-center justify-end">
                             <div className="flex items-center gap-2">
                                 <FilterButton leftIcon={<CheckCircleIcon />} />
                                 <FilterButton leftIcon={<Squares2X2Icon />} />

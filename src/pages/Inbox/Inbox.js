@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import styles from './Inbox.module.scss';
 
 import { Bars3Icon } from '@heroicons/react/24/solid';
-import { SearchInput, UserAvatar, UserMenu } from '~/components';
+import { MobileHeadBar, SearchInput, UserAvatar, UserMenu } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
 import { fetchConversations } from '~/lib';
 import { convertObjFromArray } from '~/lib/helpers';
@@ -74,30 +74,14 @@ function Inbox() {
             {/* Header */}
             <header className="header bg-white px-6">
                 <SearchInput
-                    className="hidden lg:flex items-center"
+                    className="hidden md:flex items-center"
                     value={searchKeys}
                     setValue={setSearchKeys}
                     placeholder="Search a message..."
                 />
+                <MobileHeadBar />
 
-                <div className="flex lg:hidden items-center justify-between gap-5 w-full">
-                    <button type="button" className={cx('header_action')}>
-                        <Bars3Icon className="w-6 h-6" />
-                    </button>
-                    <button type="button" className={cx('header_action')}>
-                        <MagnifyingGlassIcon className="w-6 h-6" />
-                    </button>
-                    <button type="button" className={cx('header_action')}>
-                        <BellIcon className="w-6 h-6" />
-                    </button>
-                    {/* Avatar menu */}
-                    <UserMenu>
-                        <div className="hover:bg-slate-100 p-1 ease-in-out duration-200 rounded-full flex items-center">
-                            <UserAvatar width="w-9" />
-                        </div>
-                    </UserMenu>
-                </div>
-                <div className="hidden lg:flex items-center justify-between gap-5">
+                <div className="hidden md:flex items-center justify-between gap-5">
                     <button type="button" className={cx('header_action')}>
                         <BellIcon className="w-6 h-6" />
                     </button>

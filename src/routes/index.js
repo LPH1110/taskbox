@@ -1,29 +1,28 @@
+import { v4 as uuidv4 } from 'uuid';
+import { DefaultLayout, HomeLayout, WrapperLayout } from '~/layouts';
 import {
-    ForgotPassword,
-    Signin,
-    Signup,
-    Workspaces,
     BoardDetail,
+    ForgotPassword,
     Home,
-    Overview,
     Inbox,
-    Meeting,
     Issues,
+    NotFound,
     Pricing,
     Profile,
-    NotFound,
+    Signin,
+    Signup,
+    UndevelopedSite,
+    Workspaces,
 } from '~/pages';
-import { DefaultLayout, WrapperLayout, HomeLayout } from '~/layouts';
-import { v4 as uuidv4 } from 'uuid';
 import ProtectedRoute from './ProtectedRoute';
 
 const publicRoutes = [
     { id: uuidv4(), protected: false, path: '/', component: Home, layout: HomeLayout },
     { id: uuidv4(), protected: true, path: '/boards/:title', component: BoardDetail, layout: DefaultLayout },
     { id: uuidv4(), protected: true, path: '/workspaces', component: Workspaces, layout: DefaultLayout },
-    { id: uuidv4(), protected: true, path: '/overview', component: Overview, layout: DefaultLayout },
+    { id: uuidv4(), protected: true, path: '/overview', component: UndevelopedSite, layout: DefaultLayout },
     { id: uuidv4(), protected: true, path: '/inbox', component: Inbox, layout: DefaultLayout },
-    { id: uuidv4(), protected: true, path: '/meeting', component: Meeting, layout: DefaultLayout },
+    { id: uuidv4(), protected: true, path: '/meeting', component: UndevelopedSite, layout: DefaultLayout },
     { id: uuidv4(), protected: true, path: '/issues', component: Issues, layout: DefaultLayout },
     { id: uuidv4(), protected: false, path: '/pricing', component: Pricing, layout: HomeLayout },
     { id: uuidv4(), protected: false, path: '/signin', component: Signin, layout: WrapperLayout },
@@ -33,4 +32,4 @@ const publicRoutes = [
     { id: uuidv4(), protected: true, path: '/not-found', component: NotFound, layout: DefaultLayout },
 ];
 
-export { publicRoutes, ProtectedRoute };
+export { ProtectedRoute, publicRoutes };
