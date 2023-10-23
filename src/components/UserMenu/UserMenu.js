@@ -56,6 +56,11 @@ const UserMenu = ({ children }) => {
                     className="min-w-[12rem] z-50 absolute right-0 mt-2 bg-white shadow-md rounded-xl p-4 flex flex-col"
                 >
                     <Menu.Item>
+                        <Link to="/" className={cx('menu-item')}>
+                            Back to home
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item>
                         <Link to="/profile" className={cx('menu-item')}>
                             My profile
                         </Link>

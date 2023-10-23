@@ -110,7 +110,7 @@ function BoardDetail() {
     };
 
     return (
-        <div className="h-full">
+        <div className="h-full overflow-auto">
             {board?.deletedAt ? (
                 <ClosedBoard setBoard={setBoard} board={board} setToast={setToast} />
             ) : (
@@ -252,7 +252,7 @@ function BoardDetail() {
                     {isLoading ? (
                         <div>Fetching your boards...</div>
                     ) : (
-                        <div className="px-6 h-[90%] overflow-auto pt-6">
+                        <div className="px-6 h-[90%] overflow-x-auto pt-6">
                             <Board
                                 setOpenTaskModal={setOpenTaskModal}
                                 direction={viewBy === 'stack' ? 'horizontal' : 'vertical'}

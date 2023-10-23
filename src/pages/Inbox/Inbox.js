@@ -72,7 +72,7 @@ function Inbox() {
     return (
         <div className="flex flex-col h-full">
             {/* Header */}
-            <header className="header bg-white px-6">
+            <header className="h-[4rem] flexBetween bg-white px-0 md:px-6">
                 <SearchInput
                     className="hidden md:flex items-center"
                     value={searchKeys}

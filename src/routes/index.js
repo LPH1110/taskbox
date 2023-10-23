@@ -28,7 +28,7 @@ const publicRoutes = [
     { id: uuidv4(), protected: false, path: '/signin', component: Signin, layout: WrapperLayout },
     { id: uuidv4(), protected: false, path: '/signup', component: Signup, layout: WrapperLayout },
     { id: uuidv4(), protected: false, path: '/forgot-password', component: ForgotPassword, layout: WrapperLayout },
-    { id: uuidv4(), protected: true, path: '/profile', component: Profile, layout: HomeLayout },
+    { id: uuidv4(), protected: true, path: '/profile', component: UndevelopedSite, layout: HomeLayout },
     { id: uuidv4(), protected: true, path: '/not-found', component: NotFound, layout: DefaultLayout },
 ];
 

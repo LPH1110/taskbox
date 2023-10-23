@@ -1,55 +1,13 @@
-import {
-    ArrowPathRoundedSquareIcon,
-    Bars3Icon,
-    CalendarDaysIcon,
-    ChatBubbleOvalLeftIcon,
-    ClipboardDocumentIcon,
-    Squares2X2Icon,
-    XMarkIcon,
-    ArrowLeftOnRectangleIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowLeftOnRectangleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+import { menuItems } from '~/constants';
 import styles from './Sidebar.module.scss';
 
 import { Tooltip } from '~/components';
 
 const cx = classNames.bind(styles);
-
-const menuItems = [
-    {
-        id: uuidv4(),
-        title: 'Overview',
-        icon: <Squares2X2Icon className="w-5 h-5" />,
-        path: '/overview',
-    },
-    {
-        id: uuidv4(),
-        title: 'Workspaces',
-        icon: <ClipboardDocumentIcon className="w-5 h-5" />,
-        path: '/workspaces',
-    },
-    {
-        id: uuidv4(),
-        title: 'Inbox',
-        icon: <ChatBubbleOvalLeftIcon className="w-5 h-5" />,
-        path: '/inbox',
-    },
-    {
-        id: uuidv4(),
-        title: 'Meeting',
-        icon: <CalendarDaysIcon className="w-5 h-5" />,
-        path: '/meeting',
-    },
-    {
-        id: uuidv4(),
-        title: 'Issues',
-        icon: <ArrowPathRoundedSquareIcon className="w-5 h-5" />,
-        path: '/issues',
-    },
-];
 
 function Sidebar() {
     const [menu, setMenu] = useState(menuItems);

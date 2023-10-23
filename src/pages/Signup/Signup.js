@@ -119,7 +119,7 @@ function Signup() {
     });
 
     return (
-        <section className="h-screen grid grid-cols-2 relative">
+        <section className="h-screen grid grid-cols-1 md:grid-cols-2 relative">
             <section className="flex items-center justify-center">
                 <section className="w-[60%] flex flex-col items-start justify-between">
                     {forward ? (
@@ -244,7 +244,7 @@ function Signup() {
                     )}
                 </section>
             </section>
-            <section className="bg-blue-500"></section>
+            <section className="bg-blue-500 hidden md:block"></section>
             <Tooltip placement="right-start" message="Go back to home">
                 <Button
                     className="my-4 ease duration-200 text-slate-400 hover:text-slate-700 absolute top-0 left-0"

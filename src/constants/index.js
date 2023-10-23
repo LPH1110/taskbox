@@ -1,3 +1,10 @@
+import {
+    ArrowPathRoundedSquareIcon,
+    CalendarDaysIcon,
+    ChatBubbleOvalLeftIcon,
+    ClipboardDocumentIcon,
+    Squares2X2Icon,
+} from '@heroicons/react/24/outline';
 import { v4 as uuidv4 } from 'uuid';
 
 export const colorThumbnails = [
@@ -48,5 +55,38 @@ export const tasks = {
         reference: 'Todo',
     },
 };
+
+export const menuItems = [
+    {
+        id: uuidv4(),
+        title: 'Overview',
+        icon: <Squares2X2Icon className="w-5 h-5" />,
+        path: '/overview',
+    },
+    {
+        id: uuidv4(),
+        title: 'Workspaces',
+        icon: <ClipboardDocumentIcon className="w-5 h-5" />,
+        path: '/workspaces',
+    },
+    {
+        id: uuidv4(),
+        title: 'Inbox',
+        icon: <ChatBubbleOvalLeftIcon className="w-5 h-5" />,
+        path: '/inbox',
+    },
+    {
+        id: uuidv4(),
+        title: 'Meeting',
+        icon: <CalendarDaysIcon className="w-5 h-5" />,
+        path: '/meeting',
+    },
+    {
+        id: uuidv4(),
+        title: 'Issues',
+        icon: <ArrowPathRoundedSquareIcon className="w-5 h-5" />,
+        path: '/issues',
+    },
+];
 
 export const columnOrder = ['column-1'];

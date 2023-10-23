@@ -28,7 +28,7 @@ const questions = [
 
 function FAQs() {
     return (
-        <div className="mt-16">
+        <div className="my-16">
             <h4 className="p-4 text-center font-bold text-4xl">Frequently Asked Questions</h4>
             <div>
                 {questions.map((q) => (

@@ -11,6 +11,13 @@
     --border-sky-500: rgb(14 165 233);
 }
 
+.image-contain-full {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    padding-top: 100%;
+}
+
 .image {
     background-position: center;
     background-repeat: no-repeat;

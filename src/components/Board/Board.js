@@ -239,7 +239,7 @@ const Board = ({ setOpenTaskModal, direction = 'horizontal', board, setBoard, co
     }, []);
 
     return (
-        <div className="h-[85%] relative">
+        <div className="h-full relative">
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable key={board?.id} direction={direction} droppableId={board?.id} type="COLUMN">
                     {(provided) => {

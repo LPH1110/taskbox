@@ -7,7 +7,7 @@ import {
     DocumentMagnifyingGlassIcon,
     ChartPieIcon,
 } from '@heroicons/react/24/outline';
-import { Button } from '~/components';
+import { Button, MobileHeadBar } from '~/components';
 
 const cx = classNames.bind(styles);
 
@@ -15,13 +15,14 @@ function Issues() {
     return (
         <section className={cx('wrapper', 'h-screen')}>
             {/* Header */}
+            <MobileHeadBar />
             <section className="px-4">
                 <section className="min-h-[5rem] py-4 flex items-center justify-between">
                     <h1 className="text-slate-600 text-2xl font-semibold">Support Center</h1>
                 </section>
             </section>
             <section className="bg-slate-100/50 h-full">
-                <section className="grid grid-cols-2 gap-8 p-8">
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
                     {/* Documentation */}
                     <div className="flex select-none shadow-md items-start bg-white p-3 rounded-xl">
                         <div className="mr-4 p-3 rounded-full bg-orange-100/70">

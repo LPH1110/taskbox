@@ -65,7 +65,7 @@ function Header() {
     return (
         <header
             ref={headerRef}
-            className="ease-in-out z-[10000] duration-300 bg-white fixed top-0 inset-x-0 border-b border-slate-200 h-20 col-span-12 px-12 flex items-center justify-between"
+            className="ease-in-out z-[10000] duration-300 bg-white fixed top-0 inset-x-0 border-b border-slate-200 h-20 col-span-12 px-6 flex items-center justify-between"
         >
             <div className="flex items-center">
                 <Button size="small" href="/" className="flex mr-2">

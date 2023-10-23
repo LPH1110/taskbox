@@ -146,7 +146,7 @@ const footNavigations = [
 
 function Footer() {
     return (
-        <section className="px-12 col-span-12">
+        <section className="px-12 col-span-12 flex flex-col justify-end">
             {/* Navigations */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 py-12 mb-12">
                 <div className="flex flex-col items-start">
