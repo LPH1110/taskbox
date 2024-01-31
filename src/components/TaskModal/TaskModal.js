@@ -11,13 +11,14 @@ import {
 } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Fragment, useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { UserAuth } from '~/contexts/AuthContext';
-import { createComment, saveComment, saveTask } from '~/lib/actions';
 import { actions, useStore } from '~/store';
 import Comment from '../Comment';
 import RichTextEditor from '../RichTextEditor';
 import UserAvatar from '../UserAvatar';
-import { v4 as uuidv4 } from 'uuid';
+import { saveTask } from '~/lib/api/tasks';
+import { saveComment } from '~/lib/api/comments';
 
 const Description = ({ setCommentEditor, description, setOpenDescEditor }) => {
     const descriptionRef = useRef();

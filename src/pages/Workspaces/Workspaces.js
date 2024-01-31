@@ -1,16 +1,15 @@
 import { ClockIcon, UsersIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { MobileHeadBar, Toast } from '~/components';
 import CreateBoardMenu from '~/components/CreateBoardMenu/CreateBoardMenu';
 import { UserAuth } from '~/contexts/AuthContext';
-import { fetchBoards, fetchColumns, fetchSharedBoards } from '~/lib/actions';
-import ClosedBoards from './ClosedBoards';
-import styles from './Workspaces.module.scss';
 import { actions, useStore } from '~/store';
 import BoardItem from './BoardItem';
+import ClosedBoards from './ClosedBoards';
+import styles from './Workspaces.module.scss';
+import { fetchBoards, fetchSharedBoards } from '~/lib/api/boards';
 
 const cx = classNames.bind(styles);
 

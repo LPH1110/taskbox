@@ -1,7 +1,6 @@
 {
     "name": "drag-and-drop",
     "version": "0.1.0",
-    "homepage": "https://LPH1110.github.io/drag-and-drop/",
     "private": true,
     "devDependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

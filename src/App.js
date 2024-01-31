@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { ScrollToTop } from './components';
 import { UserAuth } from './contexts/AuthContext';
-import updateActiveStatus from './lib/api/updateActiveStatus';
+import updateActiveStatus from './lib/api/users/updateActiveStatus';
 import { ProtectedRoute, publicRoutes as routes } from './routes';
 
 function App() {

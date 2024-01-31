@@ -7,14 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { Button, UserAvatar } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
 import { db, storage } from '~/firebase-config';
-import { addMessageToRoom, fetchUserInfo } from '~/lib';
+import { addMessageToRoom } from '~/lib/api/rooms';
+import { fetchUserInfo } from '~/lib/api/users';
 
 const ChatRoom = ({ currentRoom, setInboxes, setCurrentRoom, setEnteredChat, messages = [] }) => {
     const { user } = UserAuth();
     const [text, setText] = useState('');
     const chatRef = useRef();
     const [receiver, setReceiver] = useState();
-    const [uploadedFile, setUploadedFile] = useState(null);
 
     const { emails } = currentRoom;
     const filteredEmails = emails.filter((email) => email !== user?.email);

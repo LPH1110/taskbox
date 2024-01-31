@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { colorThumbnails } from '~/constants';
 import { UserAuth } from '~/contexts/AuthContext';
-import { fetchBoards, createBoard, createAssignee } from '~/lib/actions';
+import { createBoard } from '~/lib/api/boards';
+import { actions, useStore } from '~/store';
 import ComboboxWrapper from '../ComboboxWrapper';
 import FormField from '../FormField';
-import { actions, useStore } from '~/store';
 
 const CreateBoardForm = ({ setBoards, setOpenModal, setToast }) => {
     const { user } = UserAuth();

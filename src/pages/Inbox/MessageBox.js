@@ -6,8 +6,8 @@ import { TagIcon as TagSolidIcon } from '@heroicons/react/24/solid';
 
 import { UserAuth } from '~/contexts/AuthContext';
 import { useState } from 'react';
-import { fetchUserInfo } from '~/lib';
 import { LazyLoad } from '~/components';
+import { fetchUserInfo } from '~/lib/api/users';
 
 const cx = classNames.bind(styles);
 

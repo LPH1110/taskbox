@@ -1,20 +1,14 @@
-import {
-    BellIcon,
-    ChatBubbleBottomCenterIcon,
-    MagnifyingGlassIcon,
-    QuestionMarkCircleIcon,
-} from '@heroicons/react/24/outline';
+import { BellIcon, ChatBubbleBottomCenterIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import { useEffect, useState } from 'react';
 import styles from './Inbox.module.scss';
 
-import { Bars3Icon } from '@heroicons/react/24/solid';
 import { MobileHeadBar, SearchInput, UserAvatar, UserMenu } from '~/components';
 import { UserAuth } from '~/contexts/AuthContext';
-import { fetchConversations } from '~/lib';
 import { convertObjFromArray } from '~/lib/helpers';
 import ChatRoom from './ChatRoom';
 import MessageBox from './MessageBox';
+import { fetchConversations } from '~/lib/api/rooms';
 
 const cx = classNames.bind(styles);
 

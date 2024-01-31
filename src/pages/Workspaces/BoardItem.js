@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchColumns } from '~/lib/actions';
+import { fetchColumns } from '~/lib/api/boards';
 
 const BoardItem = ({ board, members }) => {
     const [columns, setColumns] = useState([]);

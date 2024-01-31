@@ -1,23 +1,18 @@
+import { Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import classNames from 'classnames/bind';
-import { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import {
-    fetchColumns,
-    fetchTasks,
-    createBoard,
-    saveColumn,
-    saveBoard,
-    createColumn,
-    fetchComments,
-} from '~/lib/actions';
-import { convertArrayFromObj, convertObjFromArray } from '~/lib/helpers';
+import { v4 as uuidv4 } from 'uuid';
+import { UserAuth } from '~/contexts/AuthContext';
+import { convertObjFromArray } from '~/lib/helpers';
 import { actions, useStore } from '~/store';
 import Column from '../Column/Column';
 import styles from './Board.module.scss';
-import { XMarkIcon } from '@heroicons/react/24/solid';
-import { Transition } from '@headlessui/react';
-import { v4 as uuidv4 } from 'uuid';
-import { UserAuth } from '~/contexts/AuthContext';
+import { createColumn, saveColumn } from '~/lib/api/columns';
+import { fetchColumns, saveBoard } from '~/lib/api/boards';
+import { fetchTasks } from '~/lib/api/tasks';
+import { fetchComments } from '~/lib/api/comments';
 
 const cx = classNames.bind(styles);
 

@@ -1,12 +1,11 @@
-import { Draggable } from 'react-beautiful-dnd';
-import React, { useEffect, useRef, useState } from 'react';
-import { ChatBubbleLeftEllipsisIcon, PaperClipIcon, PencilIcon, PlusSmallIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, PlusSmallIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
-import styles from './TaskListItem.module.scss';
+import { useEffect, useRef } from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 import { v4 as uuidv4 } from 'uuid';
-import { countCommentsByTaskId } from '~/lib/actions';
-import { useStore } from '~/store';
 import { countComments } from '~/lib/helpers';
+import { useStore } from '~/store';
+import styles from './TaskListItem.module.scss';
 
 const cx = classNames.bind(styles);
 

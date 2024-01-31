@@ -31,8 +31,9 @@ import FilterButton from '~/components/Board/FilterButton';
 import ClosedBoard from '~/components/ClosedBoard';
 import TaskModal from '~/components/TaskModal';
 import { UserAuth } from '~/contexts/AuthContext';
-import { fetchAssignees, fetchBoard, saveBoard } from '~/lib/actions';
 import { actions, useStore } from '~/store';
+import { fetchBoard, saveBoard } from '~/lib/api/boards';
+import { fetchAssignees } from '~/lib/api/assignees';
 
 const cx = classNames.bind(styles);
 

@@ -2,11 +2,11 @@ import { Dialog, Transition } from '@headlessui/react';
 import { LinkIcon } from '@heroicons/react/24/outline';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { Fragment, useEffect, useState } from 'react';
-import { createAssignee } from '~/lib/actions';
-import { fetchUserInfo } from '~/lib';
+import { createAssignee } from '~/lib/api/assignees';
 import { actions, useStore } from '~/store';
 import LineInput from '../LineInput';
 import UserAvatar from '../UserAvatar';
+import { fetchUserInfo } from '~/lib/api/users';
 
 const ShareModal = ({ setToast, board, show, setShow, modalTitle }) => {
     const [memberName, setMemberName] = useState('');

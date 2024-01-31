@@ -7,8 +7,8 @@ import { UserAuth } from '~/contexts/AuthContext';
 import { ActivityAuth } from '~/contexts/ActivityContext';
 import { Button } from '~/components';
 import { useStore, actions } from '~/store';
-import { saveBoard } from '~/lib/actions';
 import { DelConfirmPopper } from '~/components';
+import { saveBoard } from '~/lib/api/boards';
 
 const cx = classNames.bind(styles);
 

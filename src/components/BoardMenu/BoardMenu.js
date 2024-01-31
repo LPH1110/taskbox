@@ -7,7 +7,6 @@ import {
     EnvelopeIcon,
     ExclamationCircleIcon,
     EyeIcon,
-    MinusIcon,
     QueueListIcon,
     ShareIcon,
     TagIcon,
@@ -15,9 +14,10 @@ import {
 } from '@heroicons/react/24/outline';
 import classNames from 'classnames/bind';
 import { Fragment, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { DelConfirmPopper, Toast } from '~/components';
-import { leavingBoard, saveBoard } from '~/lib/actions';
+import { Toast } from '~/components';
+import { UserAuth } from '~/contexts/AuthContext';
 import Spacer from '../Spacer/Spacer';
 import AboutMenu from './AboutMenu';
 import ActivityMenu from './ActivityMenu';
@@ -25,9 +25,7 @@ import ArchivedMenu from './ArchivedMenu';
 import styles from './BoardMenu.module.scss';
 import ChangeBackgroundMenu from './ChangeBackgroundMenu';
 import SettingsMenu from './SettingsMenu';
-import { UserAuth } from '~/contexts/AuthContext';
-import { actions, useStore } from '~/store';
-import { useNavigate } from 'react-router-dom';
+import { leavingBoard, saveBoard } from '~/lib/api/boards';
 
 const cx = classNames.bind(styles);
 
@@ -70,7 +68,6 @@ const MenuList = ({ data, setCurrentMenu }) => {
 const BoardMenu = ({ children, admin, board, setBoard, setToast }) => {
     const { user } = UserAuth();
     const [openModal, setOpenModal] = useState(false);
-    const [openCloseConfirm, setOpenCloseConfirm] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const [currentMenu, setCurrentMenu] = useState([
         {

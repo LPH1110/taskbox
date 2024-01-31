@@ -4,11 +4,12 @@ import classNames from 'classnames/bind';
 import { useEffect, useRef, useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { v4 as uuidv4 } from 'uuid';
-import { createTask, saveColumn } from '~/lib/actions';
 import { actions, useStore } from '~/store';
 import Task from '../Task/Task';
 import TaskListItem from '../TaskListItem/TaskListItem';
 import styles from './Column.module.scss';
+import { createTask } from '~/lib/api/tasks';
+import { saveColumn } from '~/lib/api/columns';
 
 const cx = classNames.bind(styles);
 

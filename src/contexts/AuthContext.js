@@ -9,8 +9,8 @@ import {
 } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '~/firebase-config';
-import { saveUser } from '~/lib/actions';
-import updateActiveStatus from '~/lib/api/updateActiveStatus';
+import { saveUser } from '~/lib/api/users';
+import updateActiveStatus from '~/lib/api/users/updateActiveStatus';
 
 const AuthContext = createContext();
 

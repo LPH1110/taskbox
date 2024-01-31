@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '~/contexts/AuthContext';
 
 import { Button, Spinner } from '~/components';
-import updateActiveStatus from '~/lib/api/updateActiveStatus';
+import updateActiveStatus from '~/lib/api/users/updateActiveStatus';
 
 function GoogleSignInBtn({ setToast }) {
     const navigate = useNavigate();

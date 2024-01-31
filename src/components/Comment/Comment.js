@@ -2,13 +2,13 @@ import { Transition } from '@headlessui/react';
 import classNames from 'classnames/bind';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { UserAuth } from '~/contexts/AuthContext';
-import { deleteComment, saveComment } from '~/lib/actions';
 import { actions, useStore } from '~/store';
 import Button from '../Button';
 import RichTextEditor from '../RichTextEditor';
 import Spacer from '../Spacer';
 import UserAvatar from '../UserAvatar';
 import styles from './Comment.module.scss';
+import { deleteComment, saveComment } from '~/lib/api/comments';
 const cx = classNames.bind(styles);
 
 const Comment = ({ comment, admin, setCommentEditor }) => {
