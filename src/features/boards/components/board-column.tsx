@@ -1,15 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from "react";
-import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { type Column, type Task } from "../types/board-detail";
-import { TaskCard } from "./task-card";
-import { ArrowRightLeft, Copy, MoreHorizontal, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useAppDispatch } from "@/store/hooks";
-import { copyColumn, createTask, updateColumn } from "../boardDetailSlide";
-import { useToast } from "@/context/ToastContext";
-import { InlineEditable } from "@/components/ui/inline-editable";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,10 +8,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoveColumnDialog } from "./move-column-dialog";
+import { InlineEditable } from "@/components/ui/inline-editable";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/context/ToastContext";
+import { useAppDispatch } from "@/store/hooks";
+import { Draggable, Droppable } from "@hello-pangea/dnd";
+import { ArrowRightLeft, Copy, MoreHorizontal, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { createTask, updateColumn } from "../boardDetailSlide";
+import { type Column, type Task } from "../types/board-detail";
 import { CopyColumnDialog } from "./copy-column-dialog";
-import { MoveAllTasksDialog } from "./move-all-tasks-dialog";
 import { DeleteColumnDialog } from "./delete-column-dialog";
+import { MoveAllTasksDialog } from "./move-all-tasks-dialog";
+import { MoveColumnDialog } from "./move-column-dialog";
+import { TaskCard } from "./task-card";
 
 interface BoardColumnProps {
   column: Column;

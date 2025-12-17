@@ -321,7 +321,7 @@ export const moveColumnToDifferentBoard = createAsyncThunk(
   ) => {
     try {
       // Update the column's board_id and position directly
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("columns")
         .update({ board_id: targetBoardId, position: newPosition })
         .eq("id", columnId)
@@ -452,9 +452,9 @@ export const updateTaskOrder = createAsyncThunk(
   async (
     updates: {
       id: string;
-      board_id: string;
+      column_id: string;
       position: number;
-      title: string;
+      content: string;
     }[],
     { rejectWithValue }
   ) => {
