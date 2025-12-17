@@ -136,6 +136,49 @@ export const toggleTaskLabel = createAsyncThunk(
   }
 );
 
+export const updateLabel = createAsyncThunk(
+  "boardDetail/updateLabel",
+  async (
+    {
+      labelId,
+      title,
+      color,
+    }: { labelId: string; title: string; color: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data, error } = await supabase
+        .from("labels")
+        .update({ title, color })
+        .eq("id", labelId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteLabel = createAsyncThunk(
+  "boardDetail/deleteLabel",
+  async (labelId: string, { rejectWithValue }) => {
+    try {
+      const { error } = await supabase
+        .from("labels")
+        .delete()
+        .eq("id", labelId);
+
+      if (error) throw error;
+      return labelId;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // --- COLUMN ACTIONS ---
 
 export const createColumn = createAsyncThunk(
@@ -594,6 +637,27 @@ const boardDetailSlice = createSlice({
     builder.addCase(createLabel.fulfilled, (state, action) => {
       const label = action.payload;
       state.labels[label.id] = label;
+    });
+
+    // --- Handle Update Label ---
+    builder.addCase(updateLabel.fulfilled, (state, action) => {
+      const updatedLabel = action.payload;
+      if (state.labels[updatedLabel.id]) {
+        state.labels[updatedLabel.id] = updatedLabel;
+      }
+    });
+
+    // --- Handle Delete Label ---
+    builder.addCase(deleteLabel.fulfilled, (state, action) => {
+      const labelId = action.payload;
+
+      delete state.labels[labelId];
+
+      Object.values(state.tasks).forEach((task) => {
+        if (task.labelIds && task.labelIds.includes(labelId)) {
+          task.labelIds = task.labelIds.filter((id) => id !== labelId);
+        }
+      });
     });
 
     // Handle Toggle Task Label
