@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   createAsyncThunk,
   createSlice,
@@ -6,6 +7,7 @@ import {
 import {
   type BoardDetailState,
   type Column,
+  type Label,
   type Task,
 } from "./types/board-detail";
 import { supabase } from "@/lib/supabase";
@@ -32,49 +34,152 @@ export const fetchBoardDetails = createAsyncThunk(
 
       if (colsError) throw colsError;
 
-      // Fetch Tasks (for all columns in this board)
+      // Fetch labels
+      const { data: labelsData, error: labelsError } = await supabase
+        .from("labels")
+        .select("*")
+        .eq("board_id", boardId);
+      if (labelsError) throw labelsError;
+
+      // D. Fetch Tasks & TaskLabels
       const columnIds = columnsData.map((c) => c.id);
       let tasksData: any[] = [];
+      let taskLabelsData: any[] = [];
+
       if (columnIds.length > 0) {
-        const { data, error: tasksError } = await supabase
+        // Fetch tasks
+        const { data: tData, error: tError } = await supabase
           .from("tasks")
           .select("*")
           .in("column_id", columnIds)
           .order("position", { ascending: true });
+        if (tError) throw tError;
+        tasksData = tData || [];
 
-        if (tasksError) throw tasksError;
-        tasksData = data || [];
+        // Fetch relationship: Task <-> Label
+        if (tasksData.length > 0) {
+          const taskIds = tasksData.map((t) => t.id);
+          const { data: tlData, error: tlError } = await supabase
+            .from("task_labels")
+            .select("*")
+            .in("task_id", taskIds);
+          if (tlError) throw tlError;
+          taskLabelsData = tlData || [];
+        }
       }
 
-      return { board: boardData, columns: columnsData, tasks: tasksData };
+      return {
+        board: boardData,
+        columns: columnsData,
+        tasks: tasksData,
+        labels: labelsData,
+        taskLabels: taskLabelsData,
+      };
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
   }
 );
 
-export const updateTaskOrder = createAsyncThunk(
-  "boardDetail/updateTaskOrder",
+// --- LABEL ACTIONS ---
+export const createLabel = createAsyncThunk(
+  "boardDetail/createLabel",
   async (
-    updates: {
-      id: string;
-      board_id: string;
-      position: number;
-      title: string;
-    }[],
+    {
+      boardId,
+      title,
+      color,
+    }: { boardId: string; title: string; color: string },
     { rejectWithValue }
   ) => {
     try {
-      // Upsert allows us to update multiple rows at once if we provide their IDs
-      const { error } = await supabase.from("tasks").upsert(updates);
+      const { data, error } = await supabase
+        .from("labels")
+        .insert({ board_id: boardId, title, color })
+        .select()
+        .single();
       if (error) throw error;
-      return updates;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return data;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
   }
 );
+
+export const toggleTaskLabel = createAsyncThunk(
+  "boardDetail/toggleTaskLabel",
+  async (
+    {
+      taskId,
+      labelId,
+      isAdding,
+    }: { taskId: string; labelId: string; isAdding: boolean },
+    { rejectWithValue }
+  ) => {
+    try {
+      if (isAdding) {
+        const { error } = await supabase
+          .from("task_labels")
+          .insert({ task_id: taskId, label_id: labelId });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("task_labels")
+          .delete()
+          .match({ task_id: taskId, label_id: labelId });
+        if (error) throw error;
+      }
+      return { taskId, labelId, isAdding };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateLabel = createAsyncThunk(
+  "boardDetail/updateLabel",
+  async (
+    {
+      labelId,
+      title,
+      color,
+    }: { labelId: string; title: string; color: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data, error } = await supabase
+        .from("labels")
+        .update({ title, color })
+        .eq("id", labelId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteLabel = createAsyncThunk(
+  "boardDetail/deleteLabel",
+  async (labelId: string, { rejectWithValue }) => {
+    try {
+      const { error } = await supabase
+        .from("labels")
+        .delete()
+        .eq("id", labelId);
+
+      if (error) throw error;
+      return labelId;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// --- COLUMN ACTIONS ---
 
 export const createColumn = createAsyncThunk(
   "boardDetail/createColumn",
@@ -264,6 +369,31 @@ export const deleteColumn = createAsyncThunk(
   }
 );
 
+// --- TASK ACTIONS ---
+
+export const updateTaskOrder = createAsyncThunk(
+  "boardDetail/updateTaskOrder",
+  async (
+    updates: {
+      id: string;
+      board_id: string;
+      position: number;
+      title: string;
+    }[],
+    { rejectWithValue }
+  ) => {
+    try {
+      // Upsert allows us to update multiple rows at once if we provide their IDs
+      const { error } = await supabase.from("tasks").upsert(updates);
+      if (error) throw error;
+      return updates;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const createTask = createAsyncThunk(
   "boardDetail/createTask",
   async (
@@ -379,9 +509,12 @@ export const moveAllTasks = createAsyncThunk(
   }
 );
 
+// -----------------
+
 const initialState: BoardDetailState = {
   tasks: {},
   columns: {},
+  labels: {},
   columnOrder: [],
   isLoading: false,
   selectedTaskId: null,
@@ -444,12 +577,27 @@ const boardDetailSlice = createSlice({
       })
       .addCase(fetchBoardDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        const { board, columns, tasks } = action.payload;
+        const { labels, board, columns, tasks, taskLabels } = action.payload;
 
         state.currentBoard = board;
         const newTasks: Record<string, Task> = {};
         const newColumns: Record<string, Column> = {};
+        const newLabels: Record<string, Label> = {};
+        const taskLabelMap: Record<string, string[]> = {};
         const newColumnOrder: string[] = [];
+
+        // Normalize labels
+        labels.forEach((l: Label) => {
+          newLabels[l.id] = l;
+        });
+        state.labels = newLabels;
+
+        // Map Task Labels
+        // taskId -> [labelId1, labelId2]
+        taskLabels.forEach((tl: any) => {
+          if (!taskLabelMap[tl.task_id]) taskLabelMap[tl.task_id] = [];
+          taskLabelMap[tl.task_id].push(tl.label_id);
+        });
 
         // Process Columns
         columns.forEach((col: Column) => {
@@ -472,6 +620,7 @@ const boardDetailSlice = createSlice({
             priority: task.priority,
             description: task.description,
             position: task.position,
+            labelIds: taskLabelMap[task.id] || [],
           };
 
           if (newColumns[task.column_id]) {
@@ -483,6 +632,46 @@ const boardDetailSlice = createSlice({
         state.columns = newColumns;
         state.columnOrder = newColumnOrder;
       });
+
+    // --- Handle Create Label
+    builder.addCase(createLabel.fulfilled, (state, action) => {
+      const label = action.payload;
+      state.labels[label.id] = label;
+    });
+
+    // --- Handle Update Label ---
+    builder.addCase(updateLabel.fulfilled, (state, action) => {
+      const updatedLabel = action.payload;
+      if (state.labels[updatedLabel.id]) {
+        state.labels[updatedLabel.id] = updatedLabel;
+      }
+    });
+
+    // --- Handle Delete Label ---
+    builder.addCase(deleteLabel.fulfilled, (state, action) => {
+      const labelId = action.payload;
+
+      delete state.labels[labelId];
+
+      Object.values(state.tasks).forEach((task) => {
+        if (task.labelIds && task.labelIds.includes(labelId)) {
+          task.labelIds = task.labelIds.filter((id) => id !== labelId);
+        }
+      });
+    });
+
+    // Handle Toggle Task Label
+    builder.addCase(toggleTaskLabel.fulfilled, (state, action) => {
+      const { taskId, labelId, isAdding } = action.payload;
+      const task = state.tasks[taskId];
+      if (task) {
+        if (isAdding) {
+          if (!task.labelIds.includes(labelId)) task.labelIds.push(labelId);
+        } else {
+          task.labelIds = task.labelIds.filter((id) => id !== labelId);
+        }
+      }
+    });
 
     // --- Handle Create Column --
     builder.addCase(createColumn.fulfilled, (state, action) => {
@@ -560,7 +749,12 @@ const boardDetailSlice = createSlice({
     // --- Handle Create Task ---
     builder.addCase(createTask.fulfilled, (state, action) => {
       const task = action.payload;
-      state.tasks[task.id] = task;
+      state.tasks[task.id] = {
+        ...task,
+        labelIds: [],
+        position: task.position ?? 99999,
+      };
+
       state.columns[task.column_id].taskIds.push(task.id);
     });
     // --- Handle Update Task ---
