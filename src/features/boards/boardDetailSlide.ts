@@ -41,7 +41,15 @@ export const fetchBoardDetails = createAsyncThunk(
         .eq("board_id", boardId);
       if (labelsError) throw labelsError;
 
-      // D. Fetch Tasks & TaskLabels
+      // Fetch Members
+      const { data: membersData, error: membersError } = await supabase
+        .from("board_members")
+        .select("*, profiles(*)")
+        .eq("board_id", boardId);
+
+      if (membersError) throw membersError;
+
+      // Fetch Tasks & TaskLabels
       const columnIds = columnsData.map((c) => c.id);
       let tasksData: any[] = [];
       let taskLabelsData: any[] = [];
@@ -73,8 +81,76 @@ export const fetchBoardDetails = createAsyncThunk(
         columns: columnsData,
         tasks: tasksData,
         labels: labelsData,
+        members: membersData,
         taskLabels: taskLabelsData,
       };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// --- MEMBER ACTIONS ---
+export const addMember = createAsyncThunk(
+  "boardDetail/addMember",
+  async (
+    { boardId, email }: { boardId: string; email: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      // Find user by email in public profiles
+      const { data: userProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", email)
+        .single();
+
+      if (profileError || !userProfile) {
+        throw new Error("User not found. Please check the email.");
+      }
+
+      // Insert into board_members
+      const { data: newMember, error: memberError } = await supabase
+        .from("board_members")
+        .insert({
+          board_id: boardId,
+          user_id: userProfile.id,
+          role: "member", // Default role
+        })
+        .select("*, profiles(*)") // Join immediately to get profile info
+        .single();
+
+      if (memberError) {
+        if (memberError.code === "23505") {
+          // Unique violation
+          throw new Error("User is already a member of this board.");
+        }
+        throw memberError;
+      }
+
+      return newMember;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const removeMember = createAsyncThunk(
+  "boardDetail/removeMember",
+  async (
+    { boardId, userId }: { boardId: string; userId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      // Execute delete query on board_members table
+      const { error } = await supabase
+        .from("board_members")
+        .delete()
+        .match({ board_id: boardId, user_id: userId });
+
+      if (error) throw error;
+
+      return userId; // Return userId to update local state
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -516,6 +592,7 @@ const initialState: BoardDetailState = {
   columns: {},
   labels: {},
   columnOrder: [],
+  members: [],
   isLoading: false,
   selectedTaskId: null,
   currentBoard: null,
@@ -577,7 +654,8 @@ const boardDetailSlice = createSlice({
       })
       .addCase(fetchBoardDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        const { labels, board, columns, tasks, taskLabels } = action.payload;
+        const { labels, board, columns, tasks, taskLabels, members } =
+          action.payload;
 
         state.currentBoard = board;
         const newTasks: Record<string, Task> = {};
@@ -631,7 +709,20 @@ const boardDetailSlice = createSlice({
         state.tasks = newTasks;
         state.columns = newColumns;
         state.columnOrder = newColumnOrder;
+        state.members = members || [];
       });
+
+    // --- Handle Add Member
+    builder.addCase(addMember.fulfilled, (state, action) => {
+      state.members.push(action.payload);
+    });
+
+    // --- Handle Remove Member ---
+    builder.addCase(removeMember.fulfilled, (state, action) => {
+      const removedUserId = action.payload;
+      // Filter out the removed member from the list
+      state.members = state.members.filter((m) => m.user_id !== removedUserId);
+    });
 
     // --- Handle Create Label
     builder.addCase(createLabel.fulfilled, (state, action) => {

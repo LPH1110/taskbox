@@ -16,7 +16,7 @@ export default function DashboardLayout() {
 
         {/* Main Content Area */}
         <main className="flex flex-1 flex-col overflow-hidden bg-muted/20">
-          <div className="container pt-4">
+          <div className="w-full mx-auto pt-4">
             <Outlet />
           </div>
         </main>

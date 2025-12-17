@@ -1,4 +1,4 @@
-import type { Board } from ".";
+import type { Board, BoardMember } from ".";
 
 export interface Label {
   id: string;
@@ -29,6 +29,7 @@ export interface BoardDetailState {
   tasks: Record<string, Task>;
   columns: Record<string, Column>;
   labels: Record<string, Label>;
+  members: BoardMember[];
   columnOrder: string[];
   isLoading: boolean;
   selectedTaskId: string | null;

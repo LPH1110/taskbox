@@ -32,9 +32,7 @@ export function BoardCard({ board }: BoardCardProps) {
 
       {/* Title */}
       <div className="relative z-10 flex h-full flex-col justify-between">
-        <h3 className="truncate font-bold text-white shadow-sm">
-          {board.title}
-        </h3>
+        <h3 className="truncate font-bold text-white">{board.title}</h3>
 
         {/* Favorite Icon (Visible on hover or if favorited) */}
         <div

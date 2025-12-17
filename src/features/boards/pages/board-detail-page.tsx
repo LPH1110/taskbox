@@ -1,6 +1,7 @@
 import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { BoardColumn } from "../components/board-column";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Filter, UserPlus } from "lucide-react";
 import {
@@ -12,17 +13,19 @@ import {
 } from "../boardDetailSlide";
 import { TaskDetailModal } from "../components/task-detail-modal";
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AddColumnForm } from "../components/add-column-form";
 import { BoardSkeleton } from "../components/board-skeleton";
 import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll";
+import { MembersDialog } from "../components/members-dialog";
+import { MemberPopover } from "../components/member-popover";
 
 export default function BoardDetailPage() {
   const { boardId } = useParams();
   const dispatch = useAppDispatch();
-  const { tasks, columns, columnOrder, isLoading, currentBoard } =
+  const { tasks, columns, columnOrder, isLoading, currentBoard, members } =
     useAppSelector((state) => state.boardDetail);
-
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { containerRef, onWheel } = useSmoothHorizontalScroll();
 
   useEffect(() => {
@@ -121,14 +124,38 @@ export default function BoardDetailPage() {
 
   return (
     <div className={`flex h-[calc(100vh-80px)] flex-col gap-4 transition`}>
-      {/* Board Header (Title & Actions) */}
-      <div className="px-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{currentBoard?.title}</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 shrink-0">
+        <h1 className="text-2xl font-bold text-white drop-shadow-md">
+          {currentBoard?.title || "Board"}
+        </h1>
+
+        <div className="flex items-center gap-2">
+          {/* Small Facepile */}
+          <div className="flex -space-x-2 mr-2">
+            {members.slice(0, 3).map((m) => (
+              <MemberPopover key={m.user_id} member={m} boardId={boardId!} />
+            ))}
+            {members.length > 3 && (
+              <div className="h-8 w-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs font-medium z-10">
+                +{members.length - 3}
+              </div>
+            )}
+          </div>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            className="opacity-90 hover:opacity-100"
+          >
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>
-          <Button size="sm">
+
+          <Button
+            size="sm"
+            className="cursor-pointer opacity-90 hover:opacity-100"
+            onClick={() => setIsShareOpen(true)}
+          >
             <UserPlus className="mr-2 h-4 w-4" /> Share
           </Button>
         </div>
@@ -172,6 +199,10 @@ export default function BoardDetailPage() {
         </Droppable>
       </DragDropContext>
       <TaskDetailModal />
+      <MembersDialog
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+      />
     </div>
   );
 }
