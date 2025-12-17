@@ -1,9 +1,10 @@
-import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { BoardColumn } from "../components/board-column";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
 import { Filter, UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   fetchBoardDetails,
   moveColumn,
@@ -11,14 +12,12 @@ import {
   updateColumnOrder,
   updateTaskOrder,
 } from "../boardDetailSlide";
-import { TaskDetailModal } from "../components/task-detail-modal";
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { AddColumnForm } from "../components/add-column-form";
+import { BoardColumn } from "../components/board-column";
 import { BoardSkeleton } from "../components/board-skeleton";
-import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll";
-import { MembersDialog } from "../components/members-dialog";
 import { MemberPopover } from "../components/member-popover";
+import { MembersDialog } from "../components/members-dialog";
+import { TaskDetailModal } from "../components/task-detail-modal";
 
 export default function BoardDetailPage() {
   const { boardId } = useParams();

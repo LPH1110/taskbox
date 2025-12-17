@@ -42,7 +42,7 @@ type LoginFormValues = z.infer<typeof formSchema>;
 
 export function RegisterForm() {
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const navigate = useNavigate();
 
   // 3. Initialize the form

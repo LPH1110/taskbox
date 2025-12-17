@@ -1,9 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import {
-  createAsyncThunk,
-  createSlice,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 // Define the shape of the user object (simplify for now, expand later based on DB)
 interface User {
