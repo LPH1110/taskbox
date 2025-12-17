@@ -18,6 +18,7 @@ import { AddColumnForm } from "../components/add-column-form";
 import { BoardSkeleton } from "../components/board-skeleton";
 import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll";
 import { MembersDialog } from "../components/members-dialog";
+import { MemberPopover } from "../components/member-popover";
 
 export default function BoardDetailPage() {
   const { boardId } = useParams();
@@ -130,18 +131,10 @@ export default function BoardDetailPage() {
         </h1>
 
         <div className="flex items-center gap-2">
-          {/* Small Facepile (Danh sách avatar nhỏ) */}
+          {/* Small Facepile */}
           <div className="flex -space-x-2 mr-2">
             {members.slice(0, 3).map((m) => (
-              <Avatar
-                key={m.user_id}
-                className="h-8 w-8 border-2 border-background"
-              >
-                <AvatarImage src={m.profiles?.avatar_url} />
-                <AvatarFallback>
-                  {m.profiles?.full_name?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
+              <MemberPopover key={m.user_id} member={m} boardId={boardId!} />
             ))}
             {members.length > 3 && (
               <div className="h-8 w-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs font-medium z-10">

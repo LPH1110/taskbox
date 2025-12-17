@@ -135,6 +135,28 @@ export const addMember = createAsyncThunk(
   }
 );
 
+export const removeMember = createAsyncThunk(
+  "boardDetail/removeMember",
+  async (
+    { boardId, userId }: { boardId: string; userId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      // Execute delete query on board_members table
+      const { error } = await supabase
+        .from("board_members")
+        .delete()
+        .match({ board_id: boardId, user_id: userId });
+
+      if (error) throw error;
+
+      return userId; // Return userId to update local state
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // --- LABEL ACTIONS ---
 export const createLabel = createAsyncThunk(
   "boardDetail/createLabel",
@@ -693,6 +715,13 @@ const boardDetailSlice = createSlice({
     // --- Handle Add Member
     builder.addCase(addMember.fulfilled, (state, action) => {
       state.members.push(action.payload);
+    });
+
+    // --- Handle Remove Member ---
+    builder.addCase(removeMember.fulfilled, (state, action) => {
+      const removedUserId = action.payload;
+      // Filter out the removed member from the list
+      state.members = state.members.filter((m) => m.user_id !== removedUserId);
     });
 
     // --- Handle Create Label
