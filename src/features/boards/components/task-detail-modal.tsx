@@ -26,6 +26,7 @@ import { useToast } from "@/context/ToastContext";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useEffect, useState } from "react";
 import { closeTaskDetail, deleteTask, updateTask } from "../boardDetailSlide";
+import { LabelPopover } from "./label-popover";
 
 export function TaskDetailModal() {
   const dispatch = useAppDispatch();
@@ -242,12 +243,9 @@ export function TaskDetailModal() {
                   >
                     <User className="mr-2 h-4 w-4" /> Members
                   </Button>
-                  <Button
-                    variant="secondary"
-                    className="w-full justify-start h-8 text-sm"
-                  >
-                    <Tag className="mr-2 h-4 w-4" /> Labels
-                  </Button>
+
+                  <LabelPopover taskId={task.id} />
+
                   <Button
                     variant="secondary"
                     className="w-full justify-start h-8 text-sm"

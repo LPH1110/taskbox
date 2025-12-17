@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Draggable } from "@hello-pangea/dnd";
 import { openTaskDetail } from "../boardDetailSlide";
 import { type Task } from "../types/board-detail";
@@ -12,6 +12,9 @@ interface TaskCardProps {
 
 export function TaskCard({ task, index }: TaskCardProps) {
   const dispatch = useAppDispatch();
+  // Get all labels from store
+  const allLabels = useAppSelector((state) => state.boardDetail.labels);
+
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
@@ -21,16 +24,33 @@ export function TaskCard({ task, index }: TaskCardProps) {
           {...provided.dragHandleProps}
           className="mb-2"
           onClick={() => dispatch(openTaskDetail(task.id))}
-          style={{ ...provided.draggableProps.style }} // Essential for smooth movement
+          style={{ ...provided.draggableProps.style }}
         >
-          {/* Using Shadcn Card for Task UI */}
           <Card
             className={`p-0 cursor-grab hover:ring-2 hover:ring-primary/20 ${
               snapshot.isDragging ? "opacity-75 ring-2 ring-primary" : ""
             }`}
           >
             <CardContent className="p-3 text-sm flex flex-col gap-2">
-              <span>{task.content}</span>
+              {task.labelIds?.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {task.labelIds.map((labelId) => {
+                    const label = allLabels[labelId];
+                    if (!label) return null;
+                    return (
+                      <div
+                        key={label.id}
+                        className="h-2 w-8 rounded-full"
+                        style={{ backgroundColor: label.color }}
+                        title={label.title}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              <div className="text-sm font-medium leading-none">
+                {task.content}
+              </div>
               {task.priority && (
                 <div className="flex">
                   <Badge
