@@ -17,7 +17,6 @@ import {
   Clock,
   CreditCard,
   Layout,
-  Tag,
   Trash2,
   User,
 } from "lucide-react";

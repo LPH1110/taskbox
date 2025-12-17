@@ -5,11 +5,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useToast } from "@/context/ToastContext";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { UserMinus } from "lucide-react";
 import { useState } from "react";
-import { removeMember } from "../boardDetailSlide";
 import { type BoardMember } from "../types";
 import { DeleteMemberDialog } from "./delete-member-dialog";
 
@@ -19,13 +17,9 @@ interface MemberPopoverProps {
 }
 
 export function MemberPopover({ member, boardId }: MemberPopoverProps) {
-  const dispatch = useAppDispatch();
-  const { addToast } = useToast();
-
   // State for Popover and Alert Dialog
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   // Permission Check
   const { user } = useAppSelector((state) => state.auth);
