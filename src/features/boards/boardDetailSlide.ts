@@ -11,6 +11,7 @@ import {
   type Task,
 } from "./types/board-detail";
 import { supabase } from "@/lib/supabase";
+import type { Board, BoardMember } from "./types";
 
 export const fetchBoardDetails = createAsyncThunk(
   "boardDetail/fetchBoardDetails",
@@ -341,7 +342,11 @@ export const moveColumnToDifferentBoard = createAsyncThunk(
 export const updateColumnOrder = createAsyncThunk(
   "boardDetail/updateColumnOrder",
   async (
-    updates: { id: string; board_id: string; position: number }[],
+    updates: {
+      id: string;
+      board_id: string;
+      position: number;
+    }[],
     { rejectWithValue }
   ) => {
     try {
@@ -395,7 +400,8 @@ export const copyColumn = createAsyncThunk(
       let newTasksData: Task[] = [];
       if (originalTasks && originalTasks.length > 0) {
         const tasksToInsert = originalTasks.map((t) => ({
-          column_id: newColumn.id, // Link to new column
+          column_id: newColumn.id,
+          board_id: originalColumn.board_id,
           content: t.content,
           description: t.description,
           priority: t.priority,
@@ -446,7 +452,6 @@ export const deleteColumn = createAsyncThunk(
 );
 
 // --- TASK ACTIONS ---
-
 export const updateTaskOrder = createAsyncThunk(
   "boardDetail/updateTaskOrder",
   async (
@@ -454,16 +459,15 @@ export const updateTaskOrder = createAsyncThunk(
       id: string;
       column_id: string;
       position: number;
+      board_id: string;
       content: string;
     }[],
     { rejectWithValue }
   ) => {
     try {
-      // Upsert allows us to update multiple rows at once if we provide their IDs
       const { error } = await supabase.from("tasks").upsert(updates);
       if (error) throw error;
       return updates;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -473,14 +477,22 @@ export const updateTaskOrder = createAsyncThunk(
 export const createTask = createAsyncThunk(
   "boardDetail/createTask",
   async (
-    { columnId, content }: { columnId: string; content: string },
+    {
+      columnId,
+      boardId,
+      content,
+    }: { columnId: string; boardId: string; content: string },
     { rejectWithValue }
   ) => {
     try {
-      // Get 'position' logic similar to columns if needed, or default to bottom
       const { data, error } = await supabase
         .from("tasks")
-        .insert({ column_id: columnId, content, position: 99999 })
+        .insert({
+          column_id: columnId,
+          content,
+          position: 99999,
+          board_id: boardId,
+        })
         .select()
         .single();
 
@@ -602,6 +614,147 @@ const boardDetailSlice = createSlice({
   name: "boardDetail",
   initialState,
   reducers: {
+    // 1. Board Metadata
+    realtimeBoardUpdate: (state, action: PayloadAction<Partial<Board>>) => {
+      if (state.currentBoard && state.currentBoard.id === action.payload.id) {
+        state.currentBoard = { ...state.currentBoard, ...action.payload };
+      }
+    },
+
+    // 2. Columns
+    realtimeColumnUpsert: (state, action: PayloadAction<Column>) => {
+      const col = action.payload;
+
+      // 1. Kiểm tra xem column có thuộc board hiện tại không?
+      // Quan trọng: Nếu column bị move sang board khác, ta phải xóa nó khỏi state hiện tại.
+      if (col.board_id !== state.currentBoard?.id) {
+        if (state.columns[col.id]) {
+          delete state.columns[col.id];
+          state.columnOrder = state.columnOrder.filter((id) => id !== col.id);
+        }
+        return;
+      }
+
+      // 2. Cập nhật Dictionary (Giữ lại taskIds hiện có nếu là UPDATE)
+      const existingTaskIds = state.columns[col.id]?.taskIds || [];
+      state.columns[col.id] = { ...col, taskIds: existingTaskIds };
+
+      // 3. Cập nhật Order Array (IDEMPOTENT: Chỉ push nếu chưa có)
+      if (!state.columnOrder.includes(col.id)) {
+        state.columnOrder.push(col.id);
+      }
+
+      // 4. Sort lại dựa trên position từ Database để đảm bảo đồng bộ hoàn toàn
+      state.columnOrder.sort(
+        (a, b) =>
+          (state.columns[a]?.position ?? 0) - (state.columns[b]?.position ?? 0)
+      );
+    },
+    realtimeColumnDelete: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      delete state.columns[id];
+      state.columnOrder = state.columnOrder.filter((colId) => colId !== id);
+    },
+
+    // 3. Tasks
+    realtimeTaskUpsert: (state, action: PayloadAction<Task>) => {
+      const task = action.payload;
+
+      // Kiểm tra Task có thuộc về Column nào đang hiển thị không
+      if (!state.columns[task.column_id]) return;
+
+      const oldTask = state.tasks[task.id];
+      // Bảo toàn labelIds cục bộ (vì payload realtime thường không có join task_labels)
+      state.tasks[task.id] = {
+        ...task,
+        labelIds: oldTask?.labelIds || task.labelIds || [],
+      };
+
+      // Xử lý logic di chuyển Column (nếu có)
+      if (oldTask && oldTask.column_id !== task.column_id) {
+        if (state.columns[oldTask.column_id]) {
+          state.columns[oldTask.column_id].taskIds = state.columns[
+            oldTask.column_id
+          ].taskIds.filter((id) => id !== task.id);
+        }
+      }
+
+      // Add ID vào column mới (Idempotent)
+      const targetCol = state.columns[task.column_id];
+      if (targetCol && !targetCol.taskIds.includes(task.id)) {
+        targetCol.taskIds.push(task.id);
+      }
+
+      // Re-sort tasks trong column
+      targetCol.taskIds.sort(
+        (a, b) =>
+          (state.tasks[a]?.position ?? 0) - (state.tasks[b]?.position ?? 0)
+      );
+    },
+
+    realtimeTaskDelete: (
+      state,
+      action: PayloadAction<{ id: string; column_id: string }>
+    ) => {
+      const { id, column_id } = action.payload;
+      delete state.tasks[id];
+      if (state.columns[column_id]) {
+        state.columns[column_id].taskIds = state.columns[
+          column_id
+        ].taskIds.filter((taskId) => taskId !== id);
+      }
+    },
+
+    // 4. Labels (General)
+    realtimeLabelUpsert: (state, action: PayloadAction<Label>) => {
+      state.labels[action.payload.id] = action.payload;
+    },
+    realtimeLabelDelete: (state, action: PayloadAction<string>) => {
+      const labelId = action.payload;
+      delete state.labels[labelId];
+      // Cleanup labelIds in all tasks
+      Object.values(state.tasks).forEach((task) => {
+        task.labelIds = task.labelIds.filter((id) => id !== labelId);
+      });
+    },
+
+    // 5. Task Labels (Junction Table Updates)
+    realtimeTaskLabelEvent: (
+      state,
+      action: PayloadAction<{
+        task_id: string;
+        label_id: string;
+        type: "INSERT" | "DELETE";
+      }>
+    ) => {
+      const { task_id, label_id, type } = action.payload;
+      const task = state.tasks[task_id];
+      if (task) {
+        if (type === "INSERT" && !task.labelIds.includes(label_id)) {
+          task.labelIds.push(label_id);
+        } else if (type === "DELETE") {
+          task.labelIds = task.labelIds.filter((id) => id !== label_id);
+        }
+      }
+    },
+
+    // 6. Members
+    realtimeMemberEvent: (
+      state,
+      action: PayloadAction<{ member: BoardMember; type: "INSERT" | "DELETE" }>
+    ) => {
+      const { member, type } = action.payload;
+      if (type === "INSERT") {
+        if (!state.members.find((m) => m.user_id === member.user_id)) {
+          state.members.push(member);
+        }
+      } else {
+        state.members = state.members.filter(
+          (m) => m.user_id !== member.user_id
+        );
+      }
+    },
+
     moveColumn: (
       state,
       action: PayloadAction<{ sourceIndex: number; destinationIndex: number }>
@@ -650,7 +803,9 @@ const boardDetailSlice = createSlice({
     // --- Handle Fetch Board Details ---
     builder
       .addCase(fetchBoardDetails.pending, (state) => {
-        state.isLoading = true;
+        if (!state.currentBoard) {
+          state.isLoading = true;
+        }
       })
       .addCase(fetchBoardDetails.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -767,10 +922,10 @@ const boardDetailSlice = createSlice({
     // --- Handle Create Column --
     builder.addCase(createColumn.fulfilled, (state, action) => {
       const column = action.payload;
-      // 1. Add to normalized columns object
       state.columns[column.id] = { ...column, taskIds: [] };
-      // 2. Add to order array
-      state.columnOrder.push(column.id);
+      if (!state.columnOrder.includes(column.id)) {
+        state.columnOrder.push(column.id);
+      }
     });
 
     // --- Handle Update Column --
@@ -784,24 +939,21 @@ const boardDetailSlice = createSlice({
     // --- Handle Copy Column ---
     builder.addCase(copyColumn.fulfilled, (state, action) => {
       const { newColumn, newTasks, originalColumnId } = action.payload;
-
-      // 1. Add new column to dictionary
       state.columns[newColumn.id] = {
         ...newColumn,
-        taskIds: newTasks.map((t) => t.id),
+        taskIds: newTasks.map((t: any) => t.id),
       };
-
-      // 2. Add new tasks to dictionary
-      newTasks.forEach((task) => {
-        state.tasks[task.id] = task;
+      newTasks.forEach((task: any) => {
+        state.tasks[task.id] = { ...task, labelIds: [] };
       });
 
-      // 3. Insert new column ID into columnOrder RIGHT AFTER the original one
-      const index = state.columnOrder.indexOf(originalColumnId);
-      if (index !== -1) {
-        state.columnOrder.splice(index + 1, 0, newColumn.id);
-      } else {
-        state.columnOrder.push(newColumn.id); // Fallback
+      if (!state.columnOrder.includes(newColumn.id)) {
+        const index = state.columnOrder.indexOf(originalColumnId);
+        if (index !== -1) {
+          state.columnOrder.splice(index + 1, 0, newColumn.id);
+        } else {
+          state.columnOrder.push(newColumn.id);
+        }
       }
     });
 
@@ -845,8 +997,10 @@ const boardDetailSlice = createSlice({
         labelIds: [],
         position: task.position ?? 99999,
       };
-
-      state.columns[task.column_id].taskIds.push(task.id);
+      const col = state.columns[task.column_id];
+      if (col && !col.taskIds.includes(task.id)) {
+        col.taskIds.push(task.id);
+      }
     });
     // --- Handle Update Task ---
     builder.addCase(updateTask.fulfilled, (state, action) => {
@@ -909,6 +1063,19 @@ const boardDetailSlice = createSlice({
   },
 });
 
-export const { moveTask, moveColumn, openTaskDetail, closeTaskDetail } =
-  boardDetailSlice.actions;
+export const {
+  moveTask,
+  moveColumn,
+  openTaskDetail,
+  closeTaskDetail,
+  realtimeBoardUpdate,
+  realtimeColumnDelete,
+  realtimeColumnUpsert,
+  realtimeLabelDelete,
+  realtimeLabelUpsert,
+  realtimeMemberEvent,
+  realtimeTaskDelete,
+  realtimeTaskLabelEvent,
+  realtimeTaskUpsert,
+} = boardDetailSlice.actions;
 export default boardDetailSlice.reducer;
