@@ -3,12 +3,21 @@ import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll"
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
 import { Filter, UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   fetchBoardDetails,
   moveColumn,
   moveTask,
+  realtimeBoardUpdate,
+  realtimeColumnDelete,
+  realtimeColumnUpsert,
+  realtimeLabelDelete,
+  realtimeLabelUpsert,
+  realtimeMemberEvent,
+  realtimeTaskDelete,
+  realtimeTaskLabelEvent,
+  realtimeTaskUpsert,
   updateColumnOrder,
   updateTaskOrder,
 } from "../boardDetailSlide";
@@ -18,20 +27,144 @@ import { BoardSkeleton } from "../components/board-skeleton";
 import { MemberPopover } from "../components/member-popover";
 import { MembersDialog } from "../components/members-dialog";
 import { TaskDetailModal } from "../components/task-detail-modal";
+import { supabase } from "@/lib/supabase";
+import type { Board, BoardMember } from "../types";
+import type { Column, Label, Task } from "../types/board-detail";
 
 export default function BoardDetailPage() {
   const { boardId } = useParams();
   const dispatch = useAppDispatch();
   const { tasks, columns, columnOrder, isLoading, currentBoard, members } =
     useAppSelector((state) => state.boardDetail);
+  const { user } = useAppSelector((state) => state.auth);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const { containerRef, onWheel } = useSmoothHorizontalScroll();
 
+  const stateRef = useRef({ columns, tasks });
+  useEffect(() => {
+    stateRef.current = { columns, tasks };
+  }, [columns, tasks]);
+
+  // Initial fetch
   useEffect(() => {
     if (boardId) {
       dispatch(fetchBoardDetails(boardId));
     }
   }, [dispatch, boardId]);
+
+  // Realtime updates
+  useEffect(() => {
+    if (!boardId || !user) return;
+
+    const channel = supabase
+      .channel(`board:${boardId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "boards",
+          filter: `id=eq.${boardId}`,
+        },
+        (payload) => {
+          if (payload.eventType === "UPDATE")
+            dispatch(realtimeBoardUpdate(payload.new as Board));
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "columns",
+          filter: `board_id=eq.${boardId}`,
+        },
+        (p) => {
+          if (p.eventType === "DELETE")
+            dispatch(realtimeColumnDelete(p.old.id));
+          else dispatch(realtimeColumnUpsert(p.new as Column));
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "tasks",
+          filter: `board_id=eq.${boardId}`,
+        },
+        (p) => {
+          if (p.eventType === "DELETE") {
+            const taskId = p.old.id;
+            const taskInState = stateRef.current.tasks[taskId];
+            if (taskInState)
+              dispatch(
+                realtimeTaskDelete({
+                  id: taskId,
+                  column_id: taskInState.column_id,
+                })
+              );
+          } else {
+            dispatch(realtimeTaskUpsert(p.new as Task));
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "labels",
+          filter: `board_id=eq.${boardId}`,
+        },
+        (payload) => {
+          if (payload.eventType === "DELETE")
+            dispatch(realtimeLabelDelete(payload.old.id));
+          else dispatch(realtimeLabelUpsert(payload.new as Label));
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "task_labels" },
+        (payload) => {
+          const data: any =
+            payload.eventType === "DELETE" ? payload.old : payload.new;
+          if (tasks[data.task_id]) {
+            dispatch(
+              realtimeTaskLabelEvent({
+                task_id: data.task_id,
+                label_id: data.label_id,
+                type: payload.eventType as "INSERT" | "DELETE",
+              })
+            );
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "board_members",
+          filter: `board_id=eq.${boardId}`,
+        },
+        (payload) => {
+          dispatch(
+            realtimeMemberEvent({
+              member: (payload.eventType === "DELETE"
+                ? payload.old
+                : payload.new) as BoardMember,
+              type: payload.eventType === "INSERT" ? "INSERT" : "DELETE",
+            })
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [dispatch, boardId, user]);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
@@ -87,6 +220,7 @@ export default function BoardDetailPage() {
       updates = newTaskIds.map((taskId, index) => ({
         id: taskId,
         column_id: sourceCol.id,
+        board_id: boardId!,
         position: index,
         content: tasks[taskId].content,
       }));
@@ -101,6 +235,7 @@ export default function BoardDetailPage() {
         id: taskId,
         column_id: sourceCol.id,
         position: index,
+        board_id: boardId!,
         content: tasks[taskId].content,
       }));
 
@@ -108,6 +243,7 @@ export default function BoardDetailPage() {
         id: taskId,
         column_id: destCol.id,
         position: index,
+        board_id: boardId!,
         content: tasks[taskId].content,
       }));
 

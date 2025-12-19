@@ -22,6 +22,7 @@ import { DeleteColumnDialog } from "./delete-column-dialog";
 import { MoveAllTasksDialog } from "./move-all-tasks-dialog";
 import { MoveColumnDialog } from "./move-column-dialog";
 import { TaskCard } from "./task-card";
+import { useParams } from "react-router-dom";
 
 interface BoardColumnProps {
   column: Column;
@@ -32,6 +33,7 @@ interface BoardColumnProps {
 export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState("");
+  const { boardId } = useParams();
 
   // Dialog states
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
@@ -59,7 +61,9 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
     e.preventDefault();
     if (!content.trim()) return;
 
-    await dispatch(createTask({ columnId: column.id, content }));
+    await dispatch(
+      createTask({ columnId: column.id, boardId: boardId!, content })
+    );
     setContent("");
     setIsEditing(false);
   };
