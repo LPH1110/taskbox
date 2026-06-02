@@ -16,11 +16,12 @@ import { useNavigate } from "react-router-dom";
 // Các màu nền có sẵn để chọn
 const BOARD_COLORS = [
   "bg-gradient-to-r from-pink-500 to-rose-500",
-  "bg-gradient-to-r from-blue-600 to-violet-600",
+  "bg-gradient-to-r from-blue-600 to-cyan-600",
   "bg-gradient-to-r from-emerald-500 to-teal-500",
   "bg-gradient-to-r from-orange-400 to-rose-400",
   "bg-slate-900",
 ];
+
 
 interface CreateBoardPopoverProps {
   children: React.ReactNode;

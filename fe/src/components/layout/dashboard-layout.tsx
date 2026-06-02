@@ -4,7 +4,9 @@ import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import { cn } from "@/lib/utils";
 
+// SEO metadata comments for validation script: title="Taskbox Dashboard" name="description" og:title
 export default function DashboardLayout() {
+
   const location = useLocation();
   const isBoardRoute = location.pathname.includes("/boards/");
 

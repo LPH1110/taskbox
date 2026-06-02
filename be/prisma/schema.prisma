@@ -19,6 +19,9 @@ model Profile {
   boards       Board[]
   memberships  BoardMember[]
   workspaces   Workspace[]
+  workspace_memberships WorkspaceMember[]
+  activities_performed  ActivityLog[] @relation("activity_actor")
+  invitations_sent      WorkspaceInvitation[] @relation("invitation_inviter")
 
   @@map("profiles")
 }
@@ -119,8 +122,62 @@ model Workspace {
   owner_id    String   @map("owner_id") @db.Uuid
   created_at  DateTime @default(now()) @map("created_at")
 
-  owner  Profile @relation(fields: [owner_id], references: [id], onDelete: Cascade)
-  boards Board[]
+  owner      Profile           @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  boards     Board[]
+  members    WorkspaceMember[]
+  activities ActivityLog[]
+  invitations WorkspaceInvitation[]
 
   @@map("workspaces")
 }
+
+model WorkspaceMember {
+  workspace_id String   @map("workspace_id") @db.Uuid
+  user_id      String   @map("user_id") @db.Uuid
+  role         String   @default("member") // "admin" | "member" (owner is in Workspace.owner_id)
+  joined_at    DateTime @default(now()) @map("joined_at")
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  profile   Profile   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([workspace_id, user_id])
+  @@map("workspace_members")
+}
+
+model ActivityLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  workspace_id String   @map("workspace_id") @db.Uuid
+  actor_id     String?  @map("actor_id") @db.Uuid  // nullable — survives user deletion
+  action       String   // "member.invited" | "member.removed" | "member.role_changed" | "board.created" | "board.deleted"
+  target_type  String   @map("target_type") // "member" | "board"
+  target_id    String?  @map("target_id") @db.Uuid
+  metadata     Json?    // { actor_name, actor_email, target_name, target_email, role, board_title, ... }
+  created_at   DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  actor     Profile?  @relation("activity_actor", fields: [actor_id], references: [id], onDelete: SetNull)
+
+  @@index([workspace_id, created_at])
+  @@map("activity_logs")
+}
+
+model WorkspaceInvitation {
+  id           String   @id @default(uuid()) @db.Uuid
+  workspace_id String   @map("workspace_id") @db.Uuid
+  email        String
+  role         String   @default("member")
+  token        String   @unique @default(uuid())
+  invited_by   String   @map("invited_by") @db.Uuid
+  status       String   @default("pending")
+  expires_at   DateTime @map("expires_at")
+  created_at   DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  inviter   Profile   @relation("invitation_inviter", fields: [invited_by], references: [id], onDelete: Cascade)
+
+  @@index([workspace_id, status])
+  @@index([token])
+  @@map("workspace_invitations")
+}
+
+

@@ -24,13 +24,15 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { register } from "../authSlice";
 import { GoogleAuthButton } from "@/components/ui/google-auth-btn";
+import { useToast } from "@/context/ToastContext";
+import { api } from "@/lib/api";
 
 // 1. Define validation schema using Zod
 const formSchema = z.object({
-  email: z.email({ message: "Invalid email address." }),
+  email: z.string().email({ message: "Invalid email address." }),
   fullName: z.string().nonempty(),
   password: z
     .string()
@@ -44,12 +46,17 @@ export function RegisterForm() {
   const dispatch = useAppDispatch();
   const [loading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { addToast } = useToast();
+
+  const inviteToken = searchParams.get("invite_token");
+  const emailParam = searchParams.get("email");
 
   // 3. Initialize the form
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      email: emailParam || "",
       fullName: "",
       password: "",
     },
@@ -59,10 +66,21 @@ export function RegisterForm() {
   async function onSubmit(values: LoginFormValues) {
     try {
       await dispatch(register(values)).unwrap();
+      if (inviteToken) {
+        try {
+          const response = await api.post<any, { success: boolean; data: { workspaceId: string } }>(
+            `/invitations/${inviteToken}/accept`
+          );
+          addToast("Successfully joined the workspace!", "success");
+          navigate(`/workspaces/${response.data.workspaceId}`);
+          return;
+        } catch (inviteErr: any) {
+          addToast(inviteErr.message || "Failed to auto-accept invitation", "error");
+        }
+      }
       navigate("/");
     } catch (err: any) {
-      console.error("Login failed:", err);
-      // setError("root", { message: err })
+      console.error("Registration failed:", err);
     }
   }
 

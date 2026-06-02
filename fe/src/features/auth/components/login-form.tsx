@@ -24,13 +24,15 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { login, checkAuthSession } from "../authSlice";
 import { GoogleAuthButton } from "@/components/ui/google-auth-btn";
+import { useToast } from "@/context/ToastContext";
+import { api } from "@/lib/api";
 
 // 1. Define validation schema using Zod
 const formSchema = z.object({
-  email: z.email({ message: "Invalid email address." }),
+  email: z.string().email({ message: "Invalid email address." }),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." }),
@@ -43,12 +45,17 @@ export function LoginForm() {
   const dispatch = useAppDispatch();
   const [loading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { addToast } = useToast();
+
+  const inviteToken = searchParams.get("invite_token");
+  const emailParam = searchParams.get("email");
 
   // 3. Initialize the form
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      email: emailParam || "",
       password: "",
     },
   });
@@ -60,21 +67,45 @@ export function LoginForm() {
     if (token) {
       localStorage.setItem("taskbox_token", token);
       dispatch(checkAuthSession()).unwrap().then(() => {
-        navigate("/");
+        const invite = params.get("invite_token");
+        if (invite) {
+          api.post<any, { success: boolean; data: { workspaceId: string } }>(`/invitations/${invite}/accept`)
+            .then((res) => {
+              addToast("Successfully joined the workspace!", "success");
+              navigate(`/workspaces/${res.data.workspaceId}`);
+            })
+            .catch((err) => {
+              addToast(err.message || "Failed to auto-accept invitation", "error");
+              navigate("/");
+            });
+        } else {
+          navigate("/");
+        }
       }).catch((err: any) => {
         console.error("Session check after OAuth redirect failed:", err);
       });
     }
-  }, [dispatch, navigate]);
+  }, [dispatch, navigate, addToast]);
 
   // 4. Handle form submission
   async function onSubmit(values: LoginFormValues) {
     try {
       await dispatch(login(values)).unwrap();
+      if (inviteToken) {
+        try {
+          const response = await api.post<any, { success: boolean; data: { workspaceId: string } }>(
+            `/invitations/${inviteToken}/accept`
+          );
+          addToast("Successfully joined the workspace!", "success");
+          navigate(`/workspaces/${response.data.workspaceId}`);
+          return;
+        } catch (inviteErr: any) {
+          addToast(inviteErr.message || "Failed to auto-accept invitation", "error");
+        }
+      }
       navigate("/");
     } catch (err: any) {
       console.error("Login failed:", err);
-      // setError("root", { message: err })
     }
   }
 

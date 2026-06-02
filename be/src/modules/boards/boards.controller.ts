@@ -5,6 +5,8 @@ import { validate } from "../../middleware/validate";
 import { createBoardSchema, boardIdParamSchema } from "./boards.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
+import { logActivity } from "../../utils/activity-logger";
+
 
 const router = Router();
 
@@ -27,6 +29,15 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
               some: { user_id: userId },
             },
           },
+          {
+            type: "public",
+            workspace: {
+              OR: [
+                { owner_id: userId },
+                { members: { some: { user_id: userId } } },
+              ],
+            },
+          },
         ],
       },
       orderBy: { created_at: "desc" },
@@ -44,9 +55,15 @@ router.post("/", validate(createBoardSchema), async (req: Request, res: Response
   const { title, background, type, workspaceId } = req.body;
 
   try {
-    // Verify that workspace belongs to user
+    // Verify that workspace belongs to user or user is workspace member
     const workspace = await prisma.workspace.findFirst({
-      where: { id: workspaceId, owner_id: userId },
+      where: {
+        id: workspaceId,
+        OR: [
+          { owner_id: userId },
+          { members: { some: { user_id: userId } } },
+        ],
+      },
     });
     if (!workspace) {
       return sendError(res, "Workspace not found or unauthorized", 403);
@@ -62,11 +79,24 @@ router.post("/", validate(createBoardSchema), async (req: Request, res: Response
       },
     });
 
+    // Log activity
+    await logActivity({
+      workspaceId,
+      actorId: userId,
+      action: "board.created",
+      targetType: "board",
+      targetId: board.id,
+      metadata: {
+        board_title: board.title,
+      },
+    });
+
     return sendSuccess(res, board, 201);
   } catch (error) {
     return next(error);
   }
 });
+
 
 // PATCH /api/boards/:boardId/favorite (Toggle favorite status)
 router.patch("/:boardId/favorite", requireBoardMember, validate(boardIdParamSchema), async (req: Request, res: Response, next: NextFunction) => {

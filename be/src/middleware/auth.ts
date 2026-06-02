@@ -33,7 +33,7 @@ export const requireBoardMember = async (req: Request, res: Response, next: Next
     // Check if user is owner
     const board = await prisma.board.findUnique({
       where: { id: boardId },
-      select: { owner_id: true },
+      select: { owner_id: true, type: true, workspace_id: true },
     });
 
     if (!board) {
@@ -44,8 +44,8 @@ export const requireBoardMember = async (req: Request, res: Response, next: Next
       return next();
     }
 
-    // Check membership
-    const membership = await prisma.boardMember.findUnique({
+    // Check board membership
+    const boardMembership = await prisma.boardMember.findUnique({
       where: {
         board_id_user_id: {
           board_id: boardId,
@@ -54,8 +54,72 @@ export const requireBoardMember = async (req: Request, res: Response, next: Next
       },
     });
 
+    if (boardMembership) {
+      return next();
+    }
+
+    // Check workspace hybrid visibility (public board + workspace member/owner)
+    if (board.type === "public") {
+      const workspace = await prisma.workspace.findFirst({
+        where: {
+          id: board.workspace_id,
+          OR: [
+            { owner_id: userId },
+            { members: { some: { user_id: userId } } },
+          ],
+        },
+      });
+
+      if (workspace) {
+        return next();
+      }
+    }
+
+    return sendError(res, "Forbidden: You are not a member of this board", 403);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+// Check if user is a member/owner of the workspace
+export const requireWorkspaceMember = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = (req.user as any)?.id;
+  const workspaceId = req.params.workspaceId || req.params.id || req.body.workspaceId || req.query.workspaceId;
+
+  if (!userId) {
+    return sendError(res, "Unauthorized", 401);
+  }
+
+  if (!workspaceId) {
+    return sendError(res, "Missing workspace ID for access validation", 400);
+  }
+
+  try {
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      select: { owner_id: true },
+    });
+
+    if (!workspace) {
+      return sendError(res, "Workspace not found", 404);
+    }
+
+    if (workspace.owner_id === userId) {
+      return next();
+    }
+
+    const membership = await prisma.workspaceMember.findUnique({
+      where: {
+        workspace_id_user_id: {
+          workspace_id: workspaceId,
+          user_id: userId,
+        },
+      },
+    });
+
     if (!membership) {
-      return sendError(res, "Forbidden: You are not a member of this board", 403);
+      return sendError(res, "Forbidden: You are not a member of this workspace", 403);
     }
 
     return next();
@@ -63,3 +127,50 @@ export const requireBoardMember = async (req: Request, res: Response, next: Next
     return next(error);
   }
 };
+
+// Check if user is an admin or owner of the workspace
+export const requireWorkspaceAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = (req.user as any)?.id;
+  const workspaceId = req.params.workspaceId || req.params.id || req.body.workspaceId || req.query.workspaceId;
+
+  if (!userId) {
+    return sendError(res, "Unauthorized", 401);
+  }
+
+  if (!workspaceId) {
+    return sendError(res, "Missing workspace ID for access validation", 400);
+  }
+
+  try {
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      select: { owner_id: true },
+    });
+
+    if (!workspace) {
+      return sendError(res, "Workspace not found", 404);
+    }
+
+    if (workspace.owner_id === userId) {
+      return next();
+    }
+
+    const membership = await prisma.workspaceMember.findUnique({
+      where: {
+        workspace_id_user_id: {
+          workspace_id: workspaceId,
+          user_id: userId,
+        },
+      },
+    });
+
+    if (!membership || membership.role !== "admin") {
+      return sendError(res, "Forbidden: Workspace admin privileges required", 403);
+    }
+
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+

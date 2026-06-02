@@ -10,6 +10,7 @@ import ProfilePage from "@/features/profile/pages/profile-page";
 import SettingsPage from "@/features/settings/pages/settings-page";
 import WorkspaceListPage from "@/features/workspaces/pages/workspace-list-page";
 import WorkspaceDetailPage from "@/features/workspaces/pages/workspace-detail-page";
+import InvitationPage from "@/features/workspaces/pages/invitation-page";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
       },
       { path: "/register", element: <RegisterForm /> },
     ],
+  },
+  {
+    path: "/invitations/:token",
+    element: <InvitationPage />,
   },
   {
     // Protected Routes (Dashboard, Boards, Tasks)
