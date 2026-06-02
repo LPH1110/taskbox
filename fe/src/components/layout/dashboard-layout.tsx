@@ -13,7 +13,7 @@ export default function DashboardLayout() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar visible on Desktop (md:block), hidden on Mobile */}
-        <aside className="hidden w-64 flex-col border-r bg-background md:flex">
+        <aside className="hidden w-64 flex-col border-r bg-background lg:flex">
           <Sidebar className="border-r-0" />
         </aside>
 

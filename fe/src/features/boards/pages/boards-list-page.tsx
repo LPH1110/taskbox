@@ -86,7 +86,7 @@ export default function BoardsListPage() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
         >
           {/* Create Button is always first */}
           <motion.div layout variants={itemVariants}>
