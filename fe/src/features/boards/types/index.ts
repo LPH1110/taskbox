@@ -1,10 +1,11 @@
 export interface Board {
   id: string;
   title: string;
-  type: "public" | "private";
-  background_image: string;
+  type: "public" | "private" | string;
+  background_image: string | null;
   is_favorite: boolean;
-  createdAt: string;
+  created_at: string;
+  owner_id?: string;
   columnOrder?: string[];
   role?: "admin" | "member" | "viewer";
 }

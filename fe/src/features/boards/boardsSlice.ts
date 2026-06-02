@@ -1,15 +1,6 @@
 import { api } from "@/lib/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-export interface Board {
-  id: string;
-  title: string;
-  type: string;
-  background_image: string | null;
-  is_favorite: boolean;
-  owner_id: string;
-  created_at: string;
-}
+import { type Board } from "./types";
 
 interface BoardsState {
   items: Board[];

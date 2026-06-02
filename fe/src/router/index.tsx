@@ -4,6 +4,7 @@ import { ProtectedRoute } from "@/components/layout/protected-route";
 import { LoginForm } from "@/features/auth/components/login-form";
 import { RegisterForm } from "@/features/auth/components/register-form";
 import BoardDetailPage from "@/features/boards/pages/board-detail-page";
+import BoardsListPage from "@/features/boards/pages/boards-list-page";
 import DashboardPage from "@/features/boards/pages/dashboard-page";
 import { createBrowserRouter } from "react-router-dom";
 
@@ -36,7 +37,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "/boards",
-            element: <div>All Boards List Component</div>,
+            element: <BoardsListPage />,
           },
         ],
       },

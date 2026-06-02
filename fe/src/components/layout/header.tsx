@@ -32,7 +32,7 @@ export function Header() {
         {/* Logo or Breadcrumb (Desktop) */}
         <div className="mr-4 hidden md:flex">
           <a className="mr-6 flex items-center space-x-2 font-bold" href="/">
-            WORKSPACES
+            TASKBOX
           </a>
         </div>
 
