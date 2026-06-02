@@ -27,11 +27,13 @@ export function TaskCard({ task, index }: TaskCardProps) {
           style={{ ...provided.draggableProps.style }}
         >
           <Card
-            className={`p-0 cursor-grab hover:ring-2 hover:ring-primary/20 ${
-              snapshot.isDragging ? "opacity-75 ring-2 ring-primary" : ""
+            className={`p-0 cursor-grab transition-all duration-200 border-white/20 dark:border-white/10 ${
+              snapshot.isDragging 
+                ? "opacity-95 ring-2 ring-primary shadow-xl" 
+                : "shadow-sm hover:shadow-md hover:border-primary/30"
             }`}
           >
-            <CardContent className="p-3 text-sm flex flex-col gap-2">
+            <CardContent className="p-3 text-sm flex flex-col gap-2 bg-card rounded-xl">
               {task.labelIds?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                   {task.labelIds.map((labelId) => {

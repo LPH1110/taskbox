@@ -23,23 +23,24 @@ export const AddColumnForm = () => {
 
   if (isEditing) {
     return (
-      <div className="w-70 shrink-0 rounded-xl bg-muted/50 p-2 border shadow-sm h-fit">
-        <form onSubmit={handleSubmit} className="space-y-2">
+      <div className="w-72 shrink-0 rounded-xl bg-background/95 p-3 border border-white/20 dark:border-white/10 shadow-lg h-fit">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <Input
             autoFocus
             placeholder="Enter list title..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-background"
+            className="bg-background/50 border-white/10 focus-visible:ring-1 focus-visible:ring-primary shadow-inner"
           />
-          <div className="flex items-center gap-1">
-            <Button type="submit" size="sm">
+          <div className="flex items-center gap-2">
+            <Button type="submit" size="sm" className="shadow-sm">
               Add List
             </Button>
             <Button
               type="button"
               variant="ghost"
-              size="sm"
+              size="icon"
+              className="h-8 w-8 hover:bg-muted"
               onClick={() => setIsEditing(false)}
             >
               <X className="h-4 w-4" />
@@ -53,9 +54,9 @@ export const AddColumnForm = () => {
   return (
     <div
       onClick={() => setIsEditing(true)}
-      className="w-70 shrink-0 rounded-xl bg-muted/30 border border-dashed p-3 flex items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors h-[100px]"
+      className="w-72 shrink-0 rounded-xl bg-background/30 backdrop-blur-sm border border-white/10 dark:border-white/5 p-3 flex items-center justify-start cursor-pointer hover:bg-background/50 transition-colors shadow-sm h-12"
     >
-      <span className="text-muted-foreground text-sm font-medium flex items-center gap-2">
+      <span className="text-white drop-shadow-sm text-sm font-medium flex items-center gap-2 pl-2">
         <Plus className="h-4 w-4" /> Add another list
       </span>
     </div>

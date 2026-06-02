@@ -6,6 +6,10 @@ import { RegisterForm } from "@/features/auth/components/register-form";
 import BoardDetailPage from "@/features/boards/pages/board-detail-page";
 import BoardsListPage from "@/features/boards/pages/boards-list-page";
 import DashboardPage from "@/features/boards/pages/dashboard-page";
+import ProfilePage from "@/features/profile/pages/profile-page";
+import SettingsPage from "@/features/settings/pages/settings-page";
+import WorkspaceListPage from "@/features/workspaces/pages/workspace-list-page";
+import WorkspaceDetailPage from "@/features/workspaces/pages/workspace-detail-page";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -38,6 +42,22 @@ export const router = createBrowserRouter([
           {
             path: "/boards",
             element: <BoardsListPage />,
+          },
+          {
+            path: "/workspaces",
+            element: <WorkspaceListPage />,
+          },
+          {
+            path: "/workspaces/:workspaceId",
+            element: <WorkspaceDetailPage />,
+          },
+          {
+            path: "/profile",
+            element: <ProfilePage />,
+          },
+          {
+            path: "/settings",
+            element: <SettingsPage />,
           },
         ],
       },

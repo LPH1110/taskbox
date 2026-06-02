@@ -1,6 +1,7 @@
 export interface Board {
   id: string;
   title: string;
+  workspace_id: string;
   type: "public" | "private" | string;
   background_image: string | null;
   is_favorite: boolean;

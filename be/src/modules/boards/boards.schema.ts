@@ -5,6 +5,7 @@ export const createBoardSchema = z.object({
     title: z.string().min(1),
     background: z.string().optional(),
     type: z.enum(["public", "private"]).default("private"),
+    workspaceId: z.string().uuid(),
   }),
 });
 

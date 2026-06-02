@@ -218,21 +218,35 @@ export default function BoardDetailPage() {
   }
 
   return (
-    <div className={`flex h-[calc(100vh-80px)] flex-col gap-4 transition`}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 shrink-0">
-        <h1 className="text-2xl font-bold text-white drop-shadow-md">
+    <div 
+      className={`flex h-[calc(100vh-3.5rem)] flex-col transition bg-cover bg-center`}
+      style={
+        currentBoard?.background_image 
+          ? {
+              backgroundImage: currentBoard.background_image.startsWith("url")
+                ? currentBoard.background_image
+                : undefined,
+              backgroundColor: !currentBoard.background_image.startsWith("url")
+                ? currentBoard.background_image
+                : undefined,
+            }
+          : undefined
+      }
+    >
+      {/* Sleek Header */}
+      <div className="flex items-center justify-between px-6 py-4 shrink-0 bg-background/30 backdrop-blur-md border-b border-white/10 dark:border-white/5 shadow-sm relative z-10">
+        <h1 className="text-xl font-bold tracking-tight text-white drop-shadow-sm">
           {currentBoard?.title || "Board"}
         </h1>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Small Facepile */}
           <div className="flex -space-x-2 mr-2">
             {members.slice(0, 3).map((m) => (
               <MemberPopover key={m.user_id} member={m} boardId={boardId!} />
             ))}
             {members.length > 3 && (
-              <div className="h-8 w-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs font-medium z-10">
+              <div className="h-8 w-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-xs font-medium z-10 shadow-sm">
                 +{members.length - 3}
               </div>
             )}
@@ -241,14 +255,14 @@ export default function BoardDetailPage() {
           <Button
             variant="secondary"
             size="sm"
-            className="opacity-90 hover:opacity-100"
+            className="opacity-95 hover:opacity-100 shadow-sm bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-md"
           >
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>
 
           <Button
             size="sm"
-            className="cursor-pointer opacity-90 hover:opacity-100"
+            className="cursor-pointer opacity-95 hover:opacity-100 shadow-sm bg-primary text-primary-foreground"
             onClick={() => setIsShareOpen(true)}
           >
             <UserPlus className="mr-2 h-4 w-4" /> Share
@@ -270,7 +284,7 @@ export default function BoardDetailPage() {
                 containerRef.current = el;
               }}
               onWheel={onWheel}
-              className="flex flex-1 gap-4 overflow-x-auto overflow-y-hidden px-4 pb-4 custom-scrollbar items-start"
+              className="flex flex-1 gap-4 overflow-x-auto overflow-y-hidden px-6 pt-6 pb-6 custom-scrollbar items-start relative z-0"
             >
               {columnOrder.map((columnId, index) => {
                 const column = columns[columnId];

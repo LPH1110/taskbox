@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchBoards } from "@/features/boards/boardsSlice";
+import { fetchWorkspaces } from "@/features/workspaces/workspacesSlice";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Link } from "react-router-dom";
 import { Search, Loader2 } from "lucide-react";
@@ -9,6 +10,7 @@ import { AnimatePresence, motion } from "motion/react";
 export function HeaderSearch() {
   const dispatch = useAppDispatch();
   const { items: boards, isLoading } = useAppSelector((state) => state.boards);
+  const { items: workspaces } = useAppSelector((state) => state.workspaces);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -19,6 +21,7 @@ export function HeaderSearch() {
   const handleFocus = () => {
     setIsOpen(true);
     dispatch(fetchBoards());
+    dispatch(fetchWorkspaces());
   };
 
   // Close dropdown when clicking outside
@@ -43,6 +46,10 @@ export function HeaderSearch() {
 
   const starredBoards = boards.filter((board) => board.is_favorite);
   const showDropdown = isOpen && (query.trim() || starredBoards.length > 0);
+
+  const getWorkspaceName = (workspaceId: string) => {
+    return workspaces.find((w) => w.id === workspaceId)?.name || "Workspace";
+  };
 
   return (
     <div ref={containerRef} className="relative w-full max-w-sm">
@@ -87,8 +94,13 @@ export function HeaderSearch() {
                       }}
                       className="flex items-center justify-between px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
-                      <span className="font-medium truncate">{board.title}</span>
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-medium truncate text-foreground">{board.title}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">
+                          {getWorkspaceName(board.workspace_id)}
+                        </span>
+                      </div>
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider shrink-0">
                         {board.type}
                       </span>
                     </Link>
@@ -114,8 +126,13 @@ export function HeaderSearch() {
                     }}
                     className="flex items-center justify-between px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
                   >
-                    <span className="font-medium truncate">{board.title}</span>
-                    <span className="text-xs text-yellow-500">★</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-medium truncate text-foreground">{board.title}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">
+                        {getWorkspaceName(board.workspace_id)}
+                      </span>
+                    </div>
+                    <span className="text-xs text-yellow-500 shrink-0">★</span>
                   </Link>
                 ))}
               </div>

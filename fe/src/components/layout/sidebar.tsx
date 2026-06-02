@@ -1,14 +1,19 @@
-import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Kanban, Users, Settings } from "lucide-react";
+import { NavLink, useLocation, Link } from "react-router-dom";
+import { LayoutDashboard, Briefcase, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "motion/react";
+import { WorkspaceSwitcher } from "./workspace-switcher";
+import { useAppSelector } from "@/store/hooks";
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Sidebar({ className }: SidebarProps) {
   const location = useLocation();
+  const { items: boards } = useAppSelector((state) => state.boards);
+  const { activeWorkspaceId } = useAppSelector((state) => state.workspaces);
+
+  const activeWorkspaceBoards = boards.filter((b) => b.workspace_id === activeWorkspaceId);
 
   // Navigation items configuration
   const navItems = [
@@ -18,14 +23,9 @@ export function Sidebar({ className }: SidebarProps) {
       icon: LayoutDashboard,
     },
     {
-      title: "Boards",
-      href: "/boards",
-      icon: Kanban,
-    },
-    {
-      title: "Members",
-      href: "/members",
-      icon: Users,
+      title: "Workspaces",
+      href: "/workspaces",
+      icon: Briefcase,
     },
     {
       title: "Settings",
@@ -37,10 +37,10 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <div className={cn("pb-12 border-r bg-background", className)}>
       <div className="space-y-4 py-4">
+        {/* Workspace Switcher in Header */}
+        <WorkspaceSwitcher />
+
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            Task Manager
-          </h2>
           <div className="space-y-1">
             <nav className="grid items-start gap-2">
               {navItems.map((item, index) => {
@@ -78,30 +78,34 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         </div>
 
-        {/* Example section for user's boards */}
-        <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            Your Boards
-          </h2>
-          <ScrollArea className="h-75 px-1">
-            <div className="space-y-1 p-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start font-normal"
-              >
-                <span className="mr-2">🔵</span> Project Alpha
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start font-normal"
-              >
-                <span className="mr-2">🟢</span> Marketing Campaign
-              </Button>
-            </div>
-          </ScrollArea>
-        </div>
+        {/* Dynamic Workspace Boards Section */}
+        {activeWorkspaceId && (
+          <div className="px-3 py-2">
+            <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Workspace Boards
+            </h2>
+            <ScrollArea className="h-75 px-1">
+              <div className="space-y-1 p-1">
+                {activeWorkspaceBoards.length === 0 ? (
+                  <div className="px-4 py-3 text-xs text-muted-foreground border border-dashed rounded-sm">
+                    No boards in workspace.
+                  </div>
+                ) : (
+                  activeWorkspaceBoards.map((board) => (
+                    <Link
+                      key={board.id}
+                      to={`/boards/${board.id}`}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-sm hover:bg-accent/40 transition-colors"
+                    >
+                      <div className="h-2 w-2 rounded-full bg-foreground/60" />
+                      <span className="truncate">{board.title}</span>
+                    </Link>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+        )}
       </div>
     </div>
   );

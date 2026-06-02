@@ -24,12 +24,20 @@ router.post("/register", validate(registerSchema), async (req: Request, res: Res
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const slug = `${email.split("@")[0]}-personal-${Math.random().toString(36).substring(2, 6)}`;
+
     const profile = await prisma.profile.create({
       data: {
         email,
         password: hashedPassword,
         full_name: fullName,
         provider: "email",
+        workspaces: {
+          create: {
+            name: "Personal Workspace",
+            slug,
+          },
+        },
       },
     });
 

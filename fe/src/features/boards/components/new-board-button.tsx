@@ -1,9 +1,13 @@
 import { CreateBoardPopover } from "./create-board-popover";
 import { motion } from "motion/react";
 
-export function NewBoardButton() {
+interface NewBoardButtonProps {
+  workspaceId?: string;
+}
+
+export function NewBoardButton({ workspaceId }: NewBoardButtonProps) {
   return (
-    <CreateBoardPopover sideOffset={10} align="start">
+    <CreateBoardPopover workspaceId={workspaceId} sideOffset={10} align="start">
       <motion.button
         whileHover={{ y: -2, scale: 1.015 }}
         whileTap={{ scale: 0.985 }}

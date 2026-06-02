@@ -272,13 +272,14 @@ router.delete("/columns/:columnId", async (req: Request, res: Response, next: Ne
 });
 
 // PUT /api/columns/reorder (Batch Column positions)
-router.put("/reorder", validate(reorderColumnsSchema), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/columns/reorder", validate(reorderColumnsSchema), async (req: Request, res: Response, next: NextFunction) => {
   const updates = req.body;
   if (updates.length === 0) return sendSuccess(res, []);
 
   // Use the board_id from the first column update
   const boardId = updates[0].board_id;
 
+  req.params = req.params || {};
   req.params.boardId = boardId;
   return requireBoardMember(req, res, async (err) => {
     if (err) return next(err);

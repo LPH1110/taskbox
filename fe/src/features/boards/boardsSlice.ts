@@ -31,7 +31,7 @@ export const fetchBoards = createAsyncThunk(
 export const createBoard = createAsyncThunk(
   "boards/createBoard",
   async (
-    boardData: { title: string; background: string; type: "public" | "private" },
+    boardData: { title: string; background: string; type: "public" | "private"; workspaceId: string },
     { rejectWithValue }
   ) => {
     try {
@@ -85,15 +85,12 @@ const boardsSlice = createSlice({
 
     // Create Board
     builder.addCase(createBoard.pending, (state) => {
-      state.isLoading = true;
       state.error = null;
     });
     builder.addCase(createBoard.fulfilled, (state, action) => {
-      state.isLoading = false;
       state.items.unshift(action.payload);
     });
     builder.addCase(createBoard.rejected, (state, action) => {
-      state.isLoading = false;
       state.error = action.payload as string;
     });
 

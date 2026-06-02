@@ -17,6 +17,7 @@ import columnsRouter from "./modules/columns/columns.controller";
 import tasksRouter from "./modules/tasks/tasks.controller";
 import labelsRouter from "./modules/labels/labels.controller";
 import membersRouter from "./modules/members/members.controller";
+import workspacesRouter from "./modules/workspaces/workspaces.controller";
 
 const app = express();
 const httpServer = createServer(app);
@@ -44,6 +45,7 @@ app.get("/health", (_req, res) => {
 // API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/boards", boardsRouter);
+app.use("/api/workspaces", workspacesRouter);
 app.use("/api", columnsRouter);
 app.use("/api", tasksRouter);
 app.use("/api", labelsRouter);

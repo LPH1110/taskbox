@@ -2,9 +2,11 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout() {
   const location = useLocation();
+  const isBoardRoute = location.pathname.includes("/boards/");
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -18,8 +20,8 @@ export default function DashboardLayout() {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex flex-1 flex-col overflow-hidden bg-muted/20">
-          <div className="w-full mx-auto container py-10 overflow-y-auto custom-scrollbar h-[calc(100vh-3.5rem)]">
+        <main className={cn("flex flex-1 flex-col overflow-hidden transition-colors", !isBoardRoute && "bg-muted/20")}>
+          <div className={cn("w-full mx-auto overflow-y-auto custom-scrollbar h-[calc(100vh-3.5rem)]", !isBoardRoute && "container py-10")}>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={location.pathname}

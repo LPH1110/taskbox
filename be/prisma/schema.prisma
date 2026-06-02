@@ -18,6 +18,7 @@ model Profile {
 
   boards       Board[]
   memberships  BoardMember[]
+  workspaces   Workspace[]
 
   @@map("profiles")
 }
@@ -25,17 +26,19 @@ model Profile {
 model Board {
   id               String   @id @default(uuid()) @db.Uuid
   title            String
+  workspace_id     String   @map("workspace_id") @db.Uuid
   type             String   @default("private")
   background_image String?  @map("background_image")
   is_favorite      Boolean  @default(false) @map("is_favorite")
   owner_id         String   @map("owner_id") @db.Uuid
   created_at       DateTime @default(now()) @map("created_at")
 
-  owner    Profile       @relation(fields: [owner_id], references: [id], onDelete: Cascade)
-  columns  Column[]
-  labels   Label[]
-  members  BoardMember[]
-  tasks    Task[]
+  workspace Workspace     @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  owner     Profile       @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  columns   Column[]
+  labels    Label[]
+  members   BoardMember[]
+  tasks     Task[]
 
   @@map("boards")
 }
@@ -105,4 +108,19 @@ model BoardMember {
 
   @@id([board_id, user_id])
   @@map("board_members")
+}
+
+model Workspace {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String   @unique
+  description String?
+  logo_url    String?  @map("logo_url")
+  owner_id    String   @map("owner_id") @db.Uuid
+  created_at  DateTime @default(now()) @map("created_at")
+
+  owner  Profile @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  boards Board[]
+
+  @@map("workspaces")
 }

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { prisma } from "../../lib/prisma";
-import { sendSuccess } from "../../utils/api-response";
+import { sendSuccess, sendError } from "../../utils/api-response";
 import { validate } from "../../middleware/validate";
 import { createBoardSchema, boardIdParamSchema } from "./boards.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
@@ -14,10 +14,12 @@ router.use(requireAuth);
 // GET /api/boards (Fetch boards owned or co-shared)
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req.user as any).id;
+  const workspaceId = req.query.workspaceId as string | undefined;
 
   try {
     const boards = await prisma.board.findMany({
       where: {
+        ...(workspaceId ? { workspace_id: workspaceId } : {}),
         OR: [
           { owner_id: userId },
           {
@@ -39,15 +41,24 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 // POST /api/boards (Create Board)
 router.post("/", validate(createBoardSchema), async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req.user as any).id;
-  const { title, background, type } = req.body;
+  const { title, background, type, workspaceId } = req.body;
 
   try {
+    // Verify that workspace belongs to user
+    const workspace = await prisma.workspace.findFirst({
+      where: { id: workspaceId, owner_id: userId },
+    });
+    if (!workspace) {
+      return sendError(res, "Workspace not found or unauthorized", 403);
+    }
+
     const board = await prisma.board.create({
       data: {
         title,
         background_image: background,
         type,
         owner_id: userId,
+        workspace_id: workspaceId,
       },
     });
 

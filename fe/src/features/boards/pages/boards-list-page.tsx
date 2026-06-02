@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchBoards } from "../boardsSlice";
+import { fetchWorkspaces } from "@/features/workspaces/workspacesSlice";
 import { BoardCard } from "../components/board-card";
 import { NewBoardButton } from "../components/new-board-button";
 import { Separator } from "@/components/ui/separator";
-import { Clock, Star } from "lucide-react";
+import { Star, FolderClosed } from "lucide-react";
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -31,18 +33,18 @@ const itemVariants = {
 
 export default function BoardsListPage() {
   const dispatch = useAppDispatch();
-  const { items: boards, isLoading } = useAppSelector((state) => state.boards);
+  const { items: boards, isLoading: isLoadingBoards } = useAppSelector((state) => state.boards);
+  const { items: workspaces, isLoading: isLoadingWorkspaces } = useAppSelector((state) => state.workspaces);
 
-  // Fetch data when component mounts
   useEffect(() => {
     dispatch(fetchBoards());
+    dispatch(fetchWorkspaces());
   }, [dispatch]);
 
-  // Simple Skeleton Loading
-  if (isLoading) {
+  if (isLoadingBoards || isLoadingWorkspaces) {
     return (
       <div className="p-8 text-center text-muted-foreground">
-        Loading workspaces...
+        Loading workspaces and boards...
       </div>
     );
   }
@@ -50,19 +52,19 @@ export default function BoardsListPage() {
   const favoriteBoards = boards.filter((b) => b.is_favorite);
 
   return (
-    <div className="space-y-8 px-4 pb-8">
-      {/* 1. Favorite Boards Section (Optional) */}
+    <div className="space-y-12 px-4 pb-16">
+      {/* 1. Starred Boards Section */}
       {favoriteBoards.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
-            <Star className="h-5 w-5" />
+            <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
             <span>Starred boards</span>
           </div>
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
           >
             {favoriteBoards.map((board) => (
               <motion.div key={`fav-${board.id}`} layout variants={itemVariants}>
@@ -73,33 +75,60 @@ export default function BoardsListPage() {
         </div>
       )}
 
-      {/* 2. All Boards Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
-          <Clock className="h-5 w-5" />
-          <span>Your Workspaces</span>
-        </div>
+      {/* 2. Group Boards by Workspace */}
+      <div className="space-y-10">
+        {workspaces.map((workspace) => {
+          const workspaceBoards = boards.filter((b) => b.workspace_id === workspace.id);
 
-        <Separator className="my-4" />
+          return (
+            <div key={workspace.id} className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold text-lg text-foreground uppercase tracking-tight">
+                  <FolderClosed className="h-5 w-5" />
+                  <span>{workspace.name}</span>
+                </div>
+                <Link
+                  to={`/workspaces/${workspace.id}`}
+                  className="text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:underline"
+                >
+                  View Workspace →
+                </Link>
+              </div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-        >
-          {/* Create Button is always first */}
-          <motion.div layout variants={itemVariants}>
-            <NewBoardButton />
-          </motion.div>
+              <Separator className="my-2" />
 
-          {/* Render List */}
-          {boards.map((board) => (
-            <motion.div key={`all-${board.id}`} layout variants={itemVariants}>
-              <BoardCard board={board} />
-            </motion.div>
-          ))}
-        </motion.div>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+              >
+                {/* Create Button scoped to this workspace */}
+                <motion.div layout variants={itemVariants}>
+                  <NewBoardButton workspaceId={workspace.id} />
+                </motion.div>
+
+                {/* Workspace Boards */}
+                {workspaceBoards.map((board) => (
+                  <motion.div key={`board-${board.id}`} layout variants={itemVariants}>
+                    <BoardCard board={board} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          );
+        })}
+
+        {workspaces.length === 0 && (
+          <div className="border-2 border-dashed border-muted p-12 text-center rounded-none">
+            <h3 className="text-xl font-bold uppercase tracking-tight text-foreground">
+              No Workspaces
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              You don't belong to any workspaces yet. Create your first one in the sidebar!
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

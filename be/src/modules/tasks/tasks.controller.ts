@@ -141,12 +141,13 @@ router.delete("/tasks/:taskId", async (req: Request, res: Response, next: NextFu
 });
 
 // PUT /api/tasks/reorder (Batch task reordering across or within columns)
-router.put("/reorder", validate(reorderTasksSchema), async (req: Request, res: Response, next: NextFunction) => {
+router.put("/tasks/reorder", validate(reorderTasksSchema), async (req: Request, res: Response, next: NextFunction) => {
   const updates = req.body;
   if (updates.length === 0) return sendSuccess(res, []);
 
   const boardId = updates[0].board_id;
 
+  req.params = req.params || {};
   req.params.boardId = boardId;
   return requireBoardMember(req, res, async (err) => {
     if (err) return next(err);
@@ -176,7 +177,7 @@ router.put("/reorder", validate(reorderTasksSchema), async (req: Request, res: R
 });
 
 // POST /api/tasks/move-all (Move all tasks from source column to target column)
-router.post("/move-all", validate(moveAllTasksSchema), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/tasks/move-all", validate(moveAllTasksSchema), async (req: Request, res: Response, next: NextFunction) => {
   const { sourceColumnId, targetColumnId } = req.body;
 
   try {
@@ -187,6 +188,7 @@ router.post("/move-all", validate(moveAllTasksSchema), async (req: Request, res:
 
     if (!col) return sendError(res, "Source column not found", 404);
 
+    req.params = req.params || {};
     req.params.boardId = col.board_id;
     return requireBoardMember(req, res, async (err) => {
       if (err) return next(err);

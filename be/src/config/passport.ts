@@ -50,12 +50,19 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET && env.GOOGLE_CALLBACK_URL)
 
           if (!userProfile) {
             // Create user
+            const slug = `${email.split("@")[0]}-personal-${Math.random().toString(36).substring(2, 6)}`;
             userProfile = await prisma.profile.create({
               data: {
                 email,
                 full_name: profile.displayName,
                 avatar_url: profile.photos?.[0]?.value,
                 provider: "google",
+                workspaces: {
+                  create: {
+                    name: "Personal Workspace",
+                    slug,
+                  },
+                },
               },
             });
           }

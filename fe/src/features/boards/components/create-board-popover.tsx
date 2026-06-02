@@ -6,10 +6,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Loader2, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createBoard } from "../boardsSlice";
+import { useToast } from "@/context/ToastContext";
+import { useNavigate } from "react-router-dom";
 
 // Các màu nền có sẵn để chọn
 const BOARD_COLORS = [
@@ -24,31 +26,58 @@ interface CreateBoardPopoverProps {
   children: React.ReactNode;
   sideOffset?: number;
   align?: "start" | "center" | "end";
+  workspaceId?: string;
 }
 
 export function CreateBoardPopover({
   children,
   sideOffset = 0,
   align = "start",
+  workspaceId,
 }: CreateBoardPopoverProps) {
   const dispatch = useAppDispatch();
+  const { items: workspaces, activeWorkspaceId } = useAppSelector((state) => state.workspaces);
+  const { items: boards } = useAppSelector((state) => state.boards);
+  const { addToast } = useToast();
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [selectedColor, setSelectedColor] = useState(BOARD_COLORS[0]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(workspaceId || activeWorkspaceId || "");
+
+  useEffect(() => {
+    setSelectedWorkspaceId(workspaceId || activeWorkspaceId || "");
+  }, [workspaceId, activeWorkspaceId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !selectedWorkspaceId) return;
+
+    const duplicateBoard = boards.find(
+      (b) => b.workspace_id === selectedWorkspaceId && b.title.toLowerCase() === title.trim().toLowerCase()
+    );
+    if (duplicateBoard) {
+      addToast("A board with this title already exists in the selected workspace.", "error");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      await dispatch(
-        createBoard({ title, background: selectedColor, type: "public" })
+      const board = await dispatch(
+        createBoard({
+          title,
+          background: selectedColor,
+          type: "public",
+          workspaceId: selectedWorkspaceId,
+        })
       ).unwrap();
       setOpen(false);
       setTitle("");
-      // Optional: Show success toast
+      if (board && board.id) {
+        navigate(`/boards/${board.id}`);
+      }
     } catch (error) {
       console.error("Failed to create board:", error);
     } finally {
@@ -113,6 +142,24 @@ export function CreateBoardPopover({
               ))}
             </div>
           </div>
+
+          {!workspaceId && workspaces.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="workspaceSelect">Workspace</Label>
+              <select
+                id="workspaceSelect"
+                value={selectedWorkspaceId}
+                onChange={(e) => setSelectedWorkspaceId(e.target.value)}
+                className="w-full rounded-sm border-2 border-foreground bg-background px-3 py-2 text-sm outline-none focus:ring-0 focus:border-foreground"
+              >
+                {workspaces.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <Button
             type="submit"
