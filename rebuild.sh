@@ -20,7 +20,7 @@ echo "⏳ Waiting for database to be healthy..."
 sleep 5
 
 echo "📦 Running Prisma migrations..."
-podman-compose exec api npx prisma migrate deploy || podman compose exec api npx prisma migrate deploy
+podman-compose exec api npx prisma db push || podman compose exec api npx prisma db push
 
 echo "✅ All services are running!"
 podman-compose ps || podman compose ps

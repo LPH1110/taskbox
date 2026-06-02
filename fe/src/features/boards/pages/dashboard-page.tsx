@@ -8,7 +8,7 @@ import { Clock, Star } from "lucide-react";
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
-  const { boards, isLoading } = useAppSelector((state) => state.boards);
+  const { items: boards, isLoading } = useAppSelector((state) => state.boards);
 
   // Fetch data when component mounts
   useEffect(() => {

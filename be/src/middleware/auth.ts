@@ -4,7 +4,7 @@ import { sendError } from "../utils/api-response";
 import { prisma } from "../lib/prisma";
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate("jwt", { session: false }, (err: any, user: any, info: any) => {
+  passport.authenticate("jwt", { session: false }, (err: any, user: any) => {
     if (err) {
       return next(err);
     }

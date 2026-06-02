@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { sendError } from "../utils/api-response";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+export function errorHandler(err: any, _req: Request, res: Response, _next: NextFunction) {
   console.error("💥 Error caught by middleware:", err);
 
   const status = err.status || err.statusCode || 500;

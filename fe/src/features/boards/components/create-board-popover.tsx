@@ -44,7 +44,7 @@ export function CreateBoardPopover({
     setIsLoading(true);
     try {
       await dispatch(
-        createBoard({ title, background: selectedColor })
+        createBoard({ title, background: selectedColor, type: "public" })
       ).unwrap();
       setOpen(false);
       setTitle("");

@@ -763,7 +763,7 @@ const boardDetailSlice = createSlice({
 
       // 1. Move Task IDs in local state
       // Extract IDs that are being moved
-      const movedTaskIds = movedTasks.map((t) => t.id);
+      const movedTaskIds = movedTasks.map((t: Task) => t.id);
 
       // Remove from Source
       state.columns[sourceColumnId].taskIds = []; // Empty the source
@@ -772,7 +772,7 @@ const boardDetailSlice = createSlice({
       state.columns[targetColumnId].taskIds.push(...movedTaskIds);
 
       // 2. Update Task Objects
-      movedTasks.forEach((task) => {
+      movedTasks.forEach((task: Task) => {
         if (state.tasks[task.id]) {
           state.tasks[task.id].column_id = targetColumnId;
           state.tasks[task.id].position = task.position;

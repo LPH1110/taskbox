@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useNavigate } from "react-router-dom";
-import { login } from "../authSlice";
+import { login, checkAuthSession } from "../authSlice";
 import { GoogleAuthButton } from "@/components/ui/google-auth-btn";
 
 // 1. Define validation schema using Zod
@@ -61,7 +61,7 @@ export function LoginForm() {
       localStorage.setItem("taskbox_token", token);
       dispatch(checkAuthSession()).unwrap().then(() => {
         navigate("/");
-      }).catch((err) => {
+      }).catch((err: any) => {
         console.error("Session check after OAuth redirect failed:", err);
       });
     }

@@ -3,7 +3,7 @@ import { Star } from "lucide-react";
 import { type Board } from "../types";
 import { cn } from "@/lib/utils";
 import { useAppDispatch } from "@/store/hooks";
-import { toggleBoardFavorite } from "../boardsSlice";
+import { toggleFavorite } from "../boardsSlice";
 
 interface BoardCardProps {
   board: Board;
@@ -14,9 +14,7 @@ export function BoardCard({ board }: BoardCardProps) {
 
   const handleStarClick = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking star
-    dispatch(
-      toggleBoardFavorite({ boardId: board.id, isFavorite: board.is_favorite })
-    );
+    dispatch(toggleFavorite(board.id));
   };
 
   return (
