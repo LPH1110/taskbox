@@ -5,6 +5,29 @@ import { BoardCard } from "../components/board-card";
 import { NewBoardButton } from "../components/new-board-button";
 import { Separator } from "@/components/ui/separator";
 import { Clock, Star } from "lucide-react";
+import { motion } from "motion/react";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04,
+    },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.2,
+      ease: "easeOut",
+    },
+  },
+} as const;
 
 export default function BoardsListPage() {
   const dispatch = useAppDispatch();
@@ -35,11 +58,18 @@ export default function BoardsListPage() {
             <Star className="h-5 w-5" />
             <span>Starred boards</span>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          >
             {favoriteBoards.map((board) => (
-              <BoardCard key={board.id} board={board} />
+              <motion.div key={`fav-${board.id}`} layout variants={itemVariants}>
+                <BoardCard board={board} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       )}
 
@@ -52,15 +82,24 @@ export default function BoardsListPage() {
 
         <Separator className="my-4" />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+        >
           {/* Create Button is always first */}
-          <NewBoardButton />
+          <motion.div layout variants={itemVariants}>
+            <NewBoardButton />
+          </motion.div>
 
           {/* Render List */}
           {boards.map((board) => (
-            <BoardCard key={board.id} board={board} />
+            <motion.div key={`all-${board.id}`} layout variants={itemVariants}>
+              <BoardCard board={board} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
