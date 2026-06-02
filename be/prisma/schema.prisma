@@ -1,0 +1,108 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Profile {
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String   @unique
+  password   String?  // null for OAuth users
+  full_name  String?
+  avatar_url String?
+  provider   String   @default("email") // "email" | "google"
+  created_at DateTime @default(now()) @map("created_at")
+
+  boards       Board[]
+  memberships  BoardMember[]
+
+  @@map("profiles")
+}
+
+model Board {
+  id               String   @id @default(uuid()) @db.Uuid
+  title            String
+  type             String   @default("private")
+  background_image String?  @map("background_image")
+  is_favorite      Boolean  @default(false) @map("is_favorite")
+  owner_id         String   @map("owner_id") @db.Uuid
+  created_at       DateTime @default(now()) @map("created_at")
+
+  owner    Profile       @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  columns  Column[]
+  labels   Label[]
+  members  BoardMember[]
+  tasks    Task[]
+
+  @@map("boards")
+}
+
+model Column {
+  id         String   @id @default(uuid()) @db.Uuid
+  board_id   String   @map("board_id") @db.Uuid
+  title      String
+  position   Int      @default(0)
+  created_at DateTime @default(now()) @map("created_at")
+
+  board Board  @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  @@map("columns")
+}
+
+model Task {
+  id          String   @id @default(uuid()) @db.Uuid
+  content     String
+  description String?
+  column_id   String   @map("column_id") @db.Uuid
+  board_id    String   @map("board_id") @db.Uuid
+  priority    String?
+  position    Int      @default(0)
+  created_at  DateTime @default(now()) @map("created_at")
+
+  column     Column      @relation(fields: [column_id], references: [id], onDelete: Cascade)
+  board      Board       @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  taskLabels TaskLabel[]
+
+  @@map("tasks")
+}
+
+model Label {
+  id         String   @id @default(uuid()) @db.Uuid
+  board_id   String   @map("board_id") @db.Uuid
+  title      String
+  color      String
+  created_at DateTime @default(now()) @map("created_at")
+
+  board      Board       @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  taskLabels TaskLabel[]
+
+  @@map("labels")
+}
+
+model TaskLabel {
+  task_id  String @map("task_id") @db.Uuid
+  label_id String @map("label_id") @db.Uuid
+
+  task  Task  @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [label_id], references: [id], onDelete: Cascade)
+
+  @@id([task_id, label_id])
+  @@map("task_labels")
+}
+
+model BoardMember {
+  board_id  String   @map("board_id") @db.Uuid
+  user_id   String   @map("user_id") @db.Uuid
+  role      String   @default("member")
+  joined_at DateTime @default(now()) @map("joined_at")
+
+  board   Board   @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([board_id, user_id])
+  @@map("board_members")
+}
