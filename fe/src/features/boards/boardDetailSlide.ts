@@ -588,6 +588,7 @@ const boardDetailSlice = createSlice({
             description: task.description,
             position: task.position,
             labelIds: taskLabelMap[task.id] || [],
+            due_date: task.due_date,
           };
 
           if (newColumns[task.column_id]) {

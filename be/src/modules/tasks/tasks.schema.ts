@@ -19,6 +19,7 @@ export const updateTaskSchema = z.object({
     description: z.string().nullable().optional(),
     priority: z.enum(["low", "medium", "high"]).nullable().optional(),
     position: z.number().int().nonnegative().optional(),
+    due_date: z.string().datetime().nullable().optional(),
     column_id: z.string().uuid().optional(),
   }),
 });

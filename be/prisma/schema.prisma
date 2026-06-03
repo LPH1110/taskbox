@@ -67,6 +67,7 @@ model Task {
   board_id    String   @map("board_id") @db.Uuid
   priority    String?
   position    Int      @default(0)
+  due_date    DateTime? @map("due_date")
   created_at  DateTime @default(now()) @map("created_at")
 
   column     Column      @relation(fields: [column_id], references: [id], onDelete: Cascade)

@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Draggable } from "@hello-pangea/dnd";
 import { openTaskDetail } from "../boardDetailSlide";
 import { type Task } from "../types/board-detail";
+import { Clock } from "lucide-react";
 
 interface TaskCardProps {
   task: Task;
@@ -53,20 +54,37 @@ export function TaskCard({ task, index }: TaskCardProps) {
               <div className="text-sm font-medium leading-none">
                 {task.content}
               </div>
-              {task.priority && (
-                <div className="flex">
-                  <Badge
-                    variant={
-                      task.priority === "high"
-                        ? "destructive"
-                        : task.priority === "medium"
-                        ? "default"
-                        : "secondary"
-                    }
-                    className="text-[10px] px-1 py-0 h-5"
-                  >
-                    {task.priority}
-                  </Badge>
+              {(task.priority || task.due_date) && (
+                <div className="flex items-center gap-2 mt-1">
+                  {task.due_date && (() => {
+                    // Check if overdue (excluding time)
+                    const dueDate = new Date(task.due_date);
+                    dueDate.setHours(23, 59, 59, 999);
+                    const isOverdue = dueDate < new Date();
+                    return (
+                      <Badge
+                        variant={isOverdue ? "destructive" : "secondary"}
+                        className={`text-[10px] px-1.5 py-0 h-5 flex items-center gap-1 ${isOverdue ? "animate-pulse" : ""}`}
+                      >
+                        <Clock className="h-3 w-3" />
+                        {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </Badge>
+                    );
+                  })()}
+                  {task.priority && (
+                    <Badge
+                      variant={
+                        task.priority === "high"
+                          ? "destructive"
+                          : task.priority === "medium"
+                          ? "default"
+                          : "secondary"
+                      }
+                      className="text-[10px] px-1 py-0 h-5"
+                    >
+                      {task.priority}
+                    </Badge>
+                  )}
                 </div>
               )}
             </CardContent>

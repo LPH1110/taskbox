@@ -6,7 +6,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogTitle,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
@@ -98,6 +101,18 @@ export function TaskDetailModal() {
     }
   };
 
+  const handleSetDueDate = async (date: Date | null) => {
+    try {
+      const due_date = date ? date.toISOString() : null;
+      await dispatch(
+        updateTask({ taskId: task.id, updates: { due_date } })
+      ).unwrap();
+      addToast(due_date ? "Due date updated" : "Due date removed", "success");
+    } catch (error) {
+      addToast("Failed to update due date", "error");
+    }
+  };
+
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       dispatch(closeTaskDetail());
@@ -108,6 +123,7 @@ export function TaskDetailModal() {
   return (
     <Dialog open={!!selectedTaskId} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-6xl! w-full h-[90vh] p-0 gap-0 overflow-hidden flex flex-col bg-card">
+        <DialogTitle className="sr-only">Task details: {task.content}</DialogTitle>
         <div className="flex flex-1 overflow-hidden">
           <ScrollArea className="flex-1 h-full">
             <div className="flex flex-col md:flex-row h-full">
@@ -144,11 +160,10 @@ export function TaskDetailModal() {
                     <div className="space-y-2">
                       <Textarea
                         placeholder="Add a more detailed description..."
-                        className={`min-h-32 resize-none border-none focus-visible:ring-1 transition ${
-                          isEditingDescription
+                        className={`min-h-32 resize-none border-none focus-visible:ring-1 transition ${isEditingDescription
                             ? "bg-background ring-1 ring-ring"
                             : "bg-muted/50"
-                        }`}
+                          }`}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         onFocus={() => setIsEditingDescription(true)}
@@ -245,12 +260,26 @@ export function TaskDetailModal() {
 
                   <LabelPopover taskId={task.id} />
 
-                  <Button
-                    variant="secondary"
-                    className="w-full justify-start h-8 text-sm"
-                  >
-                    <Clock className="mr-2 h-4 w-4" /> Dates
-                  </Button>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="secondary"
+                        className="w-full justify-start h-8 text-sm"
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        {task.due_date ? new Date(task.due_date).toLocaleDateString() : "Dates"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar 
+                        selected={task.due_date ? new Date(task.due_date) : null} 
+                        onSelect={(date) => {
+                          handleSetDueDate(date);
+                          // Close popover logic would go here if we managed state, but clicking outside closes it anyway
+                        }} 
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 <div className="space-y-2">
