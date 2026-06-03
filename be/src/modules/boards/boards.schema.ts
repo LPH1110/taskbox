@@ -14,3 +14,15 @@ export const boardIdParamSchema = z.object({
     boardId: z.string().uuid(),
   }),
 });
+
+export const updateBoardSchema = z.object({
+  params: z.object({
+    boardId: z.string().uuid(),
+  }),
+  body: z.object({
+    type: z.enum(["public", "private"]).optional(),
+    title: z.string().min(1).optional(),
+  }).refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  }),
+});

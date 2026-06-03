@@ -29,11 +29,26 @@ export const fetchBoardDetails = createAsyncThunk(
 export const addMember = createAsyncThunk(
   "boardDetail/addMember",
   async (
-    { boardId, email }: { boardId: string; email: string },
+    { boardId, userId }: { boardId: string; userId: string },
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.post<any, any>(`/boards/${boardId}/members`, { email });
+      const response = await api.post<any, any>(`/boards/${boardId}/members`, { userId });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateBoardDetails = createAsyncThunk(
+  "boardDetail/updateBoardDetails",
+  async (
+    { boardId, updates }: { boardId: string; updates: { title?: string; type?: "public" | "private" } },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await api.patch<any, any>(`/boards/${boardId}`, updates);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -589,6 +604,13 @@ const boardDetailSlice = createSlice({
     // --- Handle Add Member
     builder.addCase(addMember.fulfilled, (state, action) => {
       state.members.push(action.payload);
+    });
+
+    // --- Handle Update Board Details ---
+    builder.addCase(updateBoardDetails.fulfilled, (state, action) => {
+      if (state.currentBoard && state.currentBoard.id === action.payload.id) {
+        state.currentBoard = { ...state.currentBoard, ...action.payload };
+      }
     });
 
     // --- Handle Remove Member ---

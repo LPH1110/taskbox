@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
-import { Filter, UserPlus } from "lucide-react";
+import { Check, ChevronDown, Filter, Globe, Lock, UserPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -18,9 +18,17 @@ import {
   realtimeTaskDelete,
   realtimeTaskLabelEvent,
   realtimeTaskUpsert,
+  updateBoardDetails,
   updateColumnOrder,
   updateTaskOrder,
 } from "../boardDetailSlide";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/context/ToastContext";
 import { AddColumnForm } from "../components/add-column-form";
 import { BoardColumn } from "../components/board-column";
 import { BoardSkeleton } from "../components/board-skeleton";
@@ -34,11 +42,32 @@ import type { Column, Label, Task } from "../types/board-detail";
 export default function BoardDetailPage() {
   const { boardId } = useParams();
   const dispatch = useAppDispatch();
+  const { addToast } = useToast();
   const { tasks, columns, columnOrder, isLoading, currentBoard, members } =
     useAppSelector((state) => state.boardDetail);
   const { user } = useAppSelector((state) => state.auth);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const { containerRef, onWheel } = useSmoothHorizontalScroll();
+
+  // Check if current user is owner or admin
+  const isOwner = currentBoard?.owner_id === user?.id;
+  const isBoardAdmin = members.some((m) => m.user_id === user?.id && m.role === "admin");
+  const canModifyVisibility = isOwner || isBoardAdmin;
+
+  const handleVisibilityChange = async (newType: "public" | "private") => {
+    if (!currentBoard) return;
+    try {
+      await dispatch(
+        updateBoardDetails({
+          boardId: currentBoard.id,
+          updates: { type: newType },
+        })
+      ).unwrap();
+      addToast(`Board is now ${newType}`, "success");
+    } catch (error: any) {
+      addToast(error || "Failed to update visibility", "error");
+    }
+  };
 
   const stateRef = useRef({ columns, tasks });
   useEffect(() => {
@@ -235,9 +264,82 @@ export default function BoardDetailPage() {
     >
       {/* Sleek Header */}
       <div className="flex items-center justify-between px-6 py-4 shrink-0 bg-background/30 backdrop-blur-md border-b border-white/10 dark:border-white/5 shadow-sm relative z-10">
-        <h1 className="text-xl font-bold tracking-tight text-white drop-shadow-sm">
-          {currentBoard?.title || "Board"}
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold tracking-tight text-white drop-shadow-sm">
+            {currentBoard?.title || "Board"}
+          </h1>
+
+          {currentBoard && (
+            <div className="flex items-center gap-2">
+              {canModifyVisibility ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm gap-1.5 px-2.5 cursor-pointer"
+                    >
+                      {currentBoard.type === "public" ? (
+                        <>
+                          <Globe className="h-3.5 w-3.5" />
+                          <span>Public</span>
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="h-3.5 w-3.5" />
+                          <span>Private</span>
+                        </>
+                      )}
+                      <ChevronDown className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-52">
+                    <DropdownMenuItem
+                      onClick={() => handleVisibilityChange("private")}
+                      className="flex items-center justify-between cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2 text-left">
+                        <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">Private</p>
+                          <p className="text-[10px] text-muted-foreground">Only added members access</p>
+                        </div>
+                      </div>
+                      {currentBoard.type === "private" && <Check className="h-4 w-4 text-primary shrink-0 ml-2" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleVisibilityChange("public")}
+                      className="flex items-center justify-between cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2 text-left">
+                        <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">Public</p>
+                          <p className="text-[10px] text-muted-foreground">All workspace members access</p>
+                        </div>
+                      </div>
+                      {currentBoard.type === "public" && <Check className="h-4 w-4 text-primary shrink-0 ml-2" />}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs bg-white/20 text-white/90 rounded-md backdrop-blur-sm">
+                  {currentBoard.type === "public" ? (
+                    <>
+                      <Globe className="h-3.5 w-3.5" />
+                      <span>Public</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="h-3.5 w-3.5" />
+                      <span>Private</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="flex items-center gap-3">
           {/* Small Facepile */}

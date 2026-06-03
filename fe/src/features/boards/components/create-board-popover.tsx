@@ -6,8 +6,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { Loader2, X } from "lucide-react";
+import { Globe, Loader2, Lock, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createBoard } from "../boardsSlice";
 import { useToast } from "@/context/ToastContext";
@@ -45,6 +52,7 @@ export function CreateBoardPopover({
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [selectedColor, setSelectedColor] = useState(BOARD_COLORS[0]);
+  const [type, setType] = useState<"public" | "private">("private");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(workspaceId || activeWorkspaceId || "");
 
@@ -70,12 +78,13 @@ export function CreateBoardPopover({
         createBoard({
           title,
           background: selectedColor,
-          type: "public",
+          type,
           workspaceId: selectedWorkspaceId,
         })
       ).unwrap();
       setOpen(false);
       setTitle("");
+      setType("private");
       if (board && board.id) {
         navigate(`/boards/${board.id}`);
       }
@@ -133,15 +142,46 @@ export function CreateBoardPopover({
               {BOARD_COLORS.map((color) => (
                 <div
                   key={color}
-                  className={`w-full h-8 rounded-sm cursor-pointer hover:opacity-80 transition-all ${color} ${
-                    selectedColor === color
-                      ? "ring-2 ring-neutral-800 ring-offset-1"
-                      : ""
-                  }`}
+                  className={`w-full h-8 rounded-sm cursor-pointer hover:opacity-80 transition-all ${color} ${selectedColor === color
+                    ? "ring-2 ring-neutral-800 ring-offset-1"
+                    : ""
+                    }`}
                   onClick={() => setSelectedColor(color)}
                 />
               ))}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="visibilitySelect">Visibility</Label>
+            <Select value={type} onValueChange={(val) => setType(val as "public" | "private")}>
+              <SelectTrigger
+                id="visibilitySelect"
+                className="w-full !h-[42px] rounded-sm border-2 border bg-background px-3  text-sm outline-none focus:ring-0 focus:border-foreground shadow-none"
+              >
+                <SelectValue placeholder="Select visibility" />
+              </SelectTrigger>
+              <SelectContent className="border-2 border rounded-sm shadow-sm">
+                <SelectItem value="private" className="cursor-pointer py-2">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div className="flex flex-col text-left leading-tight">
+                      <span className="font-medium">Private</span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">Only added members access</span>
+                    </div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="public" className="cursor-pointer py-2">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div className="flex flex-col text-left leading-tight">
+                      <span className="font-medium">Public</span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">All workspace members access</span>
+                    </div>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {!workspaceId && workspaces.length > 0 && (

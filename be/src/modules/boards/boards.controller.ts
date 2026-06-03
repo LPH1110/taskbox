@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { prisma } from "../../lib/prisma";
 import { sendSuccess, sendError } from "../../utils/api-response";
 import { validate } from "../../middleware/validate";
-import { createBoardSchema, boardIdParamSchema } from "./boards.schema";
+import { createBoardSchema, boardIdParamSchema, updateBoardSchema } from "./boards.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
 import { logActivity } from "../../utils/activity-logger";
@@ -114,6 +114,62 @@ router.patch("/:boardId/favorite", requireBoardMember, validate(boardIdParamSche
     });
 
     // Notify other clients about favorite status update
+    socketEmitter.toBoardRoom(boardId, "board:update", updated);
+
+    return sendSuccess(res, updated);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// PATCH /api/boards/:boardId (Update board details like title or visibility type)
+router.patch("/:boardId", requireBoardMember, validate(updateBoardSchema), async (req: Request, res: Response, next: NextFunction) => {
+  const { boardId } = req.params;
+  const { title, type } = req.body;
+  const userId = (req.user as any).id;
+
+  try {
+    const board = await prisma.board.findUnique({
+      where: { id: boardId },
+      select: { owner_id: true, workspace_id: true },
+    });
+
+    if (!board) {
+      return sendError(res, "Board not found", 404);
+    }
+
+    // Check if user is owner
+    let isAuthorized = board.owner_id === userId;
+
+    if (!isAuthorized) {
+      // Check if user is board admin
+      const membership = await prisma.boardMember.findUnique({
+        where: {
+          board_id_user_id: {
+            board_id: boardId,
+            user_id: userId,
+          },
+        },
+        select: { role: true },
+      });
+      if (membership?.role === "admin") {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      return sendError(res, "Forbidden: Only board owners or admins can modify board settings", 403);
+    }
+
+    const updated = await prisma.board.update({
+      where: { id: boardId },
+      data: {
+        ...(title !== undefined ? { title } : {}),
+        ...(type !== undefined ? { type } : {}),
+      },
+    });
+
+    // Notify other clients about update
     socketEmitter.toBoardRoom(boardId, "board:update", updated);
 
     return sendSuccess(res, updated);

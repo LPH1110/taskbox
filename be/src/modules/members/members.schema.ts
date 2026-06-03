@@ -5,7 +5,7 @@ export const addMemberSchema = z.object({
     boardId: z.string().uuid(),
   }),
   body: z.object({
-    email: z.string().email(),
+    userId: z.string().uuid(),
   }),
 });
 

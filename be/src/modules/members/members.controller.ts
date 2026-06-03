@@ -14,16 +14,16 @@ router.use(requireAuth);
 // POST /api/boards/:boardId/members (Add Board Member by Email)
 router.post("/boards/:boardId/members", requireBoardMember, validate(addMemberSchema), async (req: Request, res: Response, next: NextFunction) => {
   const { boardId } = req.params;
-  const { email } = req.body;
+  const { userId } = req.body;
 
   try {
-    // Find profile by email
+    // Find profile by userId
     const profile = await prisma.profile.findUnique({
-      where: { email },
+      where: { id: userId },
     });
 
     if (!profile) {
-      return sendError(res, "User not found. Please check the email.", 404);
+      return sendError(res, "User not found.", 404);
     }
 
     // Check if owner of board
@@ -32,7 +32,7 @@ router.post("/boards/:boardId/members", requireBoardMember, validate(addMemberSc
       select: { owner_id: true },
     });
 
-    if (board?.owner_id === profile.id) {
+    if (board?.owner_id === userId) {
       return sendError(res, "User is already the owner of this board.", 400);
     }
 
@@ -41,7 +41,7 @@ router.post("/boards/:boardId/members", requireBoardMember, validate(addMemberSc
       where: {
         board_id_user_id: {
           board_id: boardId,
-          user_id: profile.id,
+          user_id: userId,
         },
       },
     });
@@ -54,7 +54,7 @@ router.post("/boards/:boardId/members", requireBoardMember, validate(addMemberSc
     const member = await prisma.boardMember.create({
       data: {
         board_id: boardId,
-        user_id: profile.id,
+        user_id: userId,
         role: "member", // Default role
       },
       include: {
