@@ -19,7 +19,8 @@ import labelsRouter from "./modules/labels/labels.controller";
 import membersRouter from "./modules/members/members.controller";
 import workspacesRouter from "./modules/workspaces/workspaces.controller";
 import invitationsRouter from "./modules/invitations/invitations.controller";
-
+import commentsRouter from "./modules/comments/comments.controller";
+import attachmentsRouter from "./modules/attachments/attachments.controller";
 
 const app = express();
 const httpServer = createServer(app);
@@ -53,6 +54,8 @@ app.use("/api", columnsRouter);
 app.use("/api", tasksRouter);
 app.use("/api", labelsRouter);
 app.use("/api", membersRouter);
+app.use("/api", commentsRouter);
+app.use("/api", attachmentsRouter);
 
 // Centralized Error Handling
 app.use(errorHandler);

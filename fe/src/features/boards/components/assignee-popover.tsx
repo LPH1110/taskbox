@@ -8,9 +8,10 @@ import { useState } from "react";
 
 interface AssigneePopoverProps {
   taskId: string;
+  children?: React.ReactNode;
 }
 
-export function AssigneePopover({ taskId }: AssigneePopoverProps) {
+export function AssigneePopover({ taskId, children }: AssigneePopoverProps) {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   
@@ -36,12 +37,14 @@ export function AssigneePopover({ taskId }: AssigneePopoverProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="secondary"
-          className="w-full justify-start h-8 text-sm"
-        >
-          <User className="mr-2 h-4 w-4" /> Members
-        </Button>
+        {children || (
+          <Button
+            variant="secondary"
+            className="w-full justify-start h-8 text-sm"
+          >
+            <User className="mr-2 h-4 w-4" /> Members
+          </Button>
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-64 p-3" align="start" side="bottom">
         <h4 className="font-semibold text-sm mb-3 text-center">Assign Members</h4>

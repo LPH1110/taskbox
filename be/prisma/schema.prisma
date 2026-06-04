@@ -23,6 +23,8 @@ model Profile {
   activities_performed  ActivityLog[]         @relation("activity_actor")
   invitations_sent      WorkspaceInvitation[] @relation("invitation_inviter")
   TaskAssignee          TaskAssignee[]
+  comments              Comment[]             @relation("comment_author")
+  attachments           Attachment[]          @relation("attachment_uploader")
 
   @@map("profiles")
 }
@@ -75,6 +77,8 @@ model Task {
   board      Board          @relation(fields: [board_id], references: [id], onDelete: Cascade)
   taskLabels TaskLabel[]
   assignees  TaskAssignee[]
+  comments   Comment[]
+  attachments Attachment[]
 
   @@map("tasks")
 }
@@ -192,4 +196,38 @@ model WorkspaceInvitation {
   @@index([workspace_id, status])
   @@index([token])
   @@map("workspace_invitations")
+}
+
+model Comment {
+  id         String    @id @default(uuid()) @db.Uuid
+  task_id    String    @map("task_id") @db.Uuid
+  author_id  String    @map("author_id") @db.Uuid
+  content    String
+  parent_id  String?   @map("parent_id") @db.Uuid  // null = top-level, uuid = reply
+  created_at DateTime  @default(now()) @map("created_at")
+  updated_at DateTime  @updatedAt @map("updated_at")
+
+  task    Task      @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  author  Profile   @relation("comment_author", fields: [author_id], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("comment_thread", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("comment_thread")
+
+  @@index([task_id, created_at])
+  @@map("comments")
+}
+
+model Attachment {
+  id          String   @id @default(uuid()) @db.Uuid
+  task_id     String   @map("task_id") @db.Uuid
+  uploader_id String   @map("uploader_id") @db.Uuid
+  file_name   String   @map("file_name")
+  file_url    String   @map("file_url")
+  file_size   Int      @map("file_size")
+  mime_type   String   @map("mime_type")
+  created_at  DateTime @default(now()) @map("created_at")
+
+  task     Task    @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  uploader Profile @relation("attachment_uploader", fields: [uploader_id], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
 }

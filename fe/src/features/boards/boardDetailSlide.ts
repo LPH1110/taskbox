@@ -9,6 +9,8 @@ import {
   type Column,
   type Label,
   type Task,
+  type Comment,
+  type Attachment,
 } from "./types/board-detail";
 import { api } from "@/lib/api";
 import type { Board, BoardMember } from "./types";
@@ -354,6 +356,98 @@ export const moveAllTasks = createAsyncThunk(
   }
 );
 
+// --- COMMENTS ACTIONS ---
+export const fetchComments = createAsyncThunk(
+  "boardDetail/fetchComments",
+  async (taskId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get<any, any>(`/tasks/${taskId}/comments`);
+      return { taskId, comments: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const createComment = createAsyncThunk(
+  "boardDetail/createComment",
+  async ({ taskId, content, parentId }: { taskId: string, content: string, parentId?: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post<any, any>(`/tasks/${taskId}/comments`, { content, parentId });
+      return { taskId, comment: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateComment = createAsyncThunk(
+  "boardDetail/updateComment",
+  async ({ taskId, commentId, content }: { taskId: string, commentId: string, content: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.patch<any, any>(`/comments/${commentId}`, { content });
+      return { taskId, comment: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteComment = createAsyncThunk(
+  "boardDetail/deleteComment",
+  async ({ taskId, commentId }: { taskId: string, commentId: string }, { rejectWithValue }) => {
+    try {
+      await api.delete(`/comments/${commentId}`);
+      return { taskId, commentId };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// --- ATTACHMENTS ACTIONS ---
+export const fetchAttachments = createAsyncThunk(
+  "boardDetail/fetchAttachments",
+  async (taskId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get<any, any>(`/tasks/${taskId}/attachments`);
+      return { taskId, attachments: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const uploadAttachment = createAsyncThunk(
+  "boardDetail/uploadAttachment",
+  async ({ taskId, file }: { taskId: string, file: File }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await api.post<any, any>(`/tasks/${taskId}/attachments`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      return { taskId, attachment: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteAttachment = createAsyncThunk(
+  "boardDetail/deleteAttachment",
+  async ({ taskId, attachmentId }: { taskId: string, attachmentId: string }, { rejectWithValue }) => {
+    try {
+      await api.delete(`/attachments/${attachmentId}`);
+      return { taskId, attachmentId };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // -----------------
 
 const initialState: BoardDetailState = {
@@ -362,6 +456,8 @@ const initialState: BoardDetailState = {
   labels: {},
   columnOrder: [],
   members: [],
+  comments: {},
+  attachments: {},
   isLoading: false,
   selectedTaskId: null,
   currentBoard: null,
@@ -579,6 +675,36 @@ const boardDetailSlice = createSlice({
 
     closeTaskDetail: (state) => {
       state.selectedTaskId = null;
+    },
+    
+    realtimeCommentEvent: (state, action: PayloadAction<{type: "INSERT"|"UPDATE"|"DELETE", comment?: Comment, commentId?: string, taskId: string}>) => {
+      const { type, comment, commentId, taskId } = action.payload;
+      if (!state.comments[taskId]) state.comments[taskId] = [];
+      
+      if (type === "INSERT" && comment) {
+        if (!state.comments[taskId].find(c => c.id === comment.id)) {
+          state.comments[taskId].push(comment);
+        }
+      } else if (type === "UPDATE" && comment) {
+        const idx = state.comments[taskId].findIndex(c => c.id === comment.id);
+        if (idx !== -1) state.comments[taskId][idx] = comment;
+      } else if (type === "DELETE" && commentId) {
+        state.comments[taskId] = state.comments[taskId].filter(c => c.id !== commentId && c.parent_id !== commentId);
+      }
+    },
+    
+    realtimeAttachmentEvent: (state, action: PayloadAction<{type: "INSERT"|"DELETE", attachment?: Attachment, attachmentId?: string, taskId: string}>) => {
+      const { type, attachment, attachmentId, taskId } = action.payload;
+      if (!state.attachments[taskId]) state.attachments[taskId] = [];
+      
+      if (type === "INSERT" && attachment) {
+        if (!state.attachments[taskId].find(a => a.id === attachment.id)) {
+          // add to top
+          state.attachments[taskId].unshift(attachment);
+        }
+      } else if (type === "DELETE" && attachmentId) {
+        state.attachments[taskId] = state.attachments[taskId].filter(a => a.id !== attachmentId);
+      }
     },
   },
 
@@ -875,6 +1001,49 @@ const boardDetailSlice = createSlice({
         }
       });
     });
+
+    // --- Comments ---
+    builder.addCase(fetchComments.fulfilled, (state, action) => {
+      state.comments[action.payload.taskId] = action.payload.comments;
+    });
+    builder.addCase(createComment.fulfilled, (state, action) => {
+      const { taskId, comment } = action.payload;
+      if (!state.comments[taskId]) state.comments[taskId] = [];
+      if (!state.comments[taskId].find(c => c.id === comment.id)) {
+        state.comments[taskId].push(comment);
+      }
+    });
+    builder.addCase(updateComment.fulfilled, (state, action) => {
+      const { taskId, comment } = action.payload;
+      if (state.comments[taskId]) {
+        const idx = state.comments[taskId].findIndex(c => c.id === comment.id);
+        if (idx !== -1) state.comments[taskId][idx] = comment;
+      }
+    });
+    builder.addCase(deleteComment.fulfilled, (state, action) => {
+      const { taskId, commentId } = action.payload;
+      if (state.comments[taskId]) {
+        state.comments[taskId] = state.comments[taskId].filter(c => c.id !== commentId && c.parent_id !== commentId);
+      }
+    });
+
+    // --- Attachments ---
+    builder.addCase(fetchAttachments.fulfilled, (state, action) => {
+      state.attachments[action.payload.taskId] = action.payload.attachments;
+    });
+    builder.addCase(uploadAttachment.fulfilled, (state, action) => {
+      const { taskId, attachment } = action.payload;
+      if (!state.attachments[taskId]) state.attachments[taskId] = [];
+      if (!state.attachments[taskId].find(a => a.id === attachment.id)) {
+        state.attachments[taskId].unshift(attachment);
+      }
+    });
+    builder.addCase(deleteAttachment.fulfilled, (state, action) => {
+      const { taskId, attachmentId } = action.payload;
+      if (state.attachments[taskId]) {
+        state.attachments[taskId] = state.attachments[taskId].filter(a => a.id !== attachmentId);
+      }
+    });
   },
 });
 
@@ -893,5 +1062,7 @@ export const {
   realtimeTaskLabelEvent,
   realtimeTaskAssigneeEvent,
   realtimeTaskUpsert,
+  realtimeCommentEvent,
+  realtimeAttachmentEvent,
 } = boardDetailSlice.actions;
 export default boardDetailSlice.reducer;

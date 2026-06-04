@@ -18,6 +18,8 @@ import {
   realtimeTaskDelete,
   realtimeTaskLabelEvent,
   realtimeTaskUpsert,
+  realtimeCommentEvent,
+  realtimeAttachmentEvent,
   updateBoardDetails,
   updateColumnOrder,
   updateTaskOrder,
@@ -34,10 +36,10 @@ import { BoardColumn } from "../components/board-column";
 import { BoardSkeleton } from "../components/board-skeleton";
 import { MemberPopover } from "../components/member-popover";
 import { MembersDialog } from "../components/members-dialog";
-import { TaskDetailModal } from "../components/task-detail-modal";
+import { TaskDetailModal } from "../components/task-detail-modal/task-detail-modal";
 import { socket } from "@/lib/socket";
 import type { Board, BoardMember } from "../types";
-import type { Column, Label, Task } from "../types/board-detail";
+import type { Column, Label, Task, Comment, Attachment } from "../types/board-detail";
 
 export default function BoardDetailPage() {
   const { boardId } = useParams();
@@ -137,6 +139,14 @@ export default function BoardDetailPage() {
       dispatch(fetchBoardDetails(boardId));
     });
 
+    socket.on("comment:event", (data: { type: "INSERT" | "UPDATE" | "DELETE"; comment?: Comment; commentId?: string; taskId: string }) => {
+      dispatch(realtimeCommentEvent(data));
+    });
+
+    socket.on("attachment:event", (data: { type: "INSERT" | "DELETE"; attachment?: Attachment; attachmentId?: string; taskId: string }) => {
+      dispatch(realtimeAttachmentEvent(data));
+    });
+
     return () => {
       socket.emit("leave:board", boardId);
       socket.off("board:update");
@@ -151,6 +161,8 @@ export default function BoardDetailPage() {
       socket.off("column:reorder");
       socket.off("task:reorder");
       socket.off("task:move-all");
+      socket.off("comment:event");
+      socket.off("attachment:event");
       socket.disconnect();
     };
   }, [dispatch, boardId, user]);
@@ -247,18 +259,18 @@ export default function BoardDetailPage() {
   }
 
   return (
-    <div 
+    <div
       className={`flex h-[calc(100vh-3.5rem)] flex-col transition bg-cover bg-center`}
       style={
-        currentBoard?.background_image 
+        currentBoard?.background_image
           ? {
-              backgroundImage: currentBoard.background_image.startsWith("url")
-                ? currentBoard.background_image
-                : undefined,
-              backgroundColor: !currentBoard.background_image.startsWith("url")
-                ? currentBoard.background_image
-                : undefined,
-            }
+            backgroundImage: currentBoard.background_image.startsWith("url")
+              ? currentBoard.background_image
+              : undefined,
+            backgroundColor: !currentBoard.background_image.startsWith("url")
+              ? currentBoard.background_image
+              : undefined,
+          }
           : undefined
       }
     >

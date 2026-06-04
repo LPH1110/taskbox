@@ -27,11 +27,36 @@ export interface Column {
   taskIds: string[];
 }
 
+export interface Comment {
+  id: string;
+  task_id: string;
+  author_id: string;
+  content: string;
+  parent_id: string | null;
+  created_at: string;
+  updated_at: string;
+  author: { id: string; full_name: string; avatar_url: string | null; email: string };
+}
+
+export interface Attachment {
+  id: string;
+  task_id: string;
+  uploader_id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number;
+  mime_type: string;
+  created_at: string;
+  uploader: { id: string; full_name: string; avatar_url: string | null; email: string };
+}
+
 export interface BoardDetailState {
   tasks: Record<string, Task>;
   columns: Record<string, Column>;
   labels: Record<string, Label>;
   members: BoardMember[];
+  comments: Record<string, Comment[]>;
+  attachments: Record<string, Attachment[]>;
   columnOrder: string[];
   isLoading: boolean;
   selectedTaskId: string | null;
