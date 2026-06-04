@@ -789,7 +789,9 @@ const boardDetailSlice = createSlice({
 
     // --- Handle Add Member
     builder.addCase(addMember.fulfilled, (state, action) => {
-      state.members.push(action.payload);
+      if (!state.members.find((m) => m.user_id === action.payload.user_id)) {
+        state.members.push(action.payload);
+      }
     });
 
     // --- Handle Update Board Details ---
