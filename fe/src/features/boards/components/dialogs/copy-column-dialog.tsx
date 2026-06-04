@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAppDispatch } from "@/store/hooks";
-import { copyColumn } from "../boardDetailSlide";
+import { copyColumn } from "../../boardDetailSlide";
 import { useToast } from "@/context/ToastContext";
 
 interface CopyColumnDialogProps {

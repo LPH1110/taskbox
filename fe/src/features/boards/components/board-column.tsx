@@ -17,12 +17,14 @@ import { ArrowRightLeft, Copy, MoreHorizontal, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { createTask, updateColumn } from "../boardDetailSlide";
 import { type Column, type Task } from "../types/board-detail";
-import { CopyColumnDialog } from "./copy-column-dialog";
-import { DeleteColumnDialog } from "./delete-column-dialog";
-import { MoveAllTasksDialog } from "./move-all-tasks-dialog";
-import { MoveColumnDialog } from "./move-column-dialog";
 import { TaskCard } from "./task-card";
 import { useParams } from "react-router-dom";
+import {
+  CopyColumnDialog,
+  DeleteColumnDialog,
+  MoveAllTasksDialog,
+  MoveColumnDialog
+} from "./dialogs";
 
 interface BoardColumnProps {
   column: Column;
@@ -141,9 +143,8 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className={`flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 transition-colors min-h-2.5 ${
-                    snapshot.isDraggingOver ? "bg-muted/80" : ""
-                  }`}
+                  className={`flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 transition-colors min-h-2.5 ${snapshot.isDraggingOver ? "bg-muted/80" : ""
+                    }`}
                 >
                   {tasks.map((task, index) => (
                     <TaskCard key={task.id} task={task} index={index} />

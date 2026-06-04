@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { User, Check } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { toggleTaskAssignee } from "../boardDetailSlide";
+import { toggleTaskAssignee } from "../../boardDetailSlide";
 import { useState } from "react";
 
 interface AssigneePopoverProps {
@@ -14,10 +14,10 @@ interface AssigneePopoverProps {
 export function AssigneePopover({ taskId, children }: AssigneePopoverProps) {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
-  
+
   const members = useAppSelector((state) => state.boardDetail.members);
   const tasks = useAppSelector((state) => state.boardDetail.tasks);
-  
+
   const task = tasks[taskId];
   if (!task) return null;
 
@@ -58,7 +58,7 @@ export function AssigneePopover({ taskId, children }: AssigneePopoverProps) {
             const isAssigned = assigneeIds.includes(member.user_id);
             const profile = member.profiles;
             const fallback = profile?.full_name?.substring(0, 2).toUpperCase() || profile?.email?.substring(0, 2).toUpperCase() || "U";
-            
+
             return (
               <div
                 key={member.user_id}

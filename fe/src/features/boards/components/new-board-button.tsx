@@ -1,4 +1,4 @@
-import { CreateBoardPopover } from "./create-board-popover";
+import { CreateBoardPopover } from "./popovers/create-board-popover";
 import { motion } from "motion/react";
 
 interface NewBoardButtonProps {

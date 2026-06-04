@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateTaskOrder } from "../boardDetailSlide";
+import { updateTaskOrder } from "@/features/boards/boardDetailSlide";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 interface MoveTaskDialogProps {

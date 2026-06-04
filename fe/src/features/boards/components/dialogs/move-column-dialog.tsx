@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { moveColumnToDifferentBoard } from "../boardDetailSlide";
+import { moveColumnToDifferentBoard } from "@/features/boards/boardDetailSlide";
 import { useToast } from "@/context/ToastContext";
 import { api } from "@/lib/api";
 

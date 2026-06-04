@@ -11,14 +11,13 @@ import { useToast } from "@/context/ToastContext";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useEffect, useState } from "react";
 import { closeTaskDetail, updateTask } from "../../boardDetailSlide";
-import { DeleteTaskDialog } from "../delete-task-dialog";
-import { MoveTaskDialog } from "../move-task-dialog";
 import { CommentSection } from "../comment-section";
 import { AttachmentSection } from "../attachment-section";
 
 import { Header } from "./header";
 import { Description } from "./description";
 import { Sidebar } from "./sidebar";
+import { DeleteTaskDialog, MoveTaskDialog } from "../dialogs";
 
 export function TaskDetailModal() {
   const dispatch = useAppDispatch();
@@ -121,15 +120,15 @@ export function TaskDetailModal() {
           <ScrollArea className="flex-1 h-full">
             <div className="p-6 md:p-8 space-y-8">
               {/* Header Section */}
-              <Header 
-                task={task} 
-                column={column} 
-                taskLabels={taskLabels} 
-                handleRenameTask={handleRenameTask} 
+              <Header
+                task={task}
+                column={column}
+                taskLabels={taskLabels}
+                handleRenameTask={handleRenameTask}
               />
 
               {/* Description Section */}
-              <Description 
+              <Description
                 task={task}
                 description={description}
                 setDescription={setDescription}
@@ -161,7 +160,7 @@ export function TaskDetailModal() {
 
           {/* --- RIGHT COLUMN (SIDEBAR ACTIONS) --- */}
           <ScrollArea className="w-full md:w-80 bg-muted/5 border-t md:border-t-0 md:border-l flex-shrink-0 h-full">
-            <Sidebar 
+            <Sidebar
               task={task}
               taskAssignees={taskAssignees}
               isOverdue={!!isOverdue}

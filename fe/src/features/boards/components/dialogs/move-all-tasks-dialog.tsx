@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { moveAllTasks } from "../boardDetailSlide"; // Import action
+import { moveAllTasks } from "@/features/boards/boardDetailSlide"; // Import action
 import { useToast } from "@/context/ToastContext";
 
 interface MoveAllTasksDialogProps {

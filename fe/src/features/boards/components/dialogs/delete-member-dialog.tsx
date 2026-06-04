@@ -11,8 +11,8 @@ import {
 import { useToast } from "@/context/ToastContext";
 import { useAppDispatch } from "@/store/hooks";
 import { useState } from "react";
-import { removeMember } from "../boardDetailSlide";
-import { type BoardMember } from "../types";
+import { removeMember } from "@/features/boards/boardDetailSlide";
+import { type BoardMember } from "@/features/boards/types";
 
 interface DeleteMemberDialogProps {
   isOpen: boolean;

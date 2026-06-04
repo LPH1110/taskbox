@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useAppDispatch } from "@/store/hooks";
-import { deleteColumn } from "../boardDetailSlide";
+import { deleteColumn } from "@/features/boards/boardDetailSlide";
 import { useToast } from "@/context/ToastContext";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";

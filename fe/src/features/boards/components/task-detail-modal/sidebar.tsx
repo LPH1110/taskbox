@@ -6,8 +6,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Clock, CreditCard, Trash2, Plus, Paperclip } from "lucide-react";
-import { AssigneePopover } from "../assignee-popover";
-import { LabelPopover } from "../label-popover";
+import { AssigneePopover } from "../popovers/assignee-popover";
+import { LabelPopover } from "../popovers/label-popover";
 import { type Task } from "../../types/board-detail";
 
 interface SidebarProps {

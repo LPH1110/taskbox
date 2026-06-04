@@ -16,7 +16,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Globe, Loader2, Lock, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { createBoard } from "../boardsSlice";
+import { createBoard } from "../../boardsSlice";
 import { useToast } from "@/context/ToastContext";
 import { useNavigate } from "react-router-dom";
 
@@ -103,6 +103,7 @@ export function CreateBoardPopover({
         sideOffset={sideOffset}
         className="w-80 pt-3"
         side="right"
+        onInteractOutside={(e) => e.preventDefault()}
       >
         <div className="text-sm font-medium text-center text-neutral-600 mb-4 pb-2 border-b relative">
           Create board

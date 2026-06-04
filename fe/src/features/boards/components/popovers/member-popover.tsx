@@ -8,8 +8,8 @@ import {
 import { useAppSelector } from "@/store/hooks";
 import { UserMinus } from "lucide-react";
 import { useState } from "react";
-import { type BoardMember } from "../types";
-import { DeleteMemberDialog } from "./delete-member-dialog";
+import { type BoardMember } from "../../types";
+import { DeleteMemberDialog } from "../dialogs/delete-member-dialog";
 
 interface MemberPopoverProps {
   member: BoardMember;
