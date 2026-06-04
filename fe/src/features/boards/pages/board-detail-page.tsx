@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
 import { Check, ChevronDown, Filter, Globe, Lock, UserPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { useParams } from "react-router-dom";
 import {
   fetchBoardDetails,
@@ -49,6 +50,8 @@ export default function BoardDetailPage() {
     useAppSelector((state) => state.boardDetail);
   const { user } = useAppSelector((state) => state.auth);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleInput, setTitleInput] = useState("");
   const { containerRef, onWheel } = useSmoothHorizontalScroll();
 
   // Check if current user is owner or admin
@@ -68,6 +71,33 @@ export default function BoardDetailPage() {
       addToast(`Board is now ${newType}`, "success");
     } catch (error: any) {
       addToast(error || "Failed to update visibility", "error");
+    }
+  };
+
+  const handleTitleSubmit = async () => {
+    setIsEditingTitle(false);
+    if (!currentBoard) return;
+    const trimmed = titleInput.trim();
+    if (trimmed && trimmed !== currentBoard.title) {
+      try {
+        await dispatch(
+          updateBoardDetails({
+            boardId: currentBoard.id,
+            updates: { title: trimmed },
+          })
+        ).unwrap();
+        addToast("Board title updated", "success");
+      } catch (error: any) {
+        addToast(error || "Failed to update title", "error");
+      }
+    }
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleTitleSubmit();
+    } else if (e.key === "Escape") {
+      setIsEditingTitle(false);
     }
   };
 
@@ -277,9 +307,44 @@ export default function BoardDetailPage() {
       {/* Sleek Header */}
       <div className="flex items-center justify-between px-6 py-4 shrink-0 bg-background/30 backdrop-blur-md border-b border-white/10 dark:border-white/5 shadow-sm relative z-10">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold tracking-tight text-white drop-shadow-sm">
-            {currentBoard?.title || "Board"}
-          </h1>
+          <div className="relative flex items-center h-8">
+            <AnimatePresence mode="popLayout">
+              {isEditingTitle ? (
+                <motion.input
+                  key="input"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.1 } }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  autoFocus
+                  className="text-xl font-bold tracking-tight text-white bg-white/20 border-0 rounded px-2 py-0.5 -ml-2 outline-none focus:ring-2 focus:ring-white/50 h-8 w-auto min-w-[150px] max-w-[200px] md:max-w-[400px]"
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  onBlur={handleTitleSubmit}
+                  onKeyDown={handleTitleKeyDown}
+                />
+              ) : (
+                <motion.h1
+                  key="h1"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.1 } }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className={`text-xl font-bold tracking-tight text-white drop-shadow-sm px-2 py-0.5 -ml-2 rounded transition-colors whitespace-nowrap ${
+                    canModifyVisibility ? "cursor-pointer hover:bg-white/20" : ""
+                  }`}
+                  onClick={() => {
+                    if (canModifyVisibility) {
+                      setTitleInput(currentBoard?.title || "");
+                      setIsEditingTitle(true);
+                    }
+                  }}
+                >
+                  {currentBoard?.title || "Board"}
+                </motion.h1>
+              )}
+            </AnimatePresence>
+          </div>
 
           {currentBoard && (
             <div className="flex items-center gap-2">
