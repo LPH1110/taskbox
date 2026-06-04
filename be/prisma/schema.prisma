@@ -10,18 +10,19 @@ generator client {
 model Profile {
   id         String   @id @default(uuid()) @db.Uuid
   email      String   @unique
-  password   String?  // null for OAuth users
+  password   String? // null for OAuth users
   full_name  String?
   avatar_url String?
   provider   String   @default("email") // "email" | "google"
   created_at DateTime @default(now()) @map("created_at")
 
-  boards       Board[]
-  memberships  BoardMember[]
-  workspaces   Workspace[]
+  boards                Board[]
+  memberships           BoardMember[]
+  workspaces            Workspace[]
   workspace_memberships WorkspaceMember[]
-  activities_performed  ActivityLog[] @relation("activity_actor")
+  activities_performed  ActivityLog[]         @relation("activity_actor")
   invitations_sent      WorkspaceInvitation[] @relation("invitation_inviter")
+  TaskAssignee          TaskAssignee[]
 
   @@map("profiles")
 }
@@ -60,19 +61,20 @@ model Column {
 }
 
 model Task {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
   content     String
   description String?
-  column_id   String   @map("column_id") @db.Uuid
-  board_id    String   @map("board_id") @db.Uuid
+  column_id   String    @map("column_id") @db.Uuid
+  board_id    String    @map("board_id") @db.Uuid
   priority    String?
-  position    Int      @default(0)
+  position    Int       @default(0)
   due_date    DateTime? @map("due_date")
-  created_at  DateTime @default(now()) @map("created_at")
+  created_at  DateTime  @default(now()) @map("created_at")
 
-  column     Column      @relation(fields: [column_id], references: [id], onDelete: Cascade)
-  board      Board       @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  column     Column         @relation(fields: [column_id], references: [id], onDelete: Cascade)
+  board      Board          @relation(fields: [board_id], references: [id], onDelete: Cascade)
   taskLabels TaskLabel[]
+  assignees  TaskAssignee[]
 
   @@map("tasks")
 }
@@ -101,6 +103,17 @@ model TaskLabel {
   @@map("task_labels")
 }
 
+model TaskAssignee {
+  task_id String @map("task_id") @db.Uuid
+  user_id String @map("user_id") @db.Uuid
+
+  task    Task    @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([task_id, user_id])
+  @@map("task_assignees")
+}
+
 model BoardMember {
   board_id  String   @map("board_id") @db.Uuid
   user_id   String   @map("user_id") @db.Uuid
@@ -123,10 +136,10 @@ model Workspace {
   owner_id    String   @map("owner_id") @db.Uuid
   created_at  DateTime @default(now()) @map("created_at")
 
-  owner      Profile           @relation(fields: [owner_id], references: [id], onDelete: Cascade)
-  boards     Board[]
-  members    WorkspaceMember[]
-  activities ActivityLog[]
+  owner       Profile               @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  boards      Board[]
+  members     WorkspaceMember[]
+  activities  ActivityLog[]
   invitations WorkspaceInvitation[]
 
   @@map("workspaces")
@@ -148,11 +161,11 @@ model WorkspaceMember {
 model ActivityLog {
   id           String   @id @default(uuid()) @db.Uuid
   workspace_id String   @map("workspace_id") @db.Uuid
-  actor_id     String?  @map("actor_id") @db.Uuid  // nullable — survives user deletion
-  action       String   // "member.invited" | "member.removed" | "member.role_changed" | "board.created" | "board.deleted"
+  actor_id     String?  @map("actor_id") @db.Uuid // nullable — survives user deletion
+  action       String // "member.invited" | "member.removed" | "member.role_changed" | "board.created" | "board.deleted"
   target_type  String   @map("target_type") // "member" | "board"
   target_id    String?  @map("target_id") @db.Uuid
-  metadata     Json?    // { actor_name, actor_email, target_name, target_email, role, board_title, ... }
+  metadata     Json? // { actor_name, actor_email, target_name, target_email, role, board_title, ... }
   created_at   DateTime @default(now()) @map("created_at")
 
   workspace Workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
@@ -180,5 +193,3 @@ model WorkspaceInvitation {
   @@index([token])
   @@map("workspace_invitations")
 }
-
-

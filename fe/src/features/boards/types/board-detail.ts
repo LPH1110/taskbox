@@ -15,6 +15,7 @@ export interface Task {
   priority?: "low" | "medium" | "high";
   position: number;
   labelIds: string[];
+  assigneeIds: string[];
   due_date?: string | null;
 }
 

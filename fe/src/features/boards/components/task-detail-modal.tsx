@@ -21,7 +21,6 @@ import {
   CreditCard,
   Layout,
   Trash2,
-  User,
 } from "lucide-react";
 
 import { useToast } from "@/context/ToastContext";
@@ -29,6 +28,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useEffect, useState } from "react";
 import { closeTaskDetail, deleteTask, updateTask } from "../boardDetailSlide";
 import { LabelPopover } from "./label-popover";
+import { AssigneePopover } from "./assignee-popover";
 
 export function TaskDetailModal() {
   const dispatch = useAppDispatch();
@@ -251,12 +251,7 @@ export function TaskDetailModal() {
                   <span className="text-xs font-bold text-muted-foreground">
                     Add to card
                   </span>
-                  <Button
-                    variant="secondary"
-                    className="w-full justify-start h-8 text-sm"
-                  >
-                    <User className="mr-2 h-4 w-4" /> Members
-                  </Button>
+                  <AssigneePopover taskId={task.id} />
 
                   <LabelPopover taskId={task.id} />
 

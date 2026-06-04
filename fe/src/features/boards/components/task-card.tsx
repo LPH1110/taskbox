@@ -5,6 +5,7 @@ import { Draggable } from "@hello-pangea/dnd";
 import { openTaskDetail } from "../boardDetailSlide";
 import { type Task } from "../types/board-detail";
 import { Clock } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TaskCardProps {
   task: Task;
@@ -15,6 +16,7 @@ export function TaskCard({ task, index }: TaskCardProps) {
   const dispatch = useAppDispatch();
   // Get all labels from store
   const allLabels = useAppSelector((state) => state.boardDetail.labels);
+  const allMembers = useAppSelector((state) => state.boardDetail.members);
 
   return (
     <Draggable draggableId={task.id} index={index}>
@@ -54,39 +56,60 @@ export function TaskCard({ task, index }: TaskCardProps) {
               <div className="text-sm font-medium leading-none">
                 {task.content}
               </div>
-              {(task.priority || task.due_date) && (
-                <div className="flex items-center gap-2 mt-1">
-                  {task.due_date && (() => {
-                    // Check if overdue (excluding time)
-                    const dueDate = new Date(task.due_date);
-                    dueDate.setHours(23, 59, 59, 999);
-                    const isOverdue = dueDate < new Date();
-                    return (
-                      <Badge
-                        variant={isOverdue ? "destructive" : "secondary"}
-                        className={`text-[10px] px-1.5 py-0 h-5 flex items-center gap-1 ${isOverdue ? "animate-pulse" : ""}`}
-                      >
-                        <Clock className="h-3 w-3" />
-                        {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                      </Badge>
-                    );
-                  })()}
-                  {task.priority && (
-                    <Badge
-                      variant={
-                        task.priority === "high"
-                          ? "destructive"
-                          : task.priority === "medium"
-                          ? "default"
-                          : "secondary"
-                      }
-                      className="text-[10px] px-1 py-0 h-5"
-                    >
-                      {task.priority}
-                    </Badge>
+              <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center gap-2">
+                  {(task.priority || task.due_date) && (
+                    <div className="flex items-center gap-2">
+                      {task.due_date && (() => {
+                        // Check if overdue (excluding time)
+                        const dueDate = new Date(task.due_date);
+                        dueDate.setHours(23, 59, 59, 999);
+                        const isOverdue = dueDate < new Date();
+                        return (
+                          <Badge
+                            variant={isOverdue ? "destructive" : "secondary"}
+                            className={`text-[10px] px-1.5 py-0 h-5 flex items-center gap-1 ${isOverdue ? "animate-pulse" : ""}`}
+                          >
+                            <Clock className="h-3 w-3" />
+                            {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </Badge>
+                        );
+                      })()}
+                      {task.priority && (
+                        <Badge
+                          variant={
+                            task.priority === "high"
+                              ? "destructive"
+                              : task.priority === "medium"
+                              ? "default"
+                              : "secondary"
+                          }
+                          className="text-[10px] px-1 py-0 h-5"
+                        >
+                          {task.priority}
+                        </Badge>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
+
+                {task.assigneeIds?.length > 0 && (
+                  <div className="flex -space-x-1.5 overflow-hidden shrink-0 ml-2">
+                    {task.assigneeIds.map((userId) => {
+                      const member = allMembers.find((m) => m.user_id === userId);
+                      if (!member) return null;
+                      const profile = member.profiles;
+                      const fallback = profile?.full_name?.substring(0, 2).toUpperCase() || profile?.email?.substring(0, 2).toUpperCase() || "U";
+                      return (
+                        <Avatar key={userId} className="inline-block h-6 w-6 border-2 border-card ring-card shadow-sm">
+                          <AvatarImage src={profile?.avatar_url || ""} />
+                          <AvatarFallback className="text-[10px]">{fallback}</AvatarFallback>
+                        </Avatar>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>

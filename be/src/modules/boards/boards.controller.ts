@@ -183,10 +183,22 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
   const { boardId } = req.params;
 
   try {
-    // 1. Fetch Board Meta
+    // 1. Fetch Board Meta and Owner
     const board = await prisma.board.findUnique({
       where: { id: boardId },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            email: true,
+            full_name: true,
+            avatar_url: true,
+          },
+        },
+      },
     });
+
+    if (!board) return sendError(res, "Board not found", 404);
 
     // 2. Fetch Columns (ordered by position)
     const columns = await prisma.column.findMany({
@@ -215,7 +227,7 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
     });
 
     // Adapt to same format as client expects: profiles nested under profiles key or flattened
-    const adaptedMembers = members.map((m) => ({
+    const adaptedMembers = members.map((m: any) => ({
       board_id: m.board_id,
       user_id: m.user_id,
       role: m.role,
@@ -223,10 +235,22 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
       profiles: m.profile, // Matches Redux store profiles key
     }));
 
+    // Explicitly add the owner if they aren't already in the list
+    if (board && !adaptedMembers.find(m => m.user_id === board.owner_id)) {
+      adaptedMembers.unshift({
+        board_id: board.id,
+        user_id: board.owner_id,
+        role: "admin", // Treat owner as admin
+        joined_at: board.created_at,
+        profiles: board.owner,
+      });
+    }
+
     // 5. Fetch Tasks for all board's columns
-    const columnIds = columns.map((c) => c.id);
+    const columnIds = columns.map((c: any) => c.id);
     let tasks: any[] = [];
     let taskLabels: any[] = [];
+    let taskAssignees: any[] = [];
 
     if (columnIds.length > 0) {
       tasks = await prisma.task.findMany({
@@ -234,9 +258,12 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
         orderBy: { position: "asc" },
       });
 
-      const taskIds = tasks.map((t) => t.id);
+      const taskIds = tasks.map((t: any) => t.id);
       if (taskIds.length > 0) {
         taskLabels = await prisma.taskLabel.findMany({
+          where: { task_id: { in: taskIds } },
+        });
+        taskAssignees = await prisma.taskAssignee.findMany({
           where: { task_id: { in: taskIds } },
         });
       }
@@ -249,6 +276,7 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
       labels,
       members: adaptedMembers,
       taskLabels,
+      taskAssignees,
     });
   } catch (error) {
     return next(error);

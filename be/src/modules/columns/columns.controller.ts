@@ -108,7 +108,7 @@ router.patch("/columns/:columnId/move", validate(moveColumnSchema), async (req: 
         try {
           // Perform transaction to update positions of other columns in source board
           // and move the target column
-          const result = await prisma.$transaction(async (tx) => {
+          const result = await prisma.$transaction(async (tx: any) => {
             const updated = await tx.column.update({
               where: { id: columnId },
               data: {
@@ -135,7 +135,7 @@ router.patch("/columns/:columnId/move", validate(moveColumnSchema), async (req: 
             taskIds: (await prisma.task.findMany({
               where: { column_id: columnId },
               select: { id: true },
-            })).map((t) => t.id),
+            })).map((t: any) => t.id),
           };
 
           // Notify destination board room (add column)
@@ -178,7 +178,7 @@ router.post("/columns/:columnId/copy", validate(copyColumnSchema), async (req: R
         });
 
         // Duplicate inside transaction
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
           const newCol = await tx.column.create({
             data: {
               board_id: boardId,
@@ -219,12 +219,12 @@ router.post("/columns/:columnId/copy", validate(copyColumnSchema), async (req: R
 
         const newColumnWithIds = {
           ...result.newCol,
-          taskIds: result.createdTasks.map((t) => t.id),
+          taskIds: result.createdTasks.map((t: any) => t.id),
         };
 
         // Notify client
         socketEmitter.toBoardRoom(boardId, "column:upsert", newColumnWithIds);
-        result.createdTasks.forEach((t) => {
+        result.createdTasks.forEach((t: any) => {
           socketEmitter.toBoardRoom(boardId, "task:upsert", { ...t, labelIds: [] });
         });
 

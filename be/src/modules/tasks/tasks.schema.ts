@@ -42,3 +42,10 @@ export const moveAllTasksSchema = z.object({
     targetColumnId: z.string().uuid(),
   }),
 });
+
+export const toggleTaskAssigneeSchema = z.object({
+  params: z.object({
+    taskId: z.string().uuid(),
+    userId: z.string().uuid(),
+  }),
+});

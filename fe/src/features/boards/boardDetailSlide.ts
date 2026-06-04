@@ -114,6 +114,29 @@ export const toggleTaskLabel = createAsyncThunk(
   }
 );
 
+export const toggleTaskAssignee = createAsyncThunk(
+  "boardDetail/toggleTaskAssignee",
+  async (
+    {
+      taskId,
+      userId,
+      isAdding,
+    }: { taskId: string; userId: string; isAdding: boolean },
+    { rejectWithValue }
+  ) => {
+    try {
+      if (isAdding) {
+        await api.post(`/tasks/${taskId}/assignees/${userId}`);
+      } else {
+        await api.delete(`/tasks/${taskId}/assignees/${userId}`);
+      }
+      return { taskId, userId, isAdding };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const updateLabel = createAsyncThunk(
   "boardDetail/updateLabel",
   async (
@@ -402,6 +425,7 @@ const boardDetailSlice = createSlice({
       state.tasks[task.id] = {
         ...task,
         labelIds: oldTask?.labelIds || task.labelIds || [],
+        assigneeIds: oldTask?.assigneeIds || task.assigneeIds || [],
       };
 
       // Xử lý logic di chuyển Column (nếu có)
@@ -472,6 +496,25 @@ const boardDetailSlice = createSlice({
       }
     },
 
+    realtimeTaskAssigneeEvent: (
+      state,
+      action: PayloadAction<{
+        task_id: string;
+        user_id: string;
+        type: "INSERT" | "DELETE";
+      }>
+    ) => {
+      const { task_id, user_id, type } = action.payload;
+      const task = state.tasks[task_id];
+      if (task) {
+        if (type === "INSERT" && !task.assigneeIds.includes(user_id)) {
+          task.assigneeIds.push(user_id);
+        } else if (type === "DELETE") {
+          task.assigneeIds = task.assigneeIds.filter((id) => id !== user_id);
+        }
+      }
+    },
+
     // 6. Members
     realtimeMemberEvent: (
       state,
@@ -486,6 +529,12 @@ const boardDetailSlice = createSlice({
         state.members = state.members.filter(
           (m) => m.user_id !== member.user_id
         );
+        // Clean up unassigned tasks automatically
+        Object.values(state.tasks).forEach((task) => {
+          if (task.assigneeIds) {
+            task.assigneeIds = task.assigneeIds.filter((id) => id !== member.user_id);
+          }
+        });
       }
     },
 
@@ -543,7 +592,7 @@ const boardDetailSlice = createSlice({
       })
       .addCase(fetchBoardDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        const { labels, board, columns, tasks, taskLabels, members } =
+        const { labels, board, columns, tasks, taskLabels, taskAssignees, members } =
           action.payload;
 
         state.currentBoard = board;
@@ -551,6 +600,7 @@ const boardDetailSlice = createSlice({
         const newColumns: Record<string, Column> = {};
         const newLabels: Record<string, Label> = {};
         const taskLabelMap: Record<string, string[]> = {};
+        const taskAssigneeMap: Record<string, string[]> = {};
         const newColumnOrder: string[] = [];
 
         // Normalize labels
@@ -565,6 +615,14 @@ const boardDetailSlice = createSlice({
           if (!taskLabelMap[tl.task_id]) taskLabelMap[tl.task_id] = [];
           taskLabelMap[tl.task_id].push(tl.label_id);
         });
+
+        // Map Task Assignees
+        if (taskAssignees) {
+          taskAssignees.forEach((ta: any) => {
+            if (!taskAssigneeMap[ta.task_id]) taskAssigneeMap[ta.task_id] = [];
+            taskAssigneeMap[ta.task_id].push(ta.user_id);
+          });
+        }
 
         // Process Columns
         columns.forEach((col: Column) => {
@@ -588,6 +646,7 @@ const boardDetailSlice = createSlice({
             description: task.description,
             position: task.position,
             labelIds: taskLabelMap[task.id] || [],
+            assigneeIds: taskAssigneeMap[task.id] || [],
             due_date: task.due_date,
           };
 
@@ -657,6 +716,19 @@ const boardDetailSlice = createSlice({
           if (!task.labelIds.includes(labelId)) task.labelIds.push(labelId);
         } else {
           task.labelIds = task.labelIds.filter((id) => id !== labelId);
+        }
+      }
+    });
+
+    // Handle Toggle Task Assignee
+    builder.addCase(toggleTaskAssignee.fulfilled, (state, action) => {
+      const { taskId, userId, isAdding } = action.payload;
+      const task = state.tasks[taskId];
+      if (task) {
+        if (isAdding) {
+          if (!task.assigneeIds.includes(userId)) task.assigneeIds.push(userId);
+        } else {
+          task.assigneeIds = task.assigneeIds.filter((id) => id !== userId);
         }
       }
     });
@@ -737,6 +809,7 @@ const boardDetailSlice = createSlice({
       state.tasks[task.id] = {
         ...task,
         labelIds: [],
+        assigneeIds: [],
         position: task.position ?? 99999,
       };
       const col = state.columns[task.column_id];
@@ -818,6 +891,7 @@ export const {
   realtimeMemberEvent,
   realtimeTaskDelete,
   realtimeTaskLabelEvent,
+  realtimeTaskAssigneeEvent,
   realtimeTaskUpsert,
 } = boardDetailSlice.actions;
 export default boardDetailSlice.reducer;

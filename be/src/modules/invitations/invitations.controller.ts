@@ -118,7 +118,7 @@ router.post("/:token/accept", async (req: Request, res: Response, next: NextFunc
     }
 
     // Perform database transaction to add member and update invitation
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // 1. Add member
       await tx.workspaceMember.create({
         data: {

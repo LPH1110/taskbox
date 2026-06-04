@@ -201,7 +201,7 @@ router.get("/:id/members", requireWorkspaceMember, async (req: Request, res: Res
       profiles: workspace.owner,
     };
 
-    const adaptedMembers = workspace.members.map((m) => ({
+    const adaptedMembers = workspace.members.map((m: any) => ({
       workspace_id: m.workspace_id,
       user_id: m.user_id,
       role: m.role,
@@ -341,7 +341,7 @@ router.get("/:id/invitations", requireWorkspaceAdmin, async (req: Request, res: 
     // Real-time check and update expired invitations
     const now = new Date();
     const updatedInvitations = await Promise.all(
-      invitations.map(async (inv) => {
+      invitations.map(async (inv: any) => {
         if (inv.status === "pending" && now > new Date(inv.expires_at)) {
           const updated = await prisma.workspaceInvitation.update({
             where: { id: inv.id },
@@ -568,7 +568,7 @@ router.delete("/:id/members/:userId", requireWorkspaceMember, validate(removeWor
       where: { workspace_id: id },
       select: { id: true },
     });
-    const boardIds = workspaceBoards.map((b) => b.id);
+    const boardIds = workspaceBoards.map((b: any) => b.id);
 
     if (boardIds.length > 0) {
       await prisma.boardMember.deleteMany({

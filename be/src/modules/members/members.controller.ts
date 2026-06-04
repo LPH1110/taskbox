@@ -93,6 +93,13 @@ router.delete("/boards/:boardId/members/:userId", requireBoardMember, validate(r
   const { boardId, userId } = req.params;
 
   try {
+    await prisma.taskAssignee.deleteMany({
+      where: {
+        user_id: userId,
+        task: { board_id: boardId },
+      },
+    });
+
     await prisma.boardMember.delete({
       where: {
         board_id_user_id: {

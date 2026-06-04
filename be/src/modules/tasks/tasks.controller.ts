@@ -7,6 +7,7 @@ import {
   updateTaskSchema,
   reorderTasksSchema,
   moveAllTasksSchema,
+  toggleTaskAssigneeSchema,
 } from "./tasks.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
@@ -89,7 +90,7 @@ router.patch("/tasks/:taskId", validate(updateTaskSchema), async (req: Request, 
 
         const adaptedTask = {
           ...updated,
-          labelIds: taskLabels.map((tl) => tl.label_id),
+          labelIds: taskLabels.map((tl: any) => tl.label_id),
         };
 
         socketEmitter.toBoardRoom(boardId, "task:upsert", adaptedTask);
@@ -214,7 +215,7 @@ router.post("/tasks/move-all", validate(moveAllTasksSchema), async (req: Request
         }
 
         const result = await prisma.$transaction(
-          sourceTasks.map((task, index) =>
+          sourceTasks.map((task: any, index: number) =>
             prisma.task.update({
               where: { id: task.id },
               data: {
@@ -238,6 +239,107 @@ router.post("/tasks/move-all", validate(moveAllTasksSchema), async (req: Request
         });
       } catch (e) {
         return next(e);
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// POST /api/tasks/:taskId/assignees/:userId (Assign Member to Task)
+router.post("/tasks/:taskId/assignees/:userId", validate(toggleTaskAssigneeSchema), async (req: Request, res: Response, next: NextFunction) => {
+  const { taskId, userId } = req.params;
+
+  try {
+    const boardId = await getBoardIdForTask(taskId);
+    if (!boardId) return sendError(res, "Task not found", 404);
+
+    req.params.boardId = boardId;
+    return requireBoardMember(req, res, async (err) => {
+      if (err) return next(err);
+
+      try {
+        const board = await prisma.board.findUnique({
+          where: { id: boardId },
+          select: { owner_id: true },
+        });
+
+        if (board?.owner_id !== userId) {
+          // Check if user is a valid board member and not viewer/guest
+          const boardMember = await prisma.boardMember.findUnique({
+            where: {
+              board_id_user_id: { board_id: boardId, user_id: userId },
+            },
+          });
+
+          if (!boardMember) return sendError(res, "User is not a board member", 404);
+          if (boardMember.role === "viewer" || boardMember.role === "guest") {
+            return sendError(res, "Cannot assign tasks to viewers or guests", 403);
+          }
+        }
+
+        const existing = await prisma.taskAssignee.findUnique({
+          where: {
+            task_id_user_id: { task_id: taskId, user_id: userId },
+          },
+        });
+
+        if (existing) {
+          return sendSuccess(res, { taskId, userId, isAdding: true });
+        }
+
+        await prisma.taskAssignee.create({
+          data: {
+            task_id: taskId,
+            user_id: userId,
+          },
+        });
+
+        socketEmitter.toBoardRoom(boardId, "taskAssignee:event", {
+          task_id: taskId,
+          user_id: userId,
+          type: "INSERT",
+        });
+
+        return sendSuccess(res, { taskId, userId, isAdding: true });
+      } catch (e) {
+        return next(e);
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// DELETE /api/tasks/:taskId/assignees/:userId (Unassign Member from Task)
+router.delete("/tasks/:taskId/assignees/:userId", validate(toggleTaskAssigneeSchema), async (req: Request, res: Response, next: NextFunction) => {
+  const { taskId, userId } = req.params;
+
+  try {
+    const boardId = await getBoardIdForTask(taskId);
+    if (!boardId) return sendError(res, "Task not found", 404);
+
+    req.params.boardId = boardId;
+    return requireBoardMember(req, res, async (err) => {
+      if (err) return next(err);
+
+      try {
+        await prisma.taskAssignee.delete({
+          where: {
+            task_id_user_id: { task_id: taskId, user_id: userId },
+          },
+        });
+
+        socketEmitter.toBoardRoom(boardId, "taskAssignee:event", {
+          task_id: taskId,
+          user_id: userId,
+          type: "DELETE",
+        });
+
+        return sendSuccess(res, { taskId, userId, isAdding: false });
+      } catch (e) {
+        // Ignore if not found
+        return sendSuccess(res, { taskId, userId, isAdding: false });
       }
     });
   } catch (error) {
