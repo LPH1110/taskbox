@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Clock, CreditCard, Trash2, Plus, Paperclip } from "lucide-react";
 import { AssigneePopover } from "../popovers/assignee-popover";
 import { LabelPopover } from "../popovers/label-popover";
+import { PriorityPopover } from "../popovers/priority-popover";
 import { type Task } from "../../types/board-detail";
 
 interface SidebarProps {
@@ -87,14 +88,16 @@ export function Sidebar({
             Priority
           </span>
           <div>
-            <Badge
-              variant={
-                task.priority === "high" ? "destructive" : task.priority === "medium" ? "default" : "secondary"
-              }
-              className="font-medium shadow-sm"
-            >
-              {task.priority || "No Priority"}
-            </Badge>
+            <PriorityPopover taskId={task.id}>
+              <Badge
+                variant={
+                  task.priority === "high" ? "destructive" : task.priority === "medium" ? "default" : task.priority === "low" ? "secondary" : "outline"
+                }
+                className="font-medium shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                {task.priority || "No Priority"}
+              </Badge>
+            </PriorityPopover>
           </div>
         </div>
 
@@ -125,6 +128,7 @@ export function Sidebar({
         <div className="space-y-2">
           <AssigneePopover taskId={task.id} />
           <LabelPopover taskId={task.id} />
+          <PriorityPopover taskId={task.id} />
 
           <Popover>
             <PopoverTrigger asChild>

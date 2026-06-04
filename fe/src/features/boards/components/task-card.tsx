@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Draggable } from "@hello-pangea/dnd";
 import { openTaskDetail } from "../boardDetailSlide";
 import { type Task } from "../types/board-detail";
-import { Clock } from "lucide-react";
+import { Clock, Flag } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TaskCardProps {
@@ -76,18 +76,17 @@ export function TaskCard({ task, index }: TaskCardProps) {
                         );
                       })()}
                       {task.priority && (
-                        <Badge
-                          variant={
-                            task.priority === "high"
-                              ? "destructive"
-                              : task.priority === "medium"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-[10px] px-1 py-0 h-5"
-                        >
-                          {task.priority}
-                        </Badge>
+                        <div title={`Priority: ${task.priority}`}>
+                          <Flag
+                            className={`h-3.5 w-3.5 ${
+                              task.priority === "high"
+                                ? "text-destructive fill-destructive"
+                                : task.priority === "medium"
+                                ? "text-orange-500 fill-orange-500"
+                                : "text-blue-500 fill-blue-500"
+                            }`}
+                          />
+                        </div>
                       )}
                     </div>
                   )}
