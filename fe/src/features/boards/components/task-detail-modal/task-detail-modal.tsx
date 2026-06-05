@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { closeTaskDetail, updateTask } from "../../boardDetailSlide";
 import { CommentSection } from "../comment-section";
 import { AttachmentSection } from "../attachment-section";
+import { isOverdue } from "../../utils/format-due-date";
 
 import { Header } from "./header";
 import { Description } from "./description";
@@ -104,11 +105,7 @@ export function TaskDetailModal() {
     return member ? [member] : [];
   });
 
-  const isOverdue = task.due_date && (() => {
-    const dueDate = new Date(task.due_date);
-    dueDate.setHours(23, 59, 59, 999);
-    return dueDate < new Date();
-  })();
+  const isTaskOverdue = task.due_date ? isOverdue(task.due_date) : false;
 
   return (
     <Dialog open={!!selectedTaskId} onOpenChange={handleOpenChange}>
@@ -163,7 +160,7 @@ export function TaskDetailModal() {
             <Sidebar
               task={task}
               taskAssignees={taskAssignees}
-              isOverdue={!!isOverdue}
+              isOverdue={isTaskOverdue}
               handleSetDueDate={handleSetDueDate}
               setIsMoveDialogOpen={setIsMoveDialogOpen}
               setIsDeleteDialogOpen={setIsDeleteDialogOpen}

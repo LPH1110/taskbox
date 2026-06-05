@@ -8,6 +8,7 @@ import {
   reorderTasksSchema,
   moveAllTasksSchema,
   toggleTaskAssigneeSchema,
+  timelineQuerySchema,
 } from "./tasks.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
@@ -24,6 +25,63 @@ async function getBoardIdForTask(taskId: string) {
   });
   return task?.board_id;
 }
+
+// GET /api/workspaces/:workspaceId/tasks/timeline
+router.get("/workspaces/:workspaceId/tasks/timeline", validate(timelineQuerySchema), async (req: Request, res: Response, next: NextFunction) => {
+  const { workspaceId } = req.params;
+  const { from, to, boardId } = req.query as { from: string; to: string; boardId?: string };
+  const userId = req.user!.id;
+
+  try {
+    const tasks = await prisma.task.findMany({
+      where: {
+        due_date: {
+          gte: new Date(from),
+          lte: new Date(to),
+        },
+        column: {
+          board: {
+            workspace_id: workspaceId,
+            OR: [
+              { owner_id: userId },
+              { members: { some: { user_id: userId } } },
+              { type: "public" },
+            ],
+            ...(boardId ? { id: boardId } : {}),
+          },
+        },
+      },
+      include: {
+        column: {
+          select: { title: true, board: { select: { id: true, title: true, background_image: true } } }
+        },
+        assignees: {
+          include: { profile: { select: { id: true, full_name: true, avatar_url: true } } }
+        },
+        taskLabels: {
+          include: { label: true }
+        }
+      },
+      orderBy: { due_date: 'asc' },
+    });
+
+    // Format tasks for the frontend
+    const formattedTasks = tasks.map((task: any) => ({
+      id: task.id,
+      content: task.content,
+      due_date: task.due_date,
+      priority: task.priority,
+      board: task.column.board,
+      column: { title: task.column.title },
+      assignees: task.assignees.map((ta: any) => ta.profile),
+      labels: task.taskLabels.map((tl: any) => tl.label),
+    }));
+
+    return sendSuccess(res, formattedTasks);
+  } catch (error) {
+    return next(error);
+  }
+});
 
 // POST /api/columns/:columnId/tasks (Create Task)
 router.post("/columns/:columnId/tasks", validate(createTaskSchema), async (req: Request, res: Response, next: NextFunction) => {

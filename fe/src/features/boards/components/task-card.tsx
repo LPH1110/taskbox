@@ -6,6 +6,7 @@ import { openTaskDetail } from "../boardDetailSlide";
 import { type Task } from "../types/board-detail";
 import { Clock, Flag } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatDueDate, isOverdue } from "../utils/format-due-date";
 
 interface TaskCardProps {
   task: Task;
@@ -61,17 +62,14 @@ export function TaskCard({ task, index }: TaskCardProps) {
                   {(task.priority || task.due_date) && (
                     <div className="flex items-center gap-2">
                       {task.due_date && (() => {
-                        // Check if overdue (excluding time)
-                        const dueDate = new Date(task.due_date);
-                        dueDate.setHours(23, 59, 59, 999);
-                        const isOverdue = dueDate < new Date();
+                        const isTaskOverdue = isOverdue(task.due_date);
                         return (
                           <Badge
-                            variant={isOverdue ? "destructive" : "secondary"}
-                            className={`text-[10px] px-1.5 py-0 h-5 flex items-center gap-1 ${isOverdue ? "animate-pulse" : ""}`}
+                            variant={isTaskOverdue ? "destructive" : "secondary"}
+                            className={`text-[10px] px-1.5 py-0 h-5 flex items-center gap-1 ${isTaskOverdue ? "animate-pulse" : ""}`}
                           >
                             <Clock className="h-3 w-3" />
-                            {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            {formatDueDate(task.due_date, { short: true })}
                           </Badge>
                         );
                       })()}

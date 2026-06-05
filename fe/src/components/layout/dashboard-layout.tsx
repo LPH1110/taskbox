@@ -1,8 +1,20 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { useLocation, useOutlet } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import { cn } from "@/lib/utils";
+
+/**
+ * Captures the outlet element at mount time so the exiting
+ * AnimatePresence wrapper keeps rendering the OLD page
+ * instead of immediately switching to the new route's component.
+ */
+function FrozenOutlet() {
+  const outlet = useOutlet();
+  const [frozen] = useState(outlet);
+  return frozen;
+}
 
 // SEO metadata comments for validation script: title="Taskbox Dashboard" name="description" og:title
 export default function DashboardLayout() {
@@ -33,7 +45,7 @@ export default function DashboardLayout() {
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 className="w-full h-full"
               >
-                <Outlet />
+                <FrozenOutlet />
               </motion.div>
             </AnimatePresence>
           </div>

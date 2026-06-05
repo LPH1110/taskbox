@@ -49,3 +49,14 @@ export const toggleTaskAssigneeSchema = z.object({
     userId: z.string().uuid(),
   }),
 });
+
+export const timelineQuerySchema = z.object({
+  params: z.object({
+    workspaceId: z.string().uuid(),
+  }),
+  query: z.object({
+    from: z.string().datetime(),
+    to: z.string().datetime(),
+    boardId: z.string().uuid().optional(),
+  }),
+});

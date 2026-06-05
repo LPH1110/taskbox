@@ -3,6 +3,7 @@ import authReducer from "@/features/auth/authSlice";
 import boardsReducer from "@/features/boards/boardsSlice";
 import boardDetailReducer from "@/features/boards/boardDetailSlide";
 import workspacesReducer from "@/features/workspaces/workspacesSlice";
+import plannerReducer from "@/features/planner/plannerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     boards: boardsReducer,
     boardDetail: boardDetailReducer,
     workspaces: workspacesReducer,
+    planner: plannerReducer,
   },
 });
 

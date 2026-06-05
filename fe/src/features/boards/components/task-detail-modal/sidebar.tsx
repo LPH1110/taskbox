@@ -10,6 +10,7 @@ import { AssigneePopover } from "../popovers/assignee-popover";
 import { LabelPopover } from "../popovers/label-popover";
 import { PriorityPopover } from "../popovers/priority-popover";
 import { type Task } from "../../types/board-detail";
+import { formatDueDate } from "../../utils/format-due-date";
 
 interface SidebarProps {
   task: Task;
@@ -110,7 +111,7 @@ export function Sidebar({
             <div>
               <Badge variant={isOverdue ? "destructive" : "secondary"} className="font-medium flex w-fit items-center gap-1.5 shadow-sm">
                 <Clock className="h-3.5 w-3.5" />
-                {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                {formatDueDate(task.due_date)}
                 {isOverdue && <span className="ml-1 uppercase text-[10px] bg-background/20 px-1 rounded">Overdue</span>}
               </Badge>
             </div>

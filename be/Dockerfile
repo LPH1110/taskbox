@@ -13,8 +13,8 @@ RUN npm ci
 COPY tsconfig.json ./
 COPY src ./src
 
-RUN npm run build
 RUN npx prisma generate
+RUN npm run build
 
 # Production Stage
 FROM node:20-alpine

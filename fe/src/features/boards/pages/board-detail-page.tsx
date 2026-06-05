@@ -5,7 +5,7 @@ import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
 import { Check, ChevronDown, Filter, Globe, Lock, UserPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import {
   fetchBoardDetails,
   moveColumn,
@@ -24,6 +24,7 @@ import {
   updateBoardDetails,
   updateColumnOrder,
   updateTaskOrder,
+  openTaskDetail,
 } from "../boardDetailSlide";
 import {
   DropdownMenu,
@@ -44,6 +45,7 @@ import type { Column, Label, Task, Comment, Attachment } from "../types/board-de
 
 export default function BoardDetailPage() {
   const { boardId } = useParams();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const { tasks, columns, columnOrder, isLoading, currentBoard, members } =
@@ -112,6 +114,20 @@ export default function BoardDetailPage() {
       dispatch(fetchBoardDetails(boardId));
     }
   }, [dispatch, boardId]);
+
+  // Handle auto-opening task via navigation state (from planner deep-link)
+  useEffect(() => {
+    const openTaskId = (location.state as { openTaskId?: string })?.openTaskId;
+    if (openTaskId && !isLoading && Object.keys(tasks).length > 0) {
+      if (tasks[openTaskId]) {
+        dispatch(openTaskDetail(openTaskId));
+      } else {
+        addToast("Task not found on this board", "error");
+      }
+      // Clear location state so back-navigation doesn't re-open
+      window.history.replaceState({}, "");
+    }
+  }, [location.state, isLoading, tasks, dispatch, addToast]);
 
   // Realtime updates via Socket.IO
   useEffect(() => {
@@ -330,9 +346,8 @@ export default function BoardDetailPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.1 } }}
                   transition={{ duration: 0.15, ease: "easeOut" }}
-                  className={`text-xl font-bold tracking-tight text-white drop-shadow-sm px-2 py-0.5 -ml-2 rounded transition-colors whitespace-nowrap ${
-                    canModifyVisibility ? "cursor-pointer hover:bg-white/20" : ""
-                  }`}
+                  className={`text-xl font-bold tracking-tight text-white drop-shadow-sm px-2 py-0.5 -ml-2 rounded transition-colors whitespace-nowrap ${canModifyVisibility ? "cursor-pointer hover:bg-white/20" : ""
+                    }`}
                   onClick={() => {
                     if (canModifyVisibility) {
                       setTitleInput(currentBoard?.title || "");
