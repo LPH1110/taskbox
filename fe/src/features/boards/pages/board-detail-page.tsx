@@ -321,7 +321,7 @@ export default function BoardDetailPage() {
       }
     >
       {/* Sleek Header */}
-      <div className="flex items-center justify-between px-6 py-4 shrink-0 bg-background/30 backdrop-blur-md border-b border-white/10 dark:border-white/5 shadow-sm relative z-10">
+      <div className="flex items-center justify-between px-6 py-4 shrink-0 bg-background/30 backdrop-blur-md border-b border-black/5 dark:border-white/5 shadow-sm relative z-10">
         <div className="flex items-center gap-3">
           <div className="relative flex items-center h-8">
             <AnimatePresence mode="popLayout">
@@ -333,7 +333,7 @@ export default function BoardDetailPage() {
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.1 } }}
                   transition={{ duration: 0.15, ease: "easeOut" }}
                   autoFocus
-                  className="text-xl font-bold tracking-tight text-white bg-white/20 border-0 rounded px-2 py-0.5 -ml-2 outline-none focus:ring-2 focus:ring-white/50 h-8 w-auto min-w-[150px] max-w-[200px] md:max-w-[400px]"
+                  className="text-xl font-bold tracking-tight text-foreground bg-black/5 dark:bg-white/10 border-0 rounded px-2 py-0.5 -ml-2 outline-none focus:ring-2 focus:ring-primary/50 h-8 w-auto min-w-[150px] max-w-[200px] md:max-w-[400px]"
                   value={titleInput}
                   onChange={(e) => setTitleInput(e.target.value)}
                   onBlur={handleTitleSubmit}
@@ -346,7 +346,7 @@ export default function BoardDetailPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.1 } }}
                   transition={{ duration: 0.15, ease: "easeOut" }}
-                  className={`text-xl font-bold tracking-tight text-white drop-shadow-sm px-2 py-0.5 -ml-2 rounded transition-colors whitespace-nowrap ${canModifyVisibility ? "cursor-pointer hover:bg-white/20" : ""
+                  className={`text-xl font-bold tracking-tight text-foreground drop-shadow-sm px-2 py-0.5 -ml-2 rounded transition-colors whitespace-nowrap ${canModifyVisibility ? "cursor-pointer hover:bg-black/5 dark:hover:bg-white/10" : ""
                     }`}
                   onClick={() => {
                     if (canModifyVisibility) {
@@ -369,7 +369,7 @@ export default function BoardDetailPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 text-xs bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm gap-1.5 px-2.5 cursor-pointer"
+                      className="h-7 text-xs bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-foreground border-0 backdrop-blur-sm gap-1.5 px-2.5 cursor-pointer"
                     >
                       {currentBoard.type === "public" ? (
                         <>
@@ -415,7 +415,7 @@ export default function BoardDetailPage() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs bg-white/20 text-white/90 rounded-md backdrop-blur-sm">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs bg-black/5 dark:bg-white/10 text-foreground/90 rounded-md backdrop-blur-sm">
                   {currentBoard.type === "public" ? (
                     <>
                       <Globe className="h-3.5 w-3.5" />
@@ -449,7 +449,7 @@ export default function BoardDetailPage() {
           <Button
             variant="secondary"
             size="sm"
-            className="opacity-95 hover:opacity-100 shadow-sm bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-md"
+            className="opacity-95 hover:opacity-100 shadow-sm bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-foreground border-0 backdrop-blur-md"
           >
             <Filter className="mr-2 h-4 w-4" /> Filter
           </Button>

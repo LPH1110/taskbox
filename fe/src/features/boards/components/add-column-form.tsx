@@ -23,14 +23,14 @@ export const AddColumnForm = () => {
 
   if (isEditing) {
     return (
-      <div className="w-72 shrink-0 rounded-xl bg-background/95 p-3 border border-white/20 dark:border-white/10 shadow-lg h-fit">
+      <div className="w-72 shrink-0 rounded-xl bg-background/95 p-3 border border-black/10 dark:border-white/10 shadow-lg h-fit">
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input
             autoFocus
             placeholder="Enter list title..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-background/50 border-white/10 focus-visible:ring-1 focus-visible:ring-primary shadow-inner"
+            className="bg-background/50 border-black/10 dark:border-white/10 focus-visible:ring-1 focus-visible:ring-primary shadow-inner"
           />
           <div className="flex items-center gap-2">
             <Button type="submit" size="sm" className="shadow-sm">
@@ -54,9 +54,9 @@ export const AddColumnForm = () => {
   return (
     <div
       onClick={() => setIsEditing(true)}
-      className="w-72 shrink-0 rounded-xl bg-background/30 backdrop-blur-sm border border-white/10 dark:border-white/5 p-3 flex items-center justify-start cursor-pointer hover:bg-background/50 transition-colors shadow-sm h-12"
+      className="w-72 shrink-0 rounded-xl bg-background/30 backdrop-blur-sm border border-black/10 dark:border-white/5 p-3 flex items-center justify-start cursor-pointer hover:bg-background/50 transition-colors shadow-sm h-12"
     >
-      <span className="text-white drop-shadow-sm text-sm font-medium flex items-center gap-2 pl-2">
+      <span className="text-foreground drop-shadow-sm text-sm font-medium flex items-center gap-2 pl-2">
         <Plus className="h-4 w-4" /> Add another list
       </span>
     </div>

@@ -40,8 +40,8 @@ export function MonthView({ tasks, currentDate }: MonthViewProps) {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-card/50 rounded-xl border border-white/10 overflow-hidden shadow-sm backdrop-blur-sm">
-      <div className="grid grid-cols-7 border-b border-white/10 bg-muted/30">
+    <div className="flex flex-col h-full w-full bg-card/50 rounded-xl border border-black/10 dark:border-white/10 overflow-hidden shadow-sm backdrop-blur-sm">
+      <div className="grid grid-cols-7 border-b border-black/10 dark:border-white/10 bg-muted/30">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
           <div key={day} className="py-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {day}
@@ -58,7 +58,7 @@ export function MonthView({ tasks, currentDate }: MonthViewProps) {
           return (
             <div
               key={day.toISOString()}
-              className={`min-h-[100px] p-1.5 border-r border-b border-white/10 ${!isCurrentMonth ? 'bg-muted/10 opacity-50' : isToday ? 'bg-primary/5' : ''}`}
+              className={`min-h-[100px] p-1.5 border-r border-b border-black/10 dark:border-white/10 ${!isCurrentMonth ? 'bg-muted/10 opacity-50' : isToday ? 'bg-primary/5' : ''}`}
             >
               <div className={`text-xs font-medium mb-1.5 ml-1 ${isToday ? 'text-primary bg-primary/20 w-6 h-6 rounded-full flex items-center justify-center' : ''}`}>
                 {format(day, 'd')}

@@ -85,7 +85,7 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
           <div
             ref={provided.innerRef}
             {...provided.draggableProps}
-            className="max-h-full h-fit flex flex-col w-72 rounded-xl bg-background/95 border border-white/20 dark:border-white/10 shadow-lg shrink-0"
+            className="max-h-full h-fit flex flex-col w-72 rounded-xl bg-background/95 border border-black/10 dark:border-white/10 shadow-lg shrink-0"
           >
             <div
               {...provided.dragHandleProps}

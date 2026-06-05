@@ -81,7 +81,7 @@ export default function TimelinePage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 bg-muted/30 p-1.5 rounded-lg border border-white/5">
+        <div className="flex items-center gap-3 bg-muted/30 p-1.5 rounded-lg border border-black/5 dark:border-white/5">
           <Button variant="ghost" size="icon" onClick={handlePrev} className="h-8 w-8 hover:bg-background">
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -115,7 +115,7 @@ export default function TimelinePage() {
             </Select>
           </div>
 
-          <div className="flex bg-muted/50 p-1 rounded-md border border-white/5">
+          <div className="flex bg-muted/50 p-1 rounded-md border border-black/5 dark:border-white/5">
             <Button
               variant="ghost"
               size="sm"
@@ -155,7 +155,7 @@ export default function TimelinePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-xl bg-card/30"
+              className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-black/10 dark:border-white/10 rounded-xl bg-card/30"
             >
               <div className="w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mb-4">
                 <CalendarDays className="h-10 w-10 text-muted-foreground opacity-50" />

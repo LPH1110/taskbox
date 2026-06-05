@@ -40,7 +40,7 @@ export function DeleteTaskDialog({
       dispatch(closeTaskDetail());
       addToast("Task deleted", "success");
       onClose();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       addToast("Failed to delete task", "error");
     } finally {
@@ -69,7 +69,7 @@ export function DeleteTaskDialog({
               handleDelete();
             }}
             disabled={loading}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-destructive text-white hover:bg-destructive/90"
           >
             {loading ? (
               <>

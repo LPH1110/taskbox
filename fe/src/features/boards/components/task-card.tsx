@@ -31,7 +31,7 @@ export function TaskCard({ task, index }: TaskCardProps) {
           style={{ ...provided.draggableProps.style }}
         >
           <Card
-            className={`p-0 cursor-grab transition-all duration-200 border-white/20 dark:border-white/10 ${
+            className={`p-0 cursor-grab transition-all duration-200 border-black/10 dark:border-white/10 ${
               snapshot.isDragging 
                 ? "opacity-95 ring-2 ring-primary shadow-xl" 
                 : "shadow-sm hover:shadow-md hover:border-primary/30"

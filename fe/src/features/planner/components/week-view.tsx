@@ -20,7 +20,7 @@ export function WeekView({ tasks, currentDate }: WeekViewProps) {
   const today = new Date();
 
   return (
-    <div className="flex h-full w-full bg-card/50 rounded-xl border border-white/10 overflow-hidden shadow-sm backdrop-blur-sm">
+    <div className="flex h-full w-full bg-card/50 rounded-xl border border-black/10 dark:border-white/10 overflow-hidden shadow-sm backdrop-blur-sm">
       {days.map((day) => {
         const isToday = isSameDay(day, today);
         const dayTasks = tasksByDay[day.toISOString()] || [];
@@ -28,9 +28,9 @@ export function WeekView({ tasks, currentDate }: WeekViewProps) {
         return (
           <div 
             key={day.toISOString()} 
-            className={`flex-1 flex flex-col border-r border-white/10 last:border-r-0 ${isToday ? 'bg-primary/5' : ''}`}
+            className={`flex-1 flex flex-col border-r border-black/10 dark:border-white/10 last:border-r-0 ${isToday ? 'bg-primary/5' : ''}`}
           >
-            <div className={`p-3 text-center border-b border-white/10 ${isToday ? 'bg-primary/10' : 'bg-muted/30'}`}>
+            <div className={`p-3 text-center border-b border-black/10 dark:border-white/10 ${isToday ? 'bg-primary/10' : 'bg-muted/30'}`}>
               <div className={`text-xs font-semibold uppercase tracking-wider ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
                 {format(day, 'EEE')}
               </div>

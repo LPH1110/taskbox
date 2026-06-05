@@ -92,7 +92,7 @@ export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
         </motion.div>
       </PopoverTrigger>
 
-      <PopoverContent className="w-80 p-4 rounded-xl shadow-lg border border-white/10" align="start">
+      <PopoverContent className="w-80 p-4 rounded-xl shadow-lg border border-black/10 dark:border-white/10" align="start">
         <div className="space-y-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
