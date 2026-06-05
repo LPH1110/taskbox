@@ -15,10 +15,10 @@ export function Sidebar({ className }: SidebarProps) {
 
   const activeWorkspaceBoards = boards.filter((b) => b.workspace_id === activeWorkspaceId);
 
-  // Navigation items configuration
-  const navItems = [
+  // Global Navigation items
+  const globalNavItems = [
     {
-      title: "Dashboard",
+      title: "Home",
       href: "/",
       icon: LayoutDashboard,
     },
@@ -34,6 +34,17 @@ export function Sidebar({ className }: SidebarProps) {
     },
   ];
 
+  // Workspace-specific Navigation items
+  const workspaceNavItems = activeWorkspaceId
+    ? [
+        {
+          title: "Timeline",
+          href: `/workspaces/${activeWorkspaceId}/planner`,
+          icon: CalendarDays,
+        },
+      ]
+    : [];
+
   return (
     <div className={cn("pb-12 border-r bg-background", className)}>
       <div className="space-y-4 py-4">
@@ -42,12 +53,15 @@ export function Sidebar({ className }: SidebarProps) {
 
         <div className="px-3 py-2">
           <div className="space-y-1">
-            <nav className="grid items-start gap-2">
-              {navItems.map((item, index) => {
+            <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Overview
+            </h2>
+            <nav className="grid items-start gap-1">
+              {globalNavItems.map((item, index) => {
                 const isActive =
                   item.href === "/"
                     ? location.pathname === "/"
-                    : location.pathname.startsWith(item.href);
+                    : location.pathname.startsWith(item.href) && !location.pathname.includes("/planner");
 
                 return (
                   <NavLink
@@ -57,12 +71,12 @@ export function Sidebar({ className }: SidebarProps) {
                       "relative group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-accent-foreground",
                       isActive
                         ? "text-accent-foreground"
-                        : "text-muted-foreground hover:bg-accent/40"
+                        : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
                     )}
                   >
                     {isActive && (
                       <motion.div
-                        layoutId="activeNavPill"
+                        layoutId="activeGlobalNavPill"
                         className="absolute inset-0 rounded-md bg-accent z-0"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
@@ -78,28 +92,50 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         </div>
 
-        {/* Dynamic Workspace Boards Section */}
+        {/* Dynamic Workspace Section */}
         {activeWorkspaceId && (
-          <div className="px-3 py-2">
-            <div className="mb-4">
-              <NavLink
-                to={`/workspaces/${activeWorkspaceId}/planner`}
-                className={({ isActive }) => cn(
-                  "relative group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-accent-foreground",
-                  isActive
-                    ? "text-accent-foreground bg-accent/60"
-                    : "text-muted-foreground hover:bg-accent/40"
-                )}
-              >
-                <CalendarDays className="mr-2 h-4 w-4 text-primary" />
-                <span className="font-semibold text-primary">Timeline Planner</span>
-              </NavLink>
+          <>
+            <div className="px-3 py-2">
+              <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Workspace Views
+              </h2>
+              <nav className="grid items-start gap-1">
+                {workspaceNavItems.map((item, index) => {
+                  const isActive = location.pathname.startsWith(item.href);
+
+                  return (
+                    <NavLink
+                      key={index}
+                      to={item.href}
+                      className={cn(
+                        "relative group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-accent-foreground",
+                        isActive
+                          ? "text-primary"
+                          : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                      )}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeWorkspaceNavPill"
+                          className="absolute inset-0 rounded-md bg-primary/10 z-0"
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        />
+                      )}
+                      <span className="relative z-10 flex items-center">
+                        <item.icon className={cn("mr-2 h-4 w-4", isActive && "text-primary")} />
+                        <span className={cn(isActive && "font-semibold")}>{item.title}</span>
+                      </span>
+                    </NavLink>
+                  );
+                })}
+              </nav>
             </div>
 
-            <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Workspace Boards
-            </h2>
-            <ScrollArea className="h-75 px-1">
+            <div className="px-3 py-2">
+              <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Boards
+              </h2>
+              <ScrollArea className="h-[calc(100vh-[450px])] min-h-[200px] px-1">
               <div className="space-y-1 p-1">
                 {activeWorkspaceBoards.length === 0 ? (
                   <div className="px-4 py-3 text-xs text-muted-foreground border border-dashed rounded-sm">
@@ -119,7 +155,8 @@ export function Sidebar({ className }: SidebarProps) {
                 )}
               </div>
             </ScrollArea>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>
