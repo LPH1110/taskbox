@@ -1,8 +1,5 @@
-import { AuthLayout } from "@/components/layout/auth-layout";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { ProtectedRoute } from "@/components/layout/protected-route";
-import { LoginForm } from "@/features/auth/components/login-form";
-import { RegisterForm } from "@/features/auth/components/register-form";
 import BoardDetailPage from "@/features/boards/pages/board-detail-page";
 import BoardsListPage from "@/features/boards/pages/boards-list-page";
 import DashboardPage from "@/features/boards/pages/dashboard-page";
@@ -12,20 +9,15 @@ import WorkspaceListPage from "@/features/workspaces/pages/workspace-list-page";
 import WorkspaceDetailPage from "@/features/workspaces/pages/workspace-detail-page";
 import InvitationPage from "@/features/workspaces/pages/invitation-page";
 import TimelinePage from "@/features/planner/pages/timeline-page";
+import LandingPage from "@/features/landing/pages/landing-page";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
   {
-    // Public Routes (Login, Register, Landing Page)
-    element: <AuthLayout />,
-    children: [
-      {
-        path: "/login",
-        element: <LoginForm />,
-      },
-      { path: "/register", element: <RegisterForm /> },
-    ],
+    path: "/",
+    element: <LandingPage />,
   },
+
   {
     path: "/invitations/:token",
     element: <InvitationPage />,
@@ -42,7 +34,7 @@ export const router = createBrowserRouter([
             element: <BoardDetailPage />,
           },
           {
-            path: "/",
+            path: "/dashboard",
             element: <DashboardPage />,
           },
           {

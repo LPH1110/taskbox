@@ -152,7 +152,7 @@ export default function InvitationPage() {
                   variant="outline"
                   className="w-full border-input/30 hover:bg-input/10"
                 >
-                  <Link to={`/login?invite_token=${token}&email=${encodeURIComponent(details.email)}`}>
+                  <Link to={`/?mode=login&invite_token=${token}&email=${encodeURIComponent(details.email)}`}>
                     Log In
                   </Link>
                 </Button>
@@ -160,7 +160,7 @@ export default function InvitationPage() {
                   asChild
                   className="w-full bg-cyan-600 hover:bg-cyan-500 text-white"
                 >
-                  <Link to={`/register?invite_token=${token}&email=${encodeURIComponent(details.email)}`}>
+                  <Link to={`/?mode=register&invite_token=${token}&email=${encodeURIComponent(details.email)}`}>
                     Sign Up <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -179,7 +179,7 @@ export default function InvitationPage() {
                 variant="outline"
                 className="w-full border-input/30 hover:bg-input/10"
               >
-                <Link to="/login">Switch Account</Link>
+                <Link to="/?mode=login">Switch Account</Link>
               </Button>
             </div>
           ) : (

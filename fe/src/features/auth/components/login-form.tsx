@@ -1,17 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardContent
 } from "@/components/ui/card";
 import {
   Form,
@@ -23,12 +19,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { login, checkAuthSession } from "../authSlice";
 import { GoogleAuthButton } from "@/components/ui/google-auth-btn";
 import { useToast } from "@/context/ToastContext";
 import { api } from "@/lib/api";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { login } from "../authSlice";
 
 // 1. Define validation schema using Zod
 const formSchema = z.object({
@@ -60,33 +56,6 @@ export function LoginForm() {
     },
   });
 
-  // Extract OAuth token from query parameters on redirect
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-    if (token) {
-      localStorage.setItem("taskbox_token", token);
-      dispatch(checkAuthSession()).unwrap().then(() => {
-        const invite = params.get("invite_token");
-        if (invite) {
-          api.post<any, { success: boolean; data: { workspaceId: string } }>(`/invitations/${invite}/accept`)
-            .then((res) => {
-              addToast("Successfully joined the workspace!", "success");
-              navigate(`/workspaces/${res.data.workspaceId}`);
-            })
-            .catch((err) => {
-              addToast(err.message || "Failed to auto-accept invitation", "error");
-              navigate("/");
-            });
-        } else {
-          navigate("/");
-        }
-      }).catch((err: any) => {
-        console.error("Session check after OAuth redirect failed:", err);
-      });
-    }
-  }, [dispatch, navigate, addToast]);
-
   // 4. Handle form submission
   async function onSubmit(values: LoginFormValues) {
     try {
@@ -113,12 +82,6 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-md shadow-lg">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
-        <CardDescription className="text-center">
-          Enter your email and password to access your workspace
-        </CardDescription>
-      </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -175,14 +138,6 @@ export function LoginForm() {
 
         <GoogleAuthButton />
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <a href="/register" className="text-primary hover:underline">
-            Sign up
-          </a>
-        </p>
-      </CardFooter>
     </Card>
   );
 }

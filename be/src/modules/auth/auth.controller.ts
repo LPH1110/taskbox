@@ -105,13 +105,13 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
 // GET /api/auth/google/callback
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: `${env.CLIENT_URL}/login` }),
+  passport.authenticate("google", { session: false, failureRedirect: `${env.CLIENT_URL}/` }),
   (req: Request, res: Response) => {
     const user = req.user as any;
     const token = signToken({ id: user.id, email: user.email });
 
     // Send JWT token as a query parameter back to client dashboard/auth page
-    return res.redirect(`${env.CLIENT_URL}/login?token=${token}`);
+    return res.redirect(`${env.CLIENT_URL}/?token=${token}`);
   }
 );
 

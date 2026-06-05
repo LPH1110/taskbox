@@ -7,11 +7,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardContent
 } from "@/components/ui/card";
 import {
   Form,
@@ -23,12 +19,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { register } from "../authSlice";
 import { GoogleAuthButton } from "@/components/ui/google-auth-btn";
 import { useToast } from "@/context/ToastContext";
 import { api } from "@/lib/api";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { register } from "../authSlice";
 
 // 1. Define validation schema using Zod
 const formSchema = z.object({
@@ -88,14 +84,6 @@ export function RegisterForm() {
 
   return (
     <Card className="w-full max-w-md shadow-lg">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">
-          Register
-        </CardTitle>
-        <CardDescription className="text-center">
-          Enter your email, full name and password to access your workspace
-        </CardDescription>
-      </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -167,14 +155,6 @@ export function RegisterForm() {
 
         <GoogleAuthButton />
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <a href="/login" className="text-primary hover:underline">
-            Sign in
-          </a>
-        </p>
-      </CardFooter>
     </Card>
   );
 }

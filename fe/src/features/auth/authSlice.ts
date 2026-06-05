@@ -110,7 +110,8 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     // Check Session
     builder.addCase(checkAuthSession.pending, (state) => {
-      state.isLoading = true;
+      // Do not set isLoading = true here, as it will unmount the RouterProvider in App.tsx
+      // state.isLoading is already true by default for the initial load.
     });
     builder.addCase(checkAuthSession.fulfilled, (state, action) => {
       state.isLoading = false;

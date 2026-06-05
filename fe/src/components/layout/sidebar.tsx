@@ -19,7 +19,7 @@ export function Sidebar({ className }: SidebarProps) {
   const globalNavItems = [
     {
       title: "Home",
-      href: "/",
+      href: "/dashboard",
       icon: LayoutDashboard,
     },
     {
@@ -59,8 +59,8 @@ export function Sidebar({ className }: SidebarProps) {
             <nav className="grid items-start gap-1">
               {globalNavItems.map((item, index) => {
                 const isActive =
-                  item.href === "/"
-                    ? location.pathname === "/"
+                  item.href === "/dashboard"
+                    ? location.pathname === "/dashboard"
                     : location.pathname.startsWith(item.href) && !location.pathname.includes("/planner");
 
                 return (
