@@ -81,7 +81,7 @@ export function LoginForm() {
   const { error } = useAppSelector((state) => state.auth);
 
   return (
-    <Card className="w-full max-w-md shadow-lg">
+    <Card className="w-full max-w-md mx-auto shadow-lg">
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

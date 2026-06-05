@@ -134,12 +134,21 @@ export default function LandingPage() {
       </div>
 
       {/* RIGHT PANEL: Auth Gateway (30%) */}
-      <div className="w-full lg:w-[30%] min-w-[400px] h-screen sticky top-0 bg-background/95 backdrop-blur-md shadow-2xl z-20 flex flex-col border-l border-border/50">
-        <div className="flex-1 overflow-y-auto px-8 py-12 flex flex-col justify-center relative">
+      <div className="w-full lg:w-[30%] min-w-[320px] lg:min-w-[400px] h-screen sticky top-0 bg-background/95 backdrop-blur-md shadow-2xl z-20 flex flex-col border-l border-border/50">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 pt-24 pb-8 sm:py-12 flex flex-col justify-center relative">
 
-          {/* Animated Toggle Switch */}
-          <div className="absolute top-8 right-8 left-8">
-            <div className="relative flex items-center p-1 bg-muted rounded-lg w-full max-w-[240px] mx-auto lg:mx-0 lg:ml-auto">
+          {/* Top Header: Brand (Mobile) + Toggle */}
+          <div className="absolute top-6 left-4 right-4 sm:top-8 sm:left-8 sm:right-8 flex items-center justify-between">
+            {/* Mobile Brand (Hidden on desktop) */}
+            <div className="flex lg:hidden items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                <LayoutTemplate className="text-primary-foreground w-4 h-4" />
+              </div>
+              <span className="text-lg font-bold tracking-tight">Taskbox</span>
+            </div>
+
+            {/* Animated Toggle Switch */}
+            <div className="relative flex items-center p-1 bg-muted rounded-lg w-[180px] sm:w-[240px] ml-auto">
               {/* Sliding Indicator */}
               <motion.div
                 className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background rounded-md shadow-sm border border-border/50"
@@ -172,7 +181,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mb-8 mt-12 text-center lg:text-left">
+          <div className="mb-8 mt-12 text-center lg:text-left max-w-md mx-auto lg:mx-0 w-full">
             <h2 className="text-2xl font-bold tracking-tight text-foreground mb-2">
               {isLogin ? "Welcome back" : "Create an account"}
             </h2>
