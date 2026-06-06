@@ -36,6 +36,7 @@ import {
   LogOut,
   Shield,
   ShieldCheck,
+  User,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -47,7 +48,7 @@ export function MembersTab({ workspaceId }: MembersTabProps) {
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const { t } = useTranslation(["workspaces"]);
-  
+
   const members = useAppSelector((state) => state.workspaces.members);
   const isMembersLoading = useAppSelector((state) => state.workspaces.isMembersLoading);
   const invitations = useAppSelector((state) => state.workspaces.invitations);
@@ -262,9 +263,8 @@ export function MembersTab({ workspaceId }: MembersTabProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleRemoveMember(member.user_id, isSelf)}
-                        className={`h-8 w-8 hover:bg-destructive/10 ${
-                          isSelf ? "text-amber-500 hover:text-amber-600" : "text-destructive hover:text-destructive"
-                        }`}
+                        className={`h-8 w-8 hover:bg-destructive/10 ${isSelf ? "text-amber-500 hover:text-amber-600" : "text-destructive hover:text-destructive"
+                          }`}
                         title={isSelf ? "Leave Workspace" : "Remove Member"}
                       >
                         {isSelf ? (
@@ -352,14 +352,14 @@ export function MembersTab({ workspaceId }: MembersTabProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              {memberToRemove?.isSelf 
+              {memberToRemove?.isSelf
                 ? "You will leave this workspace and lose access to all its boards. This action cannot be undone."
                 : "This member will be removed from the workspace and lose access to all its boards. This action cannot be undone."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("workspaces:cancel")}</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={confirmRemoveMember}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
