@@ -56,7 +56,7 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground overflow-hidden font-sans">
       {/* LEFT PANEL*/}
-      <div className="relative hidden lg:flex flex-col justify-between w-[70%] h-screen p-16 border-r border-border/50 bg-muted/10 overflow-hidden">
+      <div className="relative hidden lg:flex flex-col justify-between flex-1 h-screen p-8 lg:p-12 xl:p-16 border-r border-border/50 bg-muted/10 overflow-hidden">
         {/* Subtle Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary/5 blur-[120px]"></div>
@@ -81,12 +81,12 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            <h1 className="text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
               {t("hero_title_1")} <br />
               {t("hero_title_2")} <br />
               <span className="text-muted-foreground">{t("hero_title_3")}</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-xl leading-relaxed mb-12">
+            <p className="text-base lg:text-lg text-muted-foreground max-w-xl leading-relaxed mb-8 xl:mb-12">
               {t("hero_subtitle")}
             </p>
           </motion.div>
@@ -95,7 +95,7 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="grid grid-cols-2 gap-8 max-w-xl"
+            className="grid grid-cols-2 gap-4 lg:gap-6 xl:gap-8 max-w-xl"
           >
             <div className="space-y-2">
               <div className="flex items-center gap-2 font-medium text-foreground">
@@ -127,17 +127,10 @@ export default function LandingPage() {
             </div>
           </motion.div>
         </div>
-
-        {/* Footer/Trust */}
-        <div className="relative z-10">
-          <p className="text-sm font-medium text-muted-foreground">
-            {t("trusted_by")}
-          </p>
-        </div>
       </div>
 
-      {/* RIGHT PANEL: Auth Gateway (30%) */}
-      <div className="w-full lg:w-[30%] min-w-[320px] lg:min-w-[400px] h-screen sticky top-0 bg-background/95 backdrop-blur-md shadow-2xl z-20 flex flex-col border-l border-border/50">
+      {/* RIGHT PANEL: Auth Gateway */}
+      <div className="w-full lg:w-[400px] xl:w-[450px] shrink-0 h-screen sticky top-0 bg-background/95 backdrop-blur-md shadow-2xl z-20 flex flex-col border-l border-border/50">
         <div className="flex-1 overflow-y-auto px-4 sm:px-8 pt-24 pb-8 sm:py-12 flex flex-col justify-center relative">
 
           {/* Top Header: Brand (Mobile) + Toggle */}
