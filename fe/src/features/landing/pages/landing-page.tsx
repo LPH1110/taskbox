@@ -9,8 +9,11 @@ import { CheckCircle2, LayoutTemplate, Lock, Workflow } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function LandingPage() {
+  const { t } = useTranslation("landing");
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -28,11 +31,11 @@ export default function LandingPage() {
         if (invite) {
           api.post<any, { success: boolean; data: { workspaceId: string } }>(`/invitations/${invite}/accept`)
             .then((res) => {
-              addToast("Successfully joined the workspace!", "success");
+              addToast(t("invite_success"), "success");
               navigate(`/workspaces/${res.data.workspaceId}`, { replace: true });
             })
             .catch((err) => {
-              addToast(err.message || "Failed to auto-accept invitation", "error");
+              addToast(err.message || t("invite_failed"), "error");
               navigate("/workspaces", { replace: true });
             });
         }
@@ -41,7 +44,7 @@ export default function LandingPage() {
         console.error("Session check after OAuth redirect failed:", err);
       });
     }
-  }, [searchParams, dispatch, navigate, addToast]);
+  }, [searchParams, dispatch, navigate, addToast, t]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -79,12 +82,12 @@ export default function LandingPage() {
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <h1 className="text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
-              Manage projects. <br />
-              Connect teams. <br />
-              <span className="text-muted-foreground">Move faster.</span>
+              {t("hero_title_1")} <br />
+              {t("hero_title_2")} <br />
+              <span className="text-muted-foreground">{t("hero_title_3")}</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl leading-relaxed mb-12">
-              Taskbox provides a seamless, visual workspace for your team to plan workflows, track deadlines, and accomplish more together.
+              {t("hero_subtitle")}
             </p>
           </motion.div>
 
@@ -97,30 +100,30 @@ export default function LandingPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 font-medium text-foreground">
                 <Workflow className="w-5 h-5 text-primary" />
-                Visual Boards
+                {t("feature_1_title")}
               </div>
-              <p className="text-sm text-muted-foreground">Organize tasks into customizable columns and workflows.</p>
+              <p className="text-sm text-muted-foreground">{t("feature_1_desc")}</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 font-medium text-foreground">
                 <LayoutTemplate className="w-5 h-5 text-primary" />
-                Workspace Planner
+                {t("feature_2_title")}
               </div>
-              <p className="text-sm text-muted-foreground">Track global deadlines across all your team's projects.</p>
+              <p className="text-sm text-muted-foreground">{t("feature_2_desc")}</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 font-medium text-foreground">
                 <CheckCircle2 className="w-5 h-5 text-primary" />
-                Real-time Sync
+                {t("feature_3_title")}
               </div>
-              <p className="text-sm text-muted-foreground">Updates happen instantly across all team members.</p>
+              <p className="text-sm text-muted-foreground">{t("feature_3_desc")}</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 font-medium text-foreground">
                 <Lock className="w-5 h-5 text-primary" />
-                Secure Access
+                {t("feature_4_title")}
               </div>
-              <p className="text-sm text-muted-foreground">Granular visibility controls for public and private boards.</p>
+              <p className="text-sm text-muted-foreground">{t("feature_4_desc")}</p>
             </div>
           </motion.div>
         </div>
@@ -128,7 +131,7 @@ export default function LandingPage() {
         {/* Footer/Trust */}
         <div className="relative z-10">
           <p className="text-sm font-medium text-muted-foreground">
-            Trusted by modern teams worldwide.
+            {t("trusted_by")}
           </p>
         </div>
       </div>
@@ -147,46 +150,50 @@ export default function LandingPage() {
               <span className="text-lg font-bold tracking-tight">Taskbox</span>
             </div>
 
-            {/* Animated Toggle Switch */}
-            <div className="relative flex items-center p-1 bg-muted rounded-lg w-[180px] sm:w-[240px] ml-auto">
-              {/* Sliding Indicator */}
-              <motion.div
-                className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background rounded-md shadow-sm border border-border/50"
-                layoutId="authTabIndicator"
-                initial={false}
-                animate={{
-                  x: isLogin ? 0 : "100%",
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
+            <div className="flex items-center gap-3 ml-auto">
+              <LanguageSwitcher />
 
-              <button
-                onClick={() => setIsLogin(true)}
-                className={cn(
-                  "relative z-10 flex-1 py-1.5 text-sm font-medium transition-colors text-center rounded-md cursor-pointer",
-                  isLogin ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Log In
-              </button>
-              <button
-                onClick={() => setIsLogin(false)}
-                className={cn(
-                  "relative z-10 flex-1 py-1.5 text-sm font-medium transition-colors text-center rounded-md cursor-pointer",
-                  !isLogin ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Sign Up
-              </button>
+              {/* Animated Toggle Switch */}
+              <div className="relative flex items-center p-1 bg-muted rounded-lg w-[140px] sm:w-[180px]">
+                {/* Sliding Indicator */}
+                <motion.div
+                  className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background rounded-md shadow-sm border border-border/50"
+                  layoutId="authTabIndicator"
+                  initial={false}
+                  animate={{
+                    x: isLogin ? 0 : "100%",
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+
+                <button
+                  onClick={() => setIsLogin(true)}
+                  className={cn(
+                    "relative z-10 flex-1 py-1.5 text-xs sm:text-sm font-medium transition-colors text-center rounded-md cursor-pointer",
+                    isLogin ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {t("auth_login")}
+                </button>
+                <button
+                  onClick={() => setIsLogin(false)}
+                  className={cn(
+                    "relative z-10 flex-1 py-1.5 text-xs sm:text-sm font-medium transition-colors text-center rounded-md cursor-pointer",
+                    !isLogin ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {t("auth_signup")}
+                </button>
+              </div>
             </div>
           </div>
 
           <div className="mb-8 mt-12 text-center lg:text-left max-w-md mx-auto lg:mx-0 w-full">
             <h2 className="text-2xl font-bold tracking-tight text-foreground mb-2">
-              {isLogin ? "Welcome back" : "Create an account"}
+              {isLogin ? t("welcome_back") : t("create_account")}
             </h2>
             <p className="text-muted-foreground text-sm">
-              {isLogin ? "Enter your credentials to access your workspace." : "Sign up to start organizing your projects."}
+              {isLogin ? t("welcome_back_desc") : t("create_account_desc")}
             </p>
           </div>
 

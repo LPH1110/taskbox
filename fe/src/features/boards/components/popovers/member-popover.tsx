@@ -8,6 +8,7 @@ import {
 import { useAppSelector } from "@/store/hooks";
 import { UserMinus } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { type BoardMember } from "../../types";
 import { DeleteMemberDialog } from "../dialogs/delete-member-dialog";
 
@@ -17,6 +18,7 @@ interface MemberPopoverProps {
 }
 
 export function MemberPopover({ member, boardId }: MemberPopoverProps) {
+  const { t } = useTranslation(["boards"]);
   // State for Popover and Alert Dialog
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -59,7 +61,7 @@ export function MemberPopover({ member, boardId }: MemberPopoverProps) {
               </Avatar>
               <div className="flex flex-col overflow-hidden">
                 <span className="font-medium text-sm truncate">
-                  {member.profiles?.full_name || "Unknown"}
+                  {member.profiles?.full_name || t("unknown_member")}
                 </span>
                 <span className="text-xs text-muted-foreground truncate">
                   {member.profiles?.email}
@@ -79,7 +81,7 @@ export function MemberPopover({ member, boardId }: MemberPopoverProps) {
                 onClick={handleRemoveClick}
               >
                 <UserMinus className="mr-2 h-3 w-3" />
-                Remove from board
+                {t("remove_from_board")}
               </Button>
             )}
           </div>

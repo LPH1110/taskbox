@@ -6,6 +6,7 @@ import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, CheckCircle, XCircle, ArrowRight, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface InvitationDetails {
   id: string;
@@ -22,6 +23,7 @@ export default function InvitationPage() {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const currentUser = useAppSelector((state) => state.auth.user);
+  const { t } = useTranslation(["workspaces"]);
   
   const [details, setDetails] = useState<InvitationDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,14 +94,14 @@ export default function InvitationPage() {
         <Card className="w-full max-w-md border-destructive/30 bg-card shadow-2xl">
           <CardHeader className="text-center pb-2">
             <XCircle className="h-12 w-12 text-destructive mx-auto mb-2" />
-            <CardTitle className="text-2xl font-bold tracking-tight">Invalid Invitation</CardTitle>
+            <CardTitle className="text-2xl font-bold tracking-tight">{t("workspaces:invalid_invitation")}</CardTitle>
             <CardDescription className="text-muted-foreground">
               {error || "This invitation link is invalid or has expired."}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center pt-4">
             <Button asChild className="bg-primary/20 hover:bg-primary/30 border border-primary/30 text-foreground w-full">
-              <Link to="/">Go to Dashboard</Link>
+              <Link to="/">{t("workspaces:go_to_dashboard")}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -179,7 +181,7 @@ export default function InvitationPage() {
                 variant="outline"
                 className="w-full border-input/30 hover:bg-input/10"
               >
-                <Link to="/?mode=login">Switch Account</Link>
+                <Link to="/?mode=login">{t("workspaces:switch_account")}</Link>
               </Button>
             </div>
           ) : (

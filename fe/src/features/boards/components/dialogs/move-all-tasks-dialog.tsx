@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ export function MoveAllTasksDialog({
   sourceColumnId,
   sourceColumnTitle,
 }: MoveAllTasksDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
 
@@ -62,13 +64,13 @@ export function MoveAllTasksDialog({
       await dispatch(moveAllTasks({ sourceColumnId, targetColumnId })).unwrap();
 
       addToast(
-        `Moved all cards to "${columns[targetColumnId].title}"`,
+        t("move_all_tasks_success", { title: columns[targetColumnId].title }),
         "success"
       );
       onClose();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      addToast("Failed to move cards", "error");
+      addToast(t("move_all_tasks_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -78,15 +80,15 @@ export function MoveAllTasksDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>Move All Cards</DialogTitle>
+          <DialogTitle>{t("move_all_cards")}</DialogTitle>
           <DialogDescription>
-            Move all cards from <b>"{sourceColumnTitle}"</b> to another list.
+            {t("move_all_cards_desc", { title: sourceColumnTitle })}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Destination</Label>
+            <Label className="text-right">{t("destination")}</Label>
             <div className="col-span-3">
               <Select
                 value={targetColumnId}
@@ -94,7 +96,7 @@ export function MoveAllTasksDialog({
                 disabled={availableColumns.length === 0}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a list" />
+                  <SelectValue placeholder={t("select_list_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableColumns.length > 0 ? (
@@ -105,7 +107,7 @@ export function MoveAllTasksDialog({
                     ))
                   ) : (
                     <div className="p-2 text-sm text-muted-foreground text-center">
-                      No other lists available
+                      {t("no_other_lists_available")}
                     </div>
                   )}
                 </SelectContent>
@@ -116,13 +118,13 @@ export function MoveAllTasksDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleMoveAll}
             disabled={loading || availableColumns.length === 0}
           >
-            {loading ? "Moving..." : "Move All"}
+            {loading ? t("moving") : t("move_all")}
           </Button>
         </DialogFooter>
       </DialogContent>

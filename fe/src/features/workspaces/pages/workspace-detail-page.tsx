@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -59,6 +60,7 @@ export default function WorkspaceDetailPage() {
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation(["workspaces"]);
 
   const [activeTab, setActiveTab] = useState<TabId>("boards");
 
@@ -79,9 +81,9 @@ export default function WorkspaceDetailPage() {
   if (!workspace) {
     return (
       <div className="p-8 text-center">
-        <p className="text-muted-foreground">Workspace not found.</p>
+        <p className="text-muted-foreground">{t("not_found")}</p>
         <Link to="/workspaces" className="mt-4 inline-block text-sm font-bold underline">
-          Back to Workspaces
+          {t("back_to_workspaces")}
         </Link>
       </div>
     );
@@ -101,9 +103,9 @@ export default function WorkspaceDetailPage() {
   };
 
   const tabs = [
-    { id: "boards", label: "Boards", icon: Layout },
-    { id: "members", label: "Members", icon: Users },
-    { id: "activity", label: "Activity", icon: History },
+    { id: "boards", label: t("boards_tab"), icon: Layout },
+    { id: "members", label: t("members_tab"), icon: Users },
+    { id: "activity", label: t("activity_tab"), icon: History },
   ] as const;
 
   return (
@@ -112,7 +114,7 @@ export default function WorkspaceDetailPage() {
       <div className="flex flex-col gap-6 border-b border-border pb-8 md:flex-row md:items-end justify-between">
         <div className="space-y-4">
           <Link to="/workspaces" className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to Workspaces
+            <ArrowLeft className="h-4 w-4" /> {t("back_to_workspaces")}
           </Link>
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-3xl">
@@ -137,20 +139,20 @@ export default function WorkspaceDetailPage() {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete Workspace
+                  <Trash2 className="mr-2 h-4 w-4" /> {t("delete_workspace")}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>{t("are_you_sure")}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your workspace and all its associated boards.
+                    {t("delete_workspace_warning")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t("workspaces:cancel")}</AlertDialogCancel>
                   <AlertDialogAction onClick={handleDeleteWorkspace} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                    Delete Workspace
+                    {t("delete_workspace")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -197,7 +199,7 @@ export default function WorkspaceDetailPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                  <span>Starred boards</span>
+                  <span>{t("workspaces:starred_boards")}</span>
                 </div>
                 <motion.div
                   variants={containerVariants}
@@ -218,7 +220,7 @@ export default function WorkspaceDetailPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
                 <FolderClosed className="h-5 w-5" />
-                <span>Workspace Boards</span>
+                <span>{t("workspaces:workspace_boards")}</span>
               </div>
 
               <motion.div

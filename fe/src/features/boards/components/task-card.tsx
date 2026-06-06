@@ -7,6 +7,7 @@ import { type Task } from "../types/board-detail";
 import { Clock, Flag } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDueDate, isOverdue } from "../utils/format-due-date";
+import { useTranslation } from "react-i18next";
 
 interface TaskCardProps {
   task: Task;
@@ -14,6 +15,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, index }: TaskCardProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   // Get all labels from store
   const allLabels = useAppSelector((state) => state.boardDetail.labels);
@@ -74,7 +76,7 @@ export function TaskCard({ task, index }: TaskCardProps) {
                         );
                       })()}
                       {task.priority && (
-                        <div title={`Priority: ${task.priority}`}>
+                        <div title={t("priority_label", { priority: t(`priority_${task.priority}`) })}>
                           <Flag
                             className={`h-3.5 w-3.5 ${
                               task.priority === "high"

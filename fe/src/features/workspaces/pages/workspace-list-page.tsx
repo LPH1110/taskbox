@@ -4,6 +4,7 @@ import { fetchWorkspaces } from "../workspacesSlice";
 import { WorkspaceCard } from "../components/workspace-card";
 import { CreateWorkspaceDialog } from "../components/create-workspace-dialog";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -23,6 +24,7 @@ const itemVariants = {
 export default function WorkspaceListPage() {
   const dispatch = useAppDispatch();
   const { items: workspaces, isLoading, error } = useAppSelector((state) => state.workspaces);
+  const { t } = useTranslation(["workspaces"]);
 
   useEffect(() => {
     dispatch(fetchWorkspaces());
@@ -33,10 +35,10 @@ export default function WorkspaceListPage() {
       <div className="mb-12 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Workspaces
+            {t("workspace_list_title")}
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Select or create a workspace to view your project boards.
+            {t("brief_desc")}
           </p>
         </div>
         <div>
@@ -55,15 +57,15 @@ export default function WorkspaceListPage() {
         </div>
       ) : error ? (
         <div className="rounded-xl border border-destructive bg-destructive/10 p-6 text-center text-destructive font-medium">
-          Failed to load workspaces: {error}
+          {t("failed_load")}: {error}
         </div>
       ) : workspaces.length === 0 ? (
         <div className="rounded-xl border border-dashed border-muted p-12 text-center">
           <h3 className="text-lg font-semibold tracking-tight text-foreground">
-            No Workspaces
+            {t("no_workspaces")}
           </h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            You don't belong to any workspaces yet. Create your first one to get started!
+            {t("no_workspaces_desc")}
           </p>
           <div className="mt-6">
             <CreateWorkspaceDialog />

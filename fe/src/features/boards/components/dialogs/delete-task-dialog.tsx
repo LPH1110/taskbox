@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteTask, closeTaskDetail } from "@/features/boards/boardDetailSlide";
 import { useToast } from "@/context/ToastContext";
@@ -29,6 +30,7 @@ export function DeleteTaskDialog({
   columnId,
   taskTitle,
 }: DeleteTaskDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -38,11 +40,11 @@ export function DeleteTaskDialog({
     try {
       await dispatch(deleteTask({ taskId, columnId })).unwrap();
       dispatch(closeTaskDetail());
-      addToast("Task deleted", "success");
+      addToast(t("task_deleted_success"), "success");
       onClose();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      addToast("Failed to delete task", "error");
+      addToast(t("task_deleted_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -53,16 +55,16 @@ export function DeleteTaskDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-destructive">
-            Delete this card?
+            {t("delete_task_confirm_title")}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            You are about to delete <b>"{taskTitle}"</b>.
+            {t("delete_task_confirm_desc", { title: taskTitle })}
             <br />
-            This action cannot be undone.
+            {t("cannot_undone")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>{t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault(); // Prevent auto-close to handle async
@@ -73,10 +75,10 @@ export function DeleteTaskDialog({
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deleting...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("deleting")}
               </>
             ) : (
-              "Delete Card"
+              t("delete_task")
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

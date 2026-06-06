@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppSelector } from "@/store/hooks";
 import { Send } from "lucide-react";
@@ -17,7 +18,7 @@ export function CommentInput({
   handlePost,
   isSubmitting
 }: CommentInputProps) {
-
+  const { t } = useTranslation(["boards"]);
   const { user } = useAppSelector((state) => state.auth);
 
   return (
@@ -33,7 +34,7 @@ export function CommentInput({
         <Textarea
           value={newComment}
           onChange={e => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
+          placeholder={t("write_comment_placeholder")}
           className="min-h-[80px] pb-10 resize-none bg-background focus-visible:ring-1 focus-visible:ring-ring"
         />
         <Button
@@ -42,7 +43,7 @@ export function CommentInput({
           onClick={handlePost}
           disabled={isSubmitting || !newComment.trim()}
         >
-          <Send className="mr-2 h-3 w-3" /> Post
+          <Send className="mr-2 h-3 w-3" /> {t("post_comment")}
         </Button>
       </div>
     </div>

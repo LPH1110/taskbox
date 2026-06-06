@@ -1,6 +1,7 @@
 import { type TimelineTask } from "../plannerSlice";
 import { TimelineTaskCard } from "./timeline-task-card";
 import { format, addDays, startOfWeek, isSameDay } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface WeekViewProps {
   tasks: TimelineTask[];
@@ -8,6 +9,7 @@ interface WeekViewProps {
 }
 
 export function WeekView({ tasks, currentDate }: WeekViewProps) {
+  const { t } = useTranslation(["planner"]);
   const startDate = startOfWeek(new Date(currentDate), { weekStartsOn: 1 }); // Monday
   
   const days = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i));
@@ -32,7 +34,7 @@ export function WeekView({ tasks, currentDate }: WeekViewProps) {
           >
             <div className={`p-3 text-center border-b border-black/10 dark:border-white/10 ${isToday ? 'bg-primary/10' : 'bg-muted/30'}`}>
               <div className={`text-xs font-semibold uppercase tracking-wider ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
-                {format(day, 'EEE')}
+                {t(`days_short.${format(day, 'EEE').toLowerCase()}` as any)}
               </div>
               <div className={`text-lg font-bold ${isToday ? 'text-primary' : ''}`}>
                 {format(day, 'd')}

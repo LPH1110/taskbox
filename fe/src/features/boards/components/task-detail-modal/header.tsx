@@ -3,6 +3,7 @@ import { DialogDescription } from "@/components/ui/dialog";
 import { InlineEditable } from "@/components/ui/inline-editable";
 import { Layout } from "lucide-react";
 import { type Column, type Label, type Task } from "../../types/board-detail";
+import { useTranslation } from "react-i18next";
 
 interface HeaderProps {
     task: Task;
@@ -12,6 +13,7 @@ interface HeaderProps {
 }
 
 export function Header({ task, column, taskLabels, handleRenameTask }: HeaderProps) {
+    const { t } = useTranslation(["boards"]);
     return <div className="flex gap-4">
         <Layout className="mt-1 h-6 w-6 text-muted-foreground shrink-0" />
         <div className="space-y-1.5 w-full">
@@ -24,7 +26,8 @@ export function Header({ task, column, taskLabels, handleRenameTask }: HeaderPro
                 />
             </div>
             <DialogDescription className="text-sm flex items-center gap-1.5">
-                in list <span className="font-semibold underline decoration-muted-foreground/30 underline-offset-4">{column.title}</span>
+                {t("in_list")}{" "}
+                <span className="font-semibold underline decoration-muted-foreground/30 underline-offset-4">{column.title}</span>
             </DialogDescription>
 
             {/* Label Display */}

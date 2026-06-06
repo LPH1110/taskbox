@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 import { createBoard } from "../../boardsSlice";
 import { useToast } from "@/context/ToastContext";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 // Các màu nền có sẵn để chọn
 const BOARD_COLORS = [
@@ -48,6 +49,7 @@ export function CreateBoardPopover({
   const { items: boards } = useAppSelector((state) => state.boards);
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation(["boards"]);
 
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -68,7 +70,7 @@ export function CreateBoardPopover({
       (b) => b.workspace_id === selectedWorkspaceId && b.title.toLowerCase() === title.trim().toLowerCase()
     );
     if (duplicateBoard) {
-      addToast("A board with this title already exists in the selected workspace.", "error");
+      addToast(t("duplicate_board_error"), "error");
       return;
     }
 
@@ -106,7 +108,7 @@ export function CreateBoardPopover({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <div className="text-sm font-medium text-center text-neutral-600 mb-4 pb-2 border-b relative">
-          Create board
+          {t("create_board")}
           <Button
             variant="ghost"
             size="icon"
@@ -123,22 +125,22 @@ export function CreateBoardPopover({
             className={`aspect-video rounded-md relative flex items-center justify-center ${selectedColor}`}
           >
             <span className="font-bold text-white text-lg drop-shadow-md px-4 text-center wrap-break-word">
-              {title || "Board Title"}
+              {title || t("board_title")}
             </span>
           </div>
 
           <div className="space-y-2">
-            <Label>Board Title</Label>
+            <Label>{t("board_title")}</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Upgrade your productivity..."
+              placeholder={t("upgrade_productivity")}
               autoFocus
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Background</Label>
+            <Label>{t("background")}</Label>
             <div className="grid grid-cols-5 gap-2">
               {BOARD_COLORS.map((color) => (
                 <div
@@ -154,21 +156,21 @@ export function CreateBoardPopover({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="visibilitySelect">Visibility</Label>
+            <Label htmlFor="visibilitySelect">{t("visibility")}</Label>
             <Select value={type} onValueChange={(val) => setType(val as "public" | "private")}>
               <SelectTrigger
                 id="visibilitySelect"
                 className="w-full !h-[42px] rounded-sm border-2 border bg-background px-3  text-sm outline-none focus:ring-0 focus:border-foreground shadow-none"
               >
-                <SelectValue placeholder="Select visibility" />
+                <SelectValue placeholder={t("select_visibility")} />
               </SelectTrigger>
               <SelectContent className="border-2 border rounded-sm shadow-sm">
                 <SelectItem value="private" className="cursor-pointer py-2">
                   <div className="flex items-center gap-2">
                     <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
                     <div className="flex flex-col text-left leading-tight">
-                      <span className="font-medium">Private</span>
-                      <span className="text-[10px] text-muted-foreground mt-0.5">Only added members access</span>
+                      <span className="font-medium">{t("private")}</span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">{t("private_desc")}</span>
                     </div>
                   </div>
                 </SelectItem>
@@ -176,8 +178,8 @@ export function CreateBoardPopover({
                   <div className="flex items-center gap-2">
                     <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
                     <div className="flex flex-col text-left leading-tight">
-                      <span className="font-medium">Public</span>
-                      <span className="text-[10px] text-muted-foreground mt-0.5">All workspace members access</span>
+                      <span className="font-medium">{t("public")}</span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">{t("public_desc")}</span>
                     </div>
                   </div>
                 </SelectItem>
@@ -187,7 +189,7 @@ export function CreateBoardPopover({
 
           {!workspaceId && workspaces.length > 0 && (
             <div className="space-y-2">
-              <Label htmlFor="workspaceSelect">Workspace</Label>
+              <Label htmlFor="workspaceSelect">{t("workspace")}</Label>
               <select
                 id="workspaceSelect"
                 value={selectedWorkspaceId}
@@ -211,7 +213,7 @@ export function CreateBoardPopover({
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Create"
+              t("create")
             )}
           </Button>
         </form>

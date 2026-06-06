@@ -2,12 +2,14 @@ import { useState } from "react";
 import { FloatingActionBar } from "@/components/ui/floating-action-bar";
 import { useAppSelector } from "@/store/hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "react-i18next";
 
 export default function ProfilePage() {
   // Use user from redux store
   const { user } = useAppSelector((state) => state.auth);
   // dispatch could be used to save data later
   // const dispatch = useAppDispatch();
+  const { t } = useTranslation("profile");
 
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -51,11 +53,11 @@ export default function ProfilePage() {
         <section className="border-t border-border py-12">
           <div className="grid gap-8 md:grid-cols-4">
             <div className="md:col-span-1">
-              <h2 className="text-lg font-semibold tracking-tight text-foreground">Personal Info</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">{t("personal_info")}</h2>
             </div>
             <div className="md:col-span-3 space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Full Name</label>
+                <label className="text-sm font-medium text-foreground">{t("full_name")}</label>
                 <input
                   type="text"
                   value={fullName}
@@ -67,7 +69,7 @@ export default function ProfilePage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Email Address</label>
+                <label className="text-sm font-medium text-foreground">{t("email_address")}</label>
                 <input
                   type="email"
                   value={email}

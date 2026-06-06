@@ -5,10 +5,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "motion/react";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { useAppSelector } from "@/store/hooks";
+import { useTranslation } from "react-i18next";
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Sidebar({ className }: SidebarProps) {
+  const { t } = useTranslation("sidebar");
   const location = useLocation();
   const { items: boards } = useAppSelector((state) => state.boards);
   const { activeWorkspaceId } = useAppSelector((state) => state.workspaces);
@@ -18,17 +20,17 @@ export function Sidebar({ className }: SidebarProps) {
   // Global Navigation items
   const globalNavItems = [
     {
-      title: "Home",
+      title: t("home"),
       href: "/dashboard",
       icon: LayoutDashboard,
     },
     {
-      title: "Workspaces",
+      title: t("workspaces"),
       href: "/workspaces",
       icon: Briefcase,
     },
     {
-      title: "Settings",
+      title: t("settings"),
       href: "/settings",
       icon: Settings,
     },
@@ -38,7 +40,7 @@ export function Sidebar({ className }: SidebarProps) {
   const workspaceNavItems = activeWorkspaceId
     ? [
         {
-          title: "Timeline",
+          title: t("timeline"),
           href: `/workspaces/${activeWorkspaceId}/planner`,
           icon: CalendarDays,
         },
@@ -54,7 +56,7 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="px-3 py-2">
           <div className="space-y-1">
             <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Overview
+              {t("overview")}
             </h2>
             <nav className="grid items-start gap-1">
               {globalNavItems.map((item, index) => {
@@ -97,7 +99,7 @@ export function Sidebar({ className }: SidebarProps) {
           <>
             <div className="px-3 py-2">
               <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Workspace Views
+                {t("workspace_views")}
               </h2>
               <nav className="grid items-start gap-1">
                 {workspaceNavItems.map((item, index) => {
@@ -133,13 +135,13 @@ export function Sidebar({ className }: SidebarProps) {
 
             <div className="px-3 py-2">
               <h2 className="mb-2 px-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Boards
+                {t("boards")}
               </h2>
               <ScrollArea className="h-[calc(100vh-[450px])] min-h-[200px] px-1">
               <div className="space-y-1 p-1">
                 {activeWorkspaceBoards.length === 0 ? (
                   <div className="px-4 py-3 text-xs text-muted-foreground border border-dashed rounded-sm">
-                    No boards in workspace.
+                    {t("no_boards")}
                   </div>
                 ) : (
                   activeWorkspaceBoards.map((board) => (

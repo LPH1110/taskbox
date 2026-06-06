@@ -6,9 +6,11 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { Link } from "react-router-dom";
 import { Search, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 export function HeaderSearch() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(["header"]);
   const { items: boards, isLoading } = useAppSelector((state) => state.boards);
   const { items: workspaces } = useAppSelector((state) => state.workspaces);
   const [query, setQuery] = useState("");
@@ -58,7 +60,7 @@ export function HeaderSearch() {
         <input
           type="text"
           name="searchInput"
-          placeholder="Search boards..."
+          placeholder={t("search_placeholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={handleFocus}
@@ -82,7 +84,7 @@ export function HeaderSearch() {
               filteredBoards.length > 0 ? (
                 <div className="space-y-0.5">
                   <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Search Results
+                    {t("search_results")}
                   </div>
                   {filteredBoards.map((board) => (
                     <Link
@@ -108,13 +110,13 @@ export function HeaderSearch() {
                 </div>
               ) : (
                 <div className="py-6 text-center text-sm text-muted-foreground">
-                  No boards found matching "{query}"
+                  {t("no_boards_found", { query })}
                 </div>
               )
             ) : starredBoards.length > 0 ? (
               <div className="space-y-0.5">
                 <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Starred Boards
+                  {t("starred_boards")}
                 </div>
                 {starredBoards.map((board) => (
                   <Link

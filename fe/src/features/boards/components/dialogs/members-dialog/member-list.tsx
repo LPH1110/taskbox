@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -25,10 +26,11 @@ export function MemberList({
   getInitials,
   setMemberToRemove
 }: MemberListProps) {
+  const { t } = useTranslation(["boards"]);
   return (
     <div className="space-y-2">
       <h4 className="text-sm font-medium text-muted-foreground">
-        Board Members ({members.length})
+        {t("board_members_count", { count: members.length })}
       </h4>
       <ScrollArea className="h-50 pr-4">
         <div className="space-y-3">
@@ -48,7 +50,7 @@ export function MemberList({
                   </Avatar>
                   <div>
                     <p className="text-sm font-medium leading-none">
-                      {member.profiles?.full_name || "Unknown User"}
+                      {member.profiles?.full_name || t("unknown_user")}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {member.profiles?.email}
@@ -93,7 +95,7 @@ export function MemberList({
                           onSelect={() => setMemberToRemove(member)}
                         >
                           <UserX className="mr-2 h-4 w-4" />
-                          Remove from board
+                          {t("remove_from_board")}
                         </DropdownMenuItem>
                       )}
 
@@ -103,7 +105,7 @@ export function MemberList({
                           disabled
                           className="opacity-50"
                         >
-                          You cannot remove yourself
+                          {t("cannot_remove_self")}
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>

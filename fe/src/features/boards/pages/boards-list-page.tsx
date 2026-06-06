@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Star, FolderClosed } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,6 +33,7 @@ const itemVariants = {
 } as const;
 
 export default function BoardsListPage() {
+  const { t } = useTranslation(["boards", "workspaces"]);
   const dispatch = useAppDispatch();
   const { items: boards, isLoading: isLoadingBoards } = useAppSelector((state) => state.boards);
   const { items: workspaces, isLoading: isLoadingWorkspaces } = useAppSelector((state) => state.workspaces);
@@ -44,7 +46,7 @@ export default function BoardsListPage() {
   if (isLoadingBoards || isLoadingWorkspaces) {
     return (
       <div className="p-8 text-center text-muted-foreground">
-        Loading workspaces and boards...
+        {t("boards:loading_workspaces_boards")}
       </div>
     );
   }
@@ -58,7 +60,7 @@ export default function BoardsListPage() {
         <div className="space-y-4">
           <div className="flex items-center gap-2 font-semibold text-lg text-foreground">
             <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-            <span>Starred boards</span>
+            <span>{t("boards:starred_boards_title")}</span>
           </div>
           <motion.div
             variants={containerVariants}
@@ -91,7 +93,7 @@ export default function BoardsListPage() {
                   to={`/workspaces/${workspace.id}`}
                   className="text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:underline"
                 >
-                  View Workspace →
+                  {t("workspaces:view_workspace")}
                 </Link>
               </div>
 
@@ -122,10 +124,10 @@ export default function BoardsListPage() {
         {workspaces.length === 0 && (
           <div className="border-2 border-dashed border-muted p-12 text-center rounded-none">
             <h3 className="text-xl font-bold uppercase tracking-tight text-foreground">
-              No Workspaces
+              {t("workspaces:no_workspaces")}
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              You don't belong to any workspaces yet. Create your first one in the sidebar!
+              {t("workspaces:no_workspaces_desc")}
             </p>
           </div>
         )}

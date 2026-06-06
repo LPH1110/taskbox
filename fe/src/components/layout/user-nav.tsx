@@ -13,9 +13,11 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/features/auth/authSlice";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export function UserNav() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(["header"]);
   // Get user info from Redux store
   const { user } = useAppSelector((state) => state.auth);
 
@@ -51,13 +53,13 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link to="/profile" className="w-full cursor-pointer">
-              Profile
+              {t("profile")}
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to="/settings" className="w-full cursor-pointer">
-              Settings
+              {t("settings")}
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
@@ -67,7 +69,7 @@ export function UserNav() {
           onClick={handleLogout}
           className="text-red-600 focus:text-red-600"
         >
-          Log out
+          {t("logout")}
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

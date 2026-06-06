@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ interface MoveTaskDialogProps {
 }
 
 export function MoveTaskDialog({ taskId, isOpen, onClose }: MoveTaskDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const task = useAppSelector((state) => state.boardDetail.tasks[taskId]);
   const columns = useAppSelector((state) => state.boardDetail.columns);
@@ -67,11 +69,11 @@ export function MoveTaskDialog({ taskId, isOpen, onClose }: MoveTaskDialogProps)
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Move Task</DialogTitle>
+          <DialogTitle>{t("move_task")}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Destination Column</label>
+            <label className="text-sm font-medium">{t("destination_column")}</label>
             <Select
               value={selectedColumnId}
               onValueChange={(val) => {
@@ -84,12 +86,12 @@ export function MoveTaskDialog({ taskId, isOpen, onClose }: MoveTaskDialogProps)
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select column" />
+                <SelectValue placeholder={t("select_column_placeholder")} />
               </SelectTrigger>
               <SelectContent>
                 {columnOrder.map((colId: string) => (
                   <SelectItem key={colId} value={colId}>
-                    {columns[colId]?.title} {colId === task.column_id && "(Current)"}
+                    {columns[colId]?.title} {colId === task.column_id && t("current_indicator")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -97,18 +99,18 @@ export function MoveTaskDialog({ taskId, isOpen, onClose }: MoveTaskDialogProps)
           </div>
           
           <div className="grid gap-2">
-            <label className="text-sm font-medium">Position</label>
+            <label className="text-sm font-medium">{t("position")}</label>
             <Select
               value={selectedPosition.toString()}
               onValueChange={(val) => setSelectedPosition(parseInt(val, 10))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select position" />
+                <SelectValue placeholder={t("select_position_placeholder")} />
               </SelectTrigger>
               <SelectContent>
                 {positions.map((pos) => (
                   <SelectItem key={pos} value={pos.toString()}>
-                    {pos + 1} {isSameColumn && pos === task.position && "(Current)"}
+                    {pos + 1} {isSameColumn && pos === task.position && t("current_indicator")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -117,10 +119,10 @@ export function MoveTaskDialog({ taskId, isOpen, onClose }: MoveTaskDialogProps)
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button onClick={handleMove} disabled={isLoading}>
-            {isLoading ? "Moving..." : "Move"}
+            {isLoading ? t("moving") : t("move")}
           </Button>
         </DialogFooter>
       </DialogContent>

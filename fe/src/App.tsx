@@ -5,8 +5,10 @@ import { RouterProvider } from "react-router-dom";
 import { checkAuthSession } from "./features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { ToastProvider } from "./context/ToastContext";
+import { useLanguageSync } from "./hooks/useLanguageSync";
 
 function App() {
+  useLanguageSync();
   const dispatch = useAppDispatch();
 
   const { isLoading } = useAppSelector((state) => state.auth);

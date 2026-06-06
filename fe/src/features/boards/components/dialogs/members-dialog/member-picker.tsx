@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,13 +22,14 @@ export function MemberPicker({
   addingUserId,
   getInitials
 }: MemberPickerProps) {
+  const { t } = useTranslation(["boards"]);
   return (
     <div className="space-y-2">
       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-        Add members from Workspace
+        {t("add_members_from_workspace")}
       </h4>
       <Input
-        placeholder="Search workspace members..."
+        placeholder={t("search_workspace_members_placeholder")}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="bg-transparent border-input/30"
@@ -35,7 +37,7 @@ export function MemberPicker({
       <ScrollArea className="h-32 border border-input/20 rounded-md p-2 bg-muted/10">
         {addableWorkspaceMembers.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-8">
-            {searchQuery ? "No matching workspace members" : "All workspace members are on this board"}
+            {searchQuery ? t("no_matching_workspace_members") : t("all_workspace_members_added")}
           </p>
         ) : (
           <div className="space-y-2">
@@ -53,7 +55,7 @@ export function MemberPicker({
                   </Avatar>
                   <div className="overflow-hidden">
                     <p className="text-xs font-medium truncate">
-                      {wsMember.profiles?.full_name || "Unknown User"}
+                      {wsMember.profiles?.full_name || t("unknown_user")}
                     </p>
                     <p className="text-[10px] text-muted-foreground truncate">
                       {wsMember.profiles?.email}
@@ -69,7 +71,7 @@ export function MemberPicker({
                   {addingUserId === wsMember.user_id ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   ) : (
-                    "Add"
+                    t("add_member")
                   )}
                 </Button>
               </div>

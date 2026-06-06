@@ -15,6 +15,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { ArrowRightLeft, Copy, MoreHorizontal, Plus, X } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { createTask, updateColumn } from "../boardDetailSlide";
 import { type Column, type Task } from "../types/board-detail";
 import { TaskCard } from "./task-card";
@@ -33,6 +34,7 @@ interface BoardColumnProps {
 }
 
 export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
+  const { t } = useTranslation(["boards"]);
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState("");
   const { boardId } = useParams();
@@ -54,7 +56,7 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
         updateColumn({ columnId: column.id, title: newTitle })
       ).unwrap();
     } catch (error) {
-      addToast("Failed to rename list", "error");
+      addToast(t("rename_column_failed"), "error");
       throw error;
     }
   };
@@ -113,26 +115,26 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>List Actions</DropdownMenuLabel>
+                 <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{t("list_actions")}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onSelect={() => setIsCopyDialogOpen(true)}>
-                    <Copy className="mr-2 h-4 w-4" /> Copy List
+                    <Copy className="mr-2 h-4 w-4" /> {t("copy_list")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => setIsMoveDialogOpen(true)}>
-                    <ArrowRightLeft className="mr-2 h-4 w-4" /> Move List
+                    <ArrowRightLeft className="mr-2 h-4 w-4" /> {t("move_list")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setIsMoveAllDialogOpen(true)}
                   >
-                    <ArrowRightLeft className="mr-2 h-4 w-4" /> Move All Cards
+                    <ArrowRightLeft className="mr-2 h-4 w-4" /> {t("move_all_cards")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-red-600 focus:text-red-600 focus:bg-red-50/10 cursor-pointer"
                     onSelect={() => setIsDeleteDialogOpen(true)}
                   >
-                    Delete List
+                    {t("delete_list")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -158,7 +160,7 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
               {isEditing ? (
                 <form onSubmit={handleCreateTask} className="space-y-2">
                   <Textarea
-                    placeholder="Enter a title for this card..."
+                    placeholder={t("enter_card_title_placeholder")}
                     className="min-h-20 bg-background resize-none focus-visible:ring-1"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
@@ -167,7 +169,7 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
                   />
                   <div className="flex items-center gap-2">
                     <Button type="submit" size="sm">
-                      Add Card
+                      {t("add_card")}
                     </Button>
                     <Button
                       type="button"
@@ -187,7 +189,7 @@ export function BoardColumn({ column, tasks, index }: BoardColumnProps) {
                   className="w-full justify-start text-muted-foreground hover:bg-background h-9 text-sm"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Add a card
+                  {t("add_card_button")}
                 </Button>
               )}
             </div>

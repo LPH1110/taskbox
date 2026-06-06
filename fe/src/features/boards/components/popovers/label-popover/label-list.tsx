@@ -2,6 +2,7 @@ import { Check, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { type Label } from "@/features/boards/types/board-detail";
+import { useTranslation } from "react-i18next";
 
 interface LabelListProps {
   search: string;
@@ -22,10 +23,11 @@ export function LabelList({
   startEdit,
   startCreate
 }: LabelListProps) {
+  const { t } = useTranslation(["boards"]);
   return (
     <>
       <Input
-        placeholder="Search labels..."
+        placeholder={t("search_labels_placeholder")}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="h-8 mb-3"
@@ -34,7 +36,7 @@ export function LabelList({
 
       <div className="space-y-1 max-h-64 overflow-y-auto mb-3">
         <span className="text-xs font-semibold text-muted-foreground block mb-2">
-          Labels
+          {t("label_popover_title")}
         </span>
         {filteredLabels.map((label) => {
           const isActive = taskLabelIds.includes(label.id);
@@ -75,7 +77,7 @@ export function LabelList({
         className="w-full h-8 text-sm bg-muted/50 hover:bg-muted"
         onClick={startCreate}
       >
-        Create a new label
+        {t("create_new_label")}
       </Button>
     </>
   );

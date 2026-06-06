@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ export function CopyColumnDialog({
   columnId,
   columnTitle,
 }: CopyColumnDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
 
@@ -35,9 +37,9 @@ export function CopyColumnDialog({
 
   useEffect(() => {
     if (isOpen) {
-      setTitle(`Copy of ${columnTitle}`);
+      setTitle(t("copy_of", { title: columnTitle }));
     }
-  }, [isOpen, columnTitle]);
+  }, [isOpen, columnTitle, t]);
 
   const handleCopy = async () => {
     if (!title.trim()) return;
@@ -46,10 +48,10 @@ export function CopyColumnDialog({
     try {
       await dispatch(copyColumn({ columnId, newTitle: title })).unwrap();
 
-      addToast("List copied successfully", "success");
+      addToast(t("list_copied_success"), "success");
       onClose();
     } catch (error) {
-      addToast("Failed to copy list", "error");
+      addToast(t("list_copied_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -59,17 +61,16 @@ export function CopyColumnDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>Copy List</DialogTitle>
+          <DialogTitle>{t("copy_list")}</DialogTitle>
           <DialogDescription>
-            Give your new list a title. It will include all cards from the
-            original list.
+            {t("copy_list_desc")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
-              Name
+              {t("name")}
             </Label>
             <Input
               id="name"
@@ -83,10 +84,10 @@ export function CopyColumnDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button onClick={handleCopy} disabled={loading || !title.trim()}>
-            {loading ? "Creating..." : "Create List"}
+            {loading ? t("creating") : t("create_list")}
           </Button>
         </DialogFooter>
       </DialogContent>

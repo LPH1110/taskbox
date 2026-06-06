@@ -5,12 +5,14 @@ import { cn } from "@/lib/utils";
 import { useAppDispatch } from "@/store/hooks";
 import { toggleFavorite } from "../boardsSlice";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 interface BoardCardProps {
   board: Board;
 }
 
 export function BoardCard({ board }: BoardCardProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
 
   const handleStarClick = (e: React.MouseEvent) => {
@@ -44,6 +46,8 @@ export function BoardCard({ board }: BoardCardProps) {
             onClick={handleStarClick}
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
+            aria-label={board.is_favorite ? t("unstar_board") : t("star_board")}
+            role="button"
             className={cn(
               "absolute bottom-0 right-0 -mb-8 mr-2 transition-all duration-300 group-hover:mb-0 cursor-pointer z-20",
               board.is_favorite

@@ -6,9 +6,12 @@ import { UserNav } from "./user-nav";
 import { HeaderSearch } from "./header-search";
 import { useTheme } from "@/components/theme-provider";
 import { Sun, Moon } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export function Header() {
   const { setTheme, theme } = useTheme();
+  const { t } = useTranslation(["header"]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -22,7 +25,7 @@ export function Header() {
               className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden"
             >
               <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle Menu</span>
+              <span className="sr-only">{t("header:toggle_menu")}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="pr-0">
@@ -44,6 +47,8 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+
             {/* Theme Toggle Button */}
             <Button
               variant="ghost"
@@ -52,7 +57,7 @@ export function Header() {
             >
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
+              <span className="sr-only">{t("header:toggle_theme")}</span>
             </Button>
 
             <UserNav />

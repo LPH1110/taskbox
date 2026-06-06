@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/context/ToastContext";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useEffect, useState } from "react";
@@ -22,6 +23,7 @@ interface MembersDialogProps {
 }
 
 export function MembersDialog({ isOpen, onClose }: MembersDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const { user } = useAppSelector((state) => state.auth);
@@ -54,9 +56,9 @@ export function MembersDialog({ isOpen, onClose }: MembersDialogProps) {
       await dispatch(
         addMember({ boardId: currentBoard.id, userId: targetUserId })
       ).unwrap();
-      addToast("Member added to board successfully", "success");
+      addToast(t("member_added_success"), "success");
     } catch (error: any) {
-      addToast(error || "Failed to add member", "error");
+      addToast(error || t("member_added_failed"), "error");
     } finally {
       setAddingUserId(null);
     }
@@ -90,9 +92,9 @@ export function MembersDialog({ isOpen, onClose }: MembersDialogProps) {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Share Board</DialogTitle>
+            <DialogTitle>{t("share_board")}</DialogTitle>
             <DialogDescription>
-              Invite team members to collaborate on this board.
+              {t("invite_team_members_desc")}
             </DialogDescription>
           </DialogHeader>
 

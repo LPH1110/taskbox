@@ -2,12 +2,15 @@ import type { Workspace } from "../types";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Briefcase } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface WorkspaceCardProps {
   workspace: Workspace;
 }
 
 export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
+  const { t } = useTranslation(["workspaces"]);
+
   return (
     <motion.div
       whileHover={{ y: -4 }}
@@ -32,10 +35,10 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
       <div className="mt-6 flex items-center justify-between border-t border-border/50 pt-4 text-xs font-medium text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <Briefcase className="h-4 w-4 text-muted-foreground/70" />
-          {workspace._count?.boards ?? 0} {workspace._count?.boards === 1 ? "Board" : "Boards"}
+          {workspace._count?.boards ?? 0} {workspace._count?.boards === 1 ? t("board") : t("board_plural")}
         </span>
         <span className="text-primary opacity-0 transition-opacity group-hover:opacity-100 font-semibold">
-          View Workspace →
+          {t("view_workspace")}
         </span>
       </div>
     </motion.div>

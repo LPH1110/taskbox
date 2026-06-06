@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { ChevronLeft, Tag } from "lucide-react";
 import { useState } from "react";
@@ -35,6 +36,7 @@ interface LabelPopoverProps {
 }
 
 export function LabelPopover({ taskId }: LabelPopoverProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { labels, currentBoard, tasks } = useAppSelector(
     (state) => state.boardDetail
@@ -131,7 +133,7 @@ export function LabelPopover({ taskId }: LabelPopoverProps) {
             variant="secondary"
             className="w-full justify-start h-8 text-sm"
           >
-            <Tag className="mr-2 h-4 w-4" /> Labels
+            <Tag className="mr-2 h-4 w-4" /> {t("label_popover_button")}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-72 p-0 overflow-hidden" align="start">
@@ -148,9 +150,9 @@ export function LabelPopover({ taskId }: LabelPopoverProps) {
               </Button>
             )}
             <span className="font-semibold text-sm col-start-2">
-              {mode === "list" && "Labels"}
-              {mode === "create" && "Create label"}
-              {mode === "edit" && "Edit label"}
+              {mode === "list" && t("label_popover_title")}
+              {mode === "create" && t("create_label")}
+              {mode === "edit" && t("edit_label")}
             </span>
           </div>
 
@@ -192,19 +194,18 @@ export function LabelPopover({ taskId }: LabelPopoverProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete label?</AlertDialogTitle>
+            <AlertDialogTitle>{t("delete_label_confirm_title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this label and remove it from all
-              cards. This action cannot be undone.
+              {t("delete_label_confirm_desc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

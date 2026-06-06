@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleTaskAssignee } from "../../boardDetailSlide";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface AssigneePopoverProps {
   taskId: string;
@@ -12,6 +13,7 @@ interface AssigneePopoverProps {
 }
 
 export function AssigneePopover({ taskId, children }: AssigneePopoverProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
 
@@ -42,16 +44,16 @@ export function AssigneePopover({ taskId, children }: AssigneePopoverProps) {
             variant="secondary"
             className="w-full justify-start h-8 text-sm"
           >
-            <User className="mr-2 h-4 w-4" /> Members
+            <User className="mr-2 h-4 w-4" /> {t("assignee_popover_button")}
           </Button>
         )}
       </PopoverTrigger>
       <PopoverContent className="w-64 p-3" align="start" side="bottom">
-        <h4 className="font-semibold text-sm mb-3 text-center">Assign Members</h4>
+        <h4 className="font-semibold text-sm mb-3 text-center">{t("assign_members_title")}</h4>
         <div className="space-y-2">
           {members.length === 0 && (
             <p className="text-xs text-muted-foreground text-center py-2">
-              No board members found.
+              {t("no_board_members_found")}
             </p>
           )}
           {members.map((member) => {

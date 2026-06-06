@@ -7,12 +7,14 @@ import { Clock, ExternalLink, Flag } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import type { TimelineTask } from "../plannerSlice";
+import { useTranslation } from "react-i18next";
 
 interface TimelineTaskCardProps {
   task: TimelineTask;
 }
 
 export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
+  const { t } = useTranslation(["planner"]);
   const navigate = useNavigate();
   const overdue = isOverdue(task.due_date);
 
@@ -50,7 +52,7 @@ export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
                     className={`text-[10px] px-1.5 py-0 h-5 flex items-center gap-1 ${overdue ? "animate-pulse" : ""}`}
                   >
                     <Clock className="h-3 w-3" />
-                    {hasTime ? formatDueDate(task.due_date, { short: true }).split(", ")[1] : "Today"}
+                    {hasTime ? formatDueDate(task.due_date, { short: true }).split(", ")[1] : t("today")}
                   </Badge>
                 );
               })()}
@@ -107,7 +109,7 @@ export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground text-xs">Due Date</span>
+              <span className="text-muted-foreground text-xs">{t("due_date")}</span>
               <span className={`font-medium text-xs flex items-center gap-1.5 ${overdue ? "text-destructive" : ""}`}>
                 <Clock className="h-3.5 w-3.5" />
                 {formatDueDate(task.due_date)}
@@ -116,7 +118,7 @@ export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
 
             {task.priority && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground text-xs">Priority</span>
+                <span className="text-muted-foreground text-xs">{t("priority")}</span>
                 <span className="font-medium text-xs flex items-center gap-1.5 capitalize">
                   <Flag
                     className={`h-3.5 w-3.5 ${task.priority === "high"
@@ -133,7 +135,7 @@ export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
 
             {task.labels && task.labels.length > 0 && (
               <div className="space-y-1.5">
-                <span className="text-muted-foreground text-xs">Labels</span>
+                <span className="text-muted-foreground text-xs">{t("labels")}</span>
                 <div className="flex flex-wrap gap-1">
                   {task.labels.map(label => (
                     <Badge key={label.id} variant="secondary" style={{ backgroundColor: label.color + "20", color: label.color, borderColor: label.color + "40" }} className="text-[10px] px-1.5 border">
@@ -146,7 +148,7 @@ export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
 
             {task.assignees && task.assignees.length > 0 && (
               <div className="space-y-1.5 pt-1">
-                <span className="text-muted-foreground text-xs">Assignees</span>
+                <span className="text-muted-foreground text-xs">{t("assignees")}</span>
                 <div className="flex flex-col gap-2">
                   {task.assignees.map(user => (
                     <div key={user.id} className="flex items-center gap-2">
@@ -167,7 +169,7 @@ export function TimelineTaskCard({ task }: TimelineTaskCardProps) {
             onClick={handleClick}
           >
             <ExternalLink className="mr-2 h-3.5 w-3.5" />
-            Open in Board
+            {t("view_on_board")}
           </Button>
         </div>
       </PopoverContent>

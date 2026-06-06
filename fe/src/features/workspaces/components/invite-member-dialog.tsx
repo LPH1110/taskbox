@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserPlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface InviteMemberDialogProps {
   workspaceId: string;
@@ -29,6 +30,7 @@ interface InviteMemberDialogProps {
 
 export function InviteMemberDialog({ workspaceId, trigger, currentUserRole }: InviteMemberDialogProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation(["workspaces"]);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "member">("member");
   const [isLoading, setIsLoading] = useState(false);
@@ -96,14 +98,14 @@ export function InviteMemberDialog({ workspaceId, trigger, currentUserRole }: In
               <SelectContent>
                 <SelectItem value="member">
                   <div className="flex flex-col text-left">
-                    <span className="font-medium">Member</span>
+                    <span className="font-medium">{t("workspaces:member")}</span>
                     <span className="text-xs text-muted-foreground">Can view and create boards.</span>
                   </div>
                 </SelectItem>
                 {isOwner && (
                   <SelectItem value="admin">
                     <div className="flex flex-col text-left">
-                      <span className="font-medium">Admin</span>
+                      <span className="font-medium">{t("workspaces:admin")}</span>
                       <span className="text-xs text-muted-foreground">Can invite/remove members and manage settings.</span>
                     </div>
                   </SelectItem>
@@ -118,7 +120,7 @@ export function InviteMemberDialog({ workspaceId, trigger, currentUserRole }: In
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Cancel
+              {t("workspaces:cancel")}
             </Button>
             <Button
               type="submit"

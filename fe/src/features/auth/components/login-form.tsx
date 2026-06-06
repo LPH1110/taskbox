@@ -25,6 +25,7 @@ import { api } from "@/lib/api";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../authSlice";
+import { useTranslation } from "react-i18next";
 
 // 1. Define validation schema using Zod
 const formSchema = z.object({
@@ -46,6 +47,7 @@ export function LoginForm() {
 
   const inviteToken = searchParams.get("invite_token");
   const emailParam = searchParams.get("email");
+  const { t } = useTranslation(["auth", "landing"]);
 
   // 3. Initialize the form
   const form = useForm<LoginFormValues>({
@@ -96,7 +98,7 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("auth:email")}</FormLabel>
                   <FormControl>
                     <Input placeholder="name@example.com" {...field} />
                   </FormControl>
@@ -111,7 +113,7 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t("auth:password")}</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••" {...field} />
                   </FormControl>
@@ -132,7 +134,7 @@ export function LoginForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or</span>
+            <span className="bg-background px-2 text-muted-foreground">{t("auth:or")}</span>
           </div>
         </div>
 

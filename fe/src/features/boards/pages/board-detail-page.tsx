@@ -26,6 +26,7 @@ import {
   updateTaskOrder,
   openTaskDetail,
 } from "../boardDetailSlide";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,7 @@ import type { Board, BoardMember } from "../types";
 import type { Column, Label, Task, Comment, Attachment } from "../types/board-detail";
 
 export default function BoardDetailPage() {
+  const { t } = useTranslation(["boards"]);
   const { boardId } = useParams();
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -70,9 +72,9 @@ export default function BoardDetailPage() {
           updates: { type: newType },
         })
       ).unwrap();
-      addToast(`Board is now ${newType}`, "success");
+      addToast(t("board_updated", { type: t(newType) }), "success");
     } catch (error: any) {
-      addToast(error || "Failed to update visibility", "error");
+      addToast(error || t("failed_update_visibility"), "error");
     }
   };
 
@@ -88,9 +90,9 @@ export default function BoardDetailPage() {
             updates: { title: trimmed },
           })
         ).unwrap();
-        addToast("Board title updated", "success");
+        addToast(t("board_title_updated"), "success");
       } catch (error: any) {
-        addToast(error || "Failed to update title", "error");
+        addToast(error || t("failed_update_title"), "error");
       }
     }
   };
@@ -122,7 +124,7 @@ export default function BoardDetailPage() {
       if (tasks[openTaskId]) {
         dispatch(openTaskDetail(openTaskId));
       } else {
-        addToast("Task not found on this board", "error");
+        addToast(t("task_not_found"), "error");
       }
       // Clear location state so back-navigation doesn't re-open
       window.history.replaceState({}, "");
@@ -355,7 +357,7 @@ export default function BoardDetailPage() {
                     }
                   }}
                 >
-                  {currentBoard?.title || "Board"}
+                  {currentBoard?.title || t("board")}
                 </motion.h1>
               )}
             </AnimatePresence>
@@ -374,12 +376,12 @@ export default function BoardDetailPage() {
                       {currentBoard.type === "public" ? (
                         <>
                           <Globe className="h-3.5 w-3.5" />
-                          <span>Public</span>
+                          <span>{t("public")}</span>
                         </>
                       ) : (
                         <>
                           <Lock className="h-3.5 w-3.5" />
-                          <span>Private</span>
+                          <span>{t("private")}</span>
                         </>
                       )}
                       <ChevronDown className="h-3 w-3 opacity-60" />
@@ -393,8 +395,8 @@ export default function BoardDetailPage() {
                       <div className="flex items-center gap-2 text-left">
                         <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
                         <div>
-                          <p className="text-sm font-medium">Private</p>
-                          <p className="text-[10px] text-muted-foreground">Only added members access</p>
+                          <p className="text-sm font-medium">{t("private")}</p>
+                          <p className="text-[10px] text-muted-foreground">{t("private_desc")}</p>
                         </div>
                       </div>
                       {currentBoard.type === "private" && <Check className="h-4 w-4 text-primary shrink-0 ml-2" />}
@@ -406,8 +408,8 @@ export default function BoardDetailPage() {
                       <div className="flex items-center gap-2 text-left">
                         <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
                         <div>
-                          <p className="text-sm font-medium">Public</p>
-                          <p className="text-[10px] text-muted-foreground">All workspace members access</p>
+                          <p className="text-sm font-medium">{t("public")}</p>
+                          <p className="text-[10px] text-muted-foreground">{t("public_desc")}</p>
                         </div>
                       </div>
                       {currentBoard.type === "public" && <Check className="h-4 w-4 text-primary shrink-0 ml-2" />}
@@ -419,12 +421,12 @@ export default function BoardDetailPage() {
                   {currentBoard.type === "public" ? (
                     <>
                       <Globe className="h-3.5 w-3.5" />
-                      <span>Public</span>
+                      <span>{t("public")}</span>
                     </>
                   ) : (
                     <>
                       <Lock className="h-3.5 w-3.5" />
-                      <span>Private</span>
+                      <span>{t("private")}</span>
                     </>
                   )}
                 </div>
@@ -451,7 +453,7 @@ export default function BoardDetailPage() {
             size="sm"
             className="opacity-95 hover:opacity-100 shadow-sm bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-foreground border-0 backdrop-blur-md"
           >
-            <Filter className="mr-2 h-4 w-4" /> Filter
+            <Filter className="mr-2 h-4 w-4" /> {t("filter")}
           </Button>
 
           <Button
@@ -459,7 +461,7 @@ export default function BoardDetailPage() {
             className="cursor-pointer opacity-95 hover:opacity-100 shadow-sm bg-primary text-primary-foreground"
             onClick={() => setIsShareOpen(true)}
           >
-            <UserPlus className="mr-2 h-4 w-4" /> Share
+            <UserPlus className="mr-2 h-4 w-4" /> {t("share")}
           </Button>
         </div>
       </div>

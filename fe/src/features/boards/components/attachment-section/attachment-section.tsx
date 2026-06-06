@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Paperclip, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fetchAttachments, uploadAttachment, deleteAttachment } from "../../boardDetailSlide";
@@ -11,6 +12,7 @@ interface AttachmentSectionProps {
 }
 
 export function AttachmentSection({ taskId }: AttachmentSectionProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const attachments = useAppSelector((state) => state.boardDetail.attachments[taskId] || []);
   const { user } = useAppSelector((state) => state.auth);
@@ -27,7 +29,7 @@ export function AttachmentSection({ taskId }: AttachmentSectionProps) {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      alert("File size must be less than 10MB");
+      alert(t("file_size_error"));
       return;
     }
 
@@ -35,7 +37,7 @@ export function AttachmentSection({ taskId }: AttachmentSectionProps) {
     try {
       await dispatch(uploadAttachment({ taskId, file })).unwrap();
     } catch (err: any) {
-      alert(err.message || "Upload failed");
+      alert(err.message || t("upload_failed"));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -43,7 +45,7 @@ export function AttachmentSection({ taskId }: AttachmentSectionProps) {
   };
 
   const handleDelete = (attachmentId: string) => {
-    if (confirm("Delete this attachment?")) {
+    if (confirm(t("delete_attachment_confirm"))) {
       dispatch(deleteAttachment({ taskId, attachmentId }));
     }
   };
@@ -65,8 +67,11 @@ export function AttachmentSection({ taskId }: AttachmentSectionProps) {
       <Paperclip className="mt-0.5 h-6 w-6 text-muted-foreground shrink-0" />
       <div className="space-y-4 w-full">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-base">Attachments</h3>
+          <h3 className="font-semibold text-base">{t("attachments_title")}</h3>
           <div>
+            <label htmlFor="task-attachment-input" className="sr-only">
+              {t("add_attachment")}
+            </label>
             <input
               id="task-attachment-input"
               type="file"
@@ -82,7 +87,7 @@ export function AttachmentSection({ taskId }: AttachmentSectionProps) {
               disabled={isUploading}
             >
               {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-1" />}
-              Add
+              {t("add_attachment")}
             </Button>
           </div>
         </div>
@@ -103,7 +108,7 @@ export function AttachmentSection({ taskId }: AttachmentSectionProps) {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-muted-foreground">Uploading...</span>
+                <span className="text-sm font-medium text-muted-foreground">{t("uploading")}</span>
               </div>
             </div>
           )}

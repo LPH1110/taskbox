@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ export function MoveColumnDialog({
   columnId,
   columnTitle,
 }: MoveColumnDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const currentBoardId = useAppSelector(
@@ -82,11 +84,11 @@ export function MoveColumnDialog({
         })
       ).unwrap();
 
-      addToast(`Moved "${columnTitle}" successfully`, "success");
+      addToast(t("move_column_success", { title: columnTitle }), "success");
       onClose();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      addToast("Failed to move list", "error");
+      addToast(t("move_column_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -96,16 +98,16 @@ export function MoveColumnDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>Move List</DialogTitle>
+          <DialogTitle>{t("move_list")}</DialogTitle>
           <DialogDescription>
-            Move <b>"{columnTitle}"</b> to another board.
+            {t("move_list_desc", { title: columnTitle })}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           {/* Target Board Selection (Shadcn Select) */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Board</Label>
+            <Label className="text-right">{t("board")}</Label>
             <div className="col-span-3">
               <Select
                 value={targetBoardId}
@@ -113,7 +115,7 @@ export function MoveColumnDialog({
                 disabled={boards.length === 0}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a board" />
+                  <SelectValue placeholder={t("select_board_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {boards.length > 0 ? (
@@ -124,7 +126,7 @@ export function MoveColumnDialog({
                     ))
                   ) : (
                     <div className="p-2 text-sm text-muted-foreground text-center">
-                      No other boards found
+                      {t("no_other_boards_found")}
                     </div>
                   )}
                 </SelectContent>
@@ -135,7 +137,7 @@ export function MoveColumnDialog({
           {/* Position Input */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="position" className="text-right">
-              Position
+              {t("position")}
             </Label>
             <Input
               id="position"
@@ -150,13 +152,13 @@ export function MoveColumnDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleMove}
             disabled={loading || boards.length === 0}
           >
-            {loading ? "Moving..." : "Move"}
+            {loading ? t("moving") : t("move")}
           </Button>
         </DialogFooter>
       </DialogContent>

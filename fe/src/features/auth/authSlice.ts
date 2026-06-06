@@ -6,6 +6,7 @@ interface User {
   email: string;
   fullName?: string;
   avatarUrl?: string;
+  language?: string;
 }
 
 interface AuthState {
@@ -98,6 +99,18 @@ export const loginWithGoogle = createAsyncThunk(
   }
 );
 
+export const updateLanguage = createAsyncThunk(
+  "auth/updateLanguage",
+  async (language: string, { rejectWithValue }) => {
+    try {
+      const response = await api.patch<any, { success: boolean; data: { id: string; language: string } }>("/auth/language", { language });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -109,10 +122,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Check Session
-    builder.addCase(checkAuthSession.pending, (state) => {
-      // Do not set isLoading = true here, as it will unmount the RouterProvider in App.tsx
-      // state.isLoading is already true by default for the initial load.
-    });
     builder.addCase(checkAuthSession.fulfilled, (state, action) => {
       state.isLoading = false;
       if (action.payload) {
@@ -163,6 +172,13 @@ const authSlice = createSlice({
     builder.addCase(logout.fulfilled, (state) => {
       state.user = null;
       state.isAuthenticated = false;
+    });
+
+    // Update Language
+    builder.addCase(updateLanguage.fulfilled, (state, action) => {
+      if (state.user) {
+        state.user.language = action.payload.language;
+      }
     });
   },
 });

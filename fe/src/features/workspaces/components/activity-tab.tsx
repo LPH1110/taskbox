@@ -13,6 +13,7 @@ import {
   Activity,
   History,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function formatDistanceToNow(date: Date, _options?: { addSuffix?: boolean }) {
   const now = new Date();
@@ -45,6 +46,7 @@ interface ActivityTabProps {
 
 export function ActivityTab({ workspaceId }: ActivityTabProps) {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(["workspaces"]);
   const { activities, isActivitiesLoading, hasMoreActivities, activityPage } =
     useAppSelector((state) => state.workspaces);
 
@@ -170,7 +172,7 @@ export function ActivityTab({ workspaceId }: ActivityTabProps) {
     <div className="space-y-6">
       <div className="flex items-center gap-2 border-b border-input/10 pb-4">
         <History className="h-5 w-5 text-muted-foreground" />
-        <h3 className="text-lg font-semibold">Activity Log</h3>
+        <h3 className="text-lg font-semibold">{t("workspaces:activity_log")}</h3>
       </div>
 
       {activities.length === 0 && !isActivitiesLoading ? (

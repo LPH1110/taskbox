@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MessageSquare } from "lucide-react";
 import { fetchComments, createComment, updateComment, deleteComment } from "../../boardDetailSlide";
 import { type Comment } from "../../types/board-detail";
@@ -11,6 +12,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ taskId }: CommentSectionProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const comments = useAppSelector((state) => state.boardDetail.comments[taskId] || []);
   const { user } = useAppSelector((state) => state.auth);
@@ -41,7 +43,7 @@ export function CommentSection({ taskId }: CommentSectionProps) {
   };
 
   const handleDelete = async (commentId: string) => {
-    if (confirm("Delete this comment?")) {
+    if (confirm(t("delete_comment_confirm"))) {
       await dispatch(deleteComment({ taskId, commentId }));
     }
   };
@@ -61,8 +63,8 @@ export function CommentSection({ taskId }: CommentSectionProps) {
         {topLevelComments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/10 rounded-lg border border-dashed border-border/50">
             <MessageSquare className="h-8 w-8 text-muted-foreground/50 mb-2" />
-            <p className="text-sm text-muted-foreground font-medium">No comments yet.</p>
-            <p className="text-xs text-muted-foreground/70">Start the conversation!</p>
+            <p className="text-sm text-muted-foreground font-medium">{t("no_comments_yet")}</p>
+            <p className="text-xs text-muted-foreground/70">{t("start_conversation")}</p>
           </div>
         ) : (
           topLevelComments.map((comment: Comment) => (

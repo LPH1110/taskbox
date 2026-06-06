@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/context/ToastContext";
 import { useAppDispatch } from "@/store/hooks";
 import { useState } from "react";
@@ -27,6 +28,7 @@ export function DeleteMemberDialog({
   member,
   boardId,
 }: DeleteMemberDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -42,10 +44,10 @@ export function DeleteMemberDialog({
         removeMember({ boardId, userId: member.user_id })
       ).unwrap();
 
-      addToast("Member removed from board", "success");
+      addToast(t("member_removed_success"), "success");
       onClose(); // Close dialog on success
     } catch (error) {
-      addToast("Failed to remove member", "error");
+      addToast(t("member_removed_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -55,23 +57,19 @@ export function DeleteMemberDialog({
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove member?</AlertDialogTitle>
+          <AlertDialogTitle>{t("remove_member_confirm_title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to remove{" "}
-            <span className="font-semibold text-foreground">
-              {member.profiles?.full_name || "this user"}
-            </span>{" "}
-            from the board? They will lose access to all lists and cards.
+            {t("remove_member_confirm_desc", { name: member.profiles?.full_name || t("unknown_user") })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>{t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-destructive hover:bg-destructive/90 text-white"
             disabled={loading}
           >
-            {loading ? "Removing..." : "Remove"}
+            {loading ? t("removing") : t("remove")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

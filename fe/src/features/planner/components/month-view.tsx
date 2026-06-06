@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 interface MonthViewProps {
   tasks: TimelineTask[];
@@ -23,6 +24,7 @@ interface MonthViewProps {
 }
 
 export function MonthView({ tasks, currentDate }: MonthViewProps) {
+  const { t } = useTranslation(["planner"]);
   const navigate = useNavigate();
   const date = new Date(currentDate);
   const monthStart = startOfMonth(date);
@@ -42,9 +44,9 @@ export function MonthView({ tasks, currentDate }: MonthViewProps) {
   return (
     <div className="flex flex-col h-full w-full bg-card/50 rounded-xl border border-black/10 dark:border-white/10 overflow-hidden shadow-sm backdrop-blur-sm">
       <div className="grid grid-cols-7 border-b border-black/10 dark:border-white/10 bg-muted/30">
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+        {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => (
           <div key={day} className="py-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {day}
+            {t(`days_short.${day}` as any)}
           </div>
         ))}
       </div>

@@ -11,10 +11,12 @@ import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, endOfWee
 import { AnimatePresence, motion } from "motion/react";
 import { fetchWorkspaces } from "@/features/workspaces/workspacesSlice";
 import { fetchBoards } from "@/features/boards/boardsSlice";
+import { useTranslation } from "react-i18next";
 
 export default function TimelinePage() {
   const { workspaceId } = useParams();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(["planner"]);
   
   const { tasks, isLoading, view, currentDate, selectedBoardId } = useAppSelector(state => state.planner);
   const { items: workspaces } = useAppSelector(state => state.workspaces);
@@ -76,7 +78,7 @@ export default function TimelinePage() {
             <CalendarDays className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Timeline Planner</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t("planner:timeline_planner")}</h1>
             <p className="text-sm text-muted-foreground">{workspace?.name || "Workspace"}</p>
           </div>
         </div>
@@ -92,7 +94,7 @@ export default function TimelinePage() {
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={handleToday} className="ml-2 h-8 text-xs font-medium">
-            Today
+            {t("today")}
           </Button>
         </div>
 
@@ -104,10 +106,10 @@ export default function TimelinePage() {
               onValueChange={(val) => dispatch(setSelectedBoardId(val === "all" ? null : val))}
             >
               <SelectTrigger className="w-[180px] h-9 text-sm bg-background">
-                <SelectValue placeholder="All Boards" />
+                <SelectValue placeholder={t("planner:all_boards")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Boards</SelectItem>
+                <SelectItem value="all">{t("planner:all_boards")}</SelectItem>
                 {boards.map(b => (
                   <SelectItem key={b.id} value={b.id}>{b.title}</SelectItem>
                 ))}
@@ -122,7 +124,7 @@ export default function TimelinePage() {
               onClick={() => dispatch(setView("week"))}
               className={`h-7 px-3 text-xs font-medium rounded-sm ${view === "week" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
             >
-              Week
+              {t("week")}
             </Button>
             <Button
               variant="ghost"
@@ -130,7 +132,7 @@ export default function TimelinePage() {
               onClick={() => dispatch(setView("month"))}
               className={`h-7 px-3 text-xs font-medium rounded-sm ${view === "month" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
             >
-              Month
+              {t("month")}
             </Button>
           </div>
         </div>
@@ -160,11 +162,11 @@ export default function TimelinePage() {
               <div className="w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mb-4">
                 <CalendarDays className="h-10 w-10 text-muted-foreground opacity-50" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">No Deadlines Found</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("no_deadlines_found")}</h3>
               <p className="text-muted-foreground text-center max-w-sm">
                 {selectedBoardId 
-                  ? "There are no tasks with deadlines in this specific board for the selected time period."
-                  : "Enjoy your free time! There are no tasks with deadlines in this workspace for the selected time period."}
+                  ? t("no_deadlines_specific_board")
+                  : t("no_deadlines_workspace")}
               </p>
             </motion.div>
           ) : (

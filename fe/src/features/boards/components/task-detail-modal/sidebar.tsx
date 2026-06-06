@@ -11,6 +11,7 @@ import { LabelPopover } from "../popovers/label-popover";
 import { PriorityPopover } from "../popovers/priority-popover";
 import { type Task } from "../../types/board-detail";
 import { formatDueDate } from "../../utils/format-due-date";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   task: Task;
@@ -29,6 +30,7 @@ export function Sidebar({
   setIsMoveDialogOpen,
   setIsDeleteDialogOpen
 }: SidebarProps) {
+  const { t } = useTranslation(["boards"]);
   return (
     <div className="p-6 space-y-8">
       {/* Meta Data */}
@@ -37,7 +39,7 @@ export function Sidebar({
         {/* Assignees */}
         <div className="space-y-2.5">
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center">
-            Assignees
+            {t("assignees")}
           </span>
           <div className="flex items-center flex-wrap gap-2">
             {taskAssignees.length > 0 ? (
@@ -77,7 +79,7 @@ export function Sidebar({
                     <Plus className="h-4 w-4" />
                   </button>
                 </AssigneePopover>
-                <span className="text-sm text-muted-foreground">No assignees</span>
+                <span className="text-sm text-muted-foreground">{t("no_assignees")}</span>
               </div>
             )}
           </div>
@@ -86,7 +88,7 @@ export function Sidebar({
         {/* Status/Priority */}
         <div className="space-y-2.5">
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Priority
+            {t("priority")}
           </span>
           <div>
             <PriorityPopover taskId={task.id}>
@@ -96,7 +98,7 @@ export function Sidebar({
                 }
                 className="font-medium shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
               >
-                {task.priority || "No Priority"}
+                {task.priority ? t(`priority_${task.priority}`) : t("no_priority")}
               </Badge>
             </PriorityPopover>
           </div>
@@ -106,13 +108,13 @@ export function Sidebar({
         {task.due_date && (
           <div className="space-y-2.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Due Date
+              {t("due_date")}
             </span>
             <div>
               <Badge variant={isOverdue ? "destructive" : "secondary"} className="font-medium flex w-fit items-center gap-1.5 shadow-sm">
                 <Clock className="h-3.5 w-3.5" />
                 {formatDueDate(task.due_date)}
-                {isOverdue && <span className="ml-1 uppercase text-[10px] bg-background/20 px-1 rounded">Overdue</span>}
+                {isOverdue && <span className="ml-1 uppercase text-[10px] bg-background/20 px-1 rounded">{t("overdue")}</span>}
               </Badge>
             </div>
           </div>
@@ -124,7 +126,7 @@ export function Sidebar({
       {/* Add to card Menu */}
       <div className="space-y-3">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Add to card
+          {t("add_to_card")}
         </span>
         <div className="space-y-2">
           <AssigneePopover taskId={task.id} />
@@ -138,7 +140,7 @@ export function Sidebar({
                 className="w-full justify-start h-8 text-sm hover:bg-accent"
               >
                 <Clock className="mr-2 h-4 w-4" />
-                Dates
+                {t("dates")}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -156,7 +158,7 @@ export function Sidebar({
       {/* Actions Menu */}
       <div className="space-y-3">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Actions
+          {t("actions")}
         </span>
         <div className="space-y-2">
           <Button
@@ -167,21 +169,21 @@ export function Sidebar({
               if (fileInput) fileInput.click();
             }}
           >
-            <Paperclip className="mr-2 h-4 w-4" /> Attachment
+            <Paperclip className="mr-2 h-4 w-4" /> {t("attachment")}
           </Button>
           <Button
             variant="secondary"
             className="w-full justify-start h-8 text-sm hover:bg-accent"
             onClick={() => setIsMoveDialogOpen(true)}
           >
-            <CreditCard className="mr-2 h-4 w-4" /> Move
+            <CreditCard className="mr-2 h-4 w-4" /> {t("move")}
           </Button>
           <Button
             variant="destructive"
             className="w-full justify-start h-8 text-sm bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-900/60"
             onClick={() => setIsDeleteDialogOpen(true)}
           >
-            <Trash2 className="mr-2 h-4 w-4" /> Delete
+            <Trash2 className="mr-2 h-4 w-4" /> {t("delete")}
           </Button>
         </div>
       </div>

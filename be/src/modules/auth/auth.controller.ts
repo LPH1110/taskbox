@@ -50,6 +50,7 @@ router.post("/register", validate(registerSchema), async (req: Request, res: Res
         email: profile.email,
         fullName: profile.full_name,
         avatarUrl: profile.avatar_url,
+        language: profile.language,
       },
     }, 201);
   } catch (error) {
@@ -81,6 +82,7 @@ router.post("/login", validate(loginSchema), async (req: Request, res: Response,
         email: profile.email,
         fullName: profile.full_name,
         avatarUrl: profile.avatar_url,
+        language: profile.language,
       },
     });
   } catch (error) {
@@ -96,7 +98,30 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
     email: user.email,
     fullName: user.full_name,
     avatarUrl: user.avatar_url,
+    language: user.language,
   });
+});
+
+// PATCH /api/auth/language
+router.patch("/language", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user as any;
+  const { language } = req.body;
+  if (!language || typeof language !== "string") {
+    return sendError(res, "Language is required", 400);
+  }
+  
+  try {
+    const updated = await prisma.profile.update({
+      where: { id: user.id },
+      data: { language },
+    });
+    return sendSuccess(res, {
+      id: updated.id,
+      language: updated.language,
+    });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 // GET /api/auth/google

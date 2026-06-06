@@ -1,4 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
+import { vi, enUS } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 import {
   Download,
   Trash2,
@@ -42,6 +44,8 @@ export function AttachmentItem({
   isOwner,
   handleDelete
 }: AttachmentItemProps) {
+  const { i18n } = useTranslation();
+  const locale = i18n.language === "vi" ? vi : enUS;
 
   return (
     <div
@@ -58,7 +62,7 @@ export function AttachmentItem({
           {attachment.file_name}
         </span>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{formatDistanceToNow(new Date(attachment.created_at), { addSuffix: true })}</span>
+          <span>{formatDistanceToNow(new Date(attachment.created_at), { addSuffix: true, locale })}</span>
           <span>•</span>
           <span>{formatBytes(attachment.file_size)}</span>
         </div>

@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteColumn } from "@/features/boards/boardDetailSlide";
 import { useToast } from "@/context/ToastContext";
@@ -29,6 +30,7 @@ export function DeleteColumnDialog({
   columnTitle,
   taskCount,
 }: DeleteColumnDialogProps) {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -37,11 +39,11 @@ export function DeleteColumnDialog({
     setLoading(true);
     try {
       await dispatch(deleteColumn(columnId)).unwrap();
-      addToast(`List "${columnTitle}" deleted`, "success");
+      addToast(t("list_deleted_success", { title: columnTitle }), "success");
       onClose();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      addToast("Failed to delete list", "error");
+      addToast(t("delete_list_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -52,21 +54,21 @@ export function DeleteColumnDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-destructive">
-            Delete this list?
+            {t("delete_list_confirm_title")}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            You are about to delete <b>"{columnTitle}"</b>.
+            {t("delete_list_confirm_desc", { title: columnTitle })}
             {taskCount > 0 && (
               <span className="block mt-2 text-red-600 font-medium">
-                This will also permanently delete {taskCount} cards inside it.
+                {t("delete_list_cards_warning", { count: taskCount })}
               </span>
             )}
             <br />
-            This action cannot be undone.
+            {t("cannot_undone")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>{t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault(); // Prevent auto-close to handle async
@@ -77,10 +79,10 @@ export function DeleteColumnDialog({
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deleting...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("deleting")}
               </>
             ) : (
-              "Delete List"
+              t("delete_list")
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

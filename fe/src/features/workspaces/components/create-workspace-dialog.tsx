@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface CreateWorkspaceDialogProps {
   trigger?: React.ReactNode;
@@ -29,6 +30,7 @@ export function CreateWorkspaceDialog({ trigger }: CreateWorkspaceDialogProps) {
   const { items: workspaces } = useAppSelector((state) => state.workspaces);
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation(["workspaces"]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ export function CreateWorkspaceDialog({ trigger }: CreateWorkspaceDialogProps) {
 
     const duplicateWorkspace = workspaces.find((w) => w.name.toLowerCase() === name.trim().toLowerCase());
     if (duplicateWorkspace) {
-      addToast("A workspace with this name already exists.", "error");
+      addToast(t("duplicate_name_error"), "error");
       return;
     }
 
@@ -61,24 +63,24 @@ export function CreateWorkspaceDialog({ trigger }: CreateWorkspaceDialogProps) {
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" className="shadow-sm">
-            <Plus className="mr-2 h-4 w-4" /> Create Workspace
+            <Plus className="mr-2 h-4 w-4" /> {t("create_workspace_btn")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            New Workspace
+            {t("new_workspace_title")}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="text-sm font-medium">
-              Workspace Name
+              {t("workspace_name_label")}
             </Label>
             <Input
               id="name"
-              placeholder="e.g. Acme Marketing, Engineering"
+              placeholder={t("workspace_name_placeholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -86,11 +88,11 @@ export function CreateWorkspaceDialog({ trigger }: CreateWorkspaceDialogProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="description" className="text-sm font-medium">
-              Description (Optional)
+              {t("workspace_desc_label")}
             </Label>
             <Textarea
               id="description"
-              placeholder="What is this workspace for?"
+              placeholder={t("workspace_desc_placeholder")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="min-h-[100px]"
@@ -102,13 +104,13 @@ export function CreateWorkspaceDialog({ trigger }: CreateWorkspaceDialogProps) {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               type="submit"
               disabled={isLoading || !name.trim()}
             >
-              {isLoading ? "Creating..." : "Create"}
+              {isLoading ? t("creating_btn") : t("create_btn")}
             </Button>
           </div>
         </form>

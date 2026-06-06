@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { vi, enUS } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 import { MoreHorizontal, Trash2, Edit2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -27,6 +29,8 @@ export function CommentItem({
   onDelete,
   onReply
 }: CommentItemProps) {
+  const { t, i18n } = useTranslation(["boards"]);
+  const locale = i18n.language === "vi" ? vi : enUS;
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [isReplying, setIsReplying] = useState(false);
@@ -35,7 +39,7 @@ export function CommentItem({
   const { user: authUser } = useAppSelector((state) => state.auth);
 
   const isOwner = user?.id === comment.author_id;
-  const authorName = comment.author?.full_name || comment.author?.email || "Unknown";
+  const authorName = comment.author?.full_name || comment.author?.email || t("unknown_user");
   const fallback = authorName.substring(0, 2).toUpperCase();
 
   const children = isReply ? [] : comments.filter((c: Comment) => c.parent_id === comment.id);
@@ -72,7 +76,7 @@ export function CommentItem({
         <div className="flex items-start justify-between gap-2">
           <div>
             <span className="font-semibold text-sm mr-2">{authorName}</span>
-            <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</span>
+            <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale })}</span>
           </div>
 
           {isOwner && !isEditing && (
@@ -84,10 +88,10 @@ export function CommentItem({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => { setIsEditing(true); setEditContent(comment.content); }}>
-                  <Edit2 className="h-4 w-4 mr-2" /> Edit
+                  <Edit2 className="h-4 w-4 mr-2" /> {t("edit")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onDelete(comment.id)} className="text-destructive focus:bg-destructive/10">
-                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                  <Trash2 className="h-4 w-4 mr-2" /> {t("delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -102,8 +106,8 @@ export function CommentItem({
               className="min-h-[60px] resize-none focus-visible:ring-1 focus-visible:ring-ring bg-background text-sm"
             />
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleEditSubmit} disabled={isSubmitting}>Save</Button>
-              <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>Cancel</Button>
+              <Button size="sm" onClick={handleEditSubmit} disabled={isSubmitting}>{t("save")}</Button>
+              <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>{t("cancel")}</Button>
             </div>
           </div>
         ) : (
@@ -117,7 +121,7 @@ export function CommentItem({
             onClick={() => { setIsReplying(true); setReplyContent(""); }}
             className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
           >
-            Reply
+            {t("reply")}
           </button>
         )}
 
@@ -134,12 +138,12 @@ export function CommentItem({
               <Textarea
                 value={replyContent}
                 onChange={e => setReplyContent(e.target.value)}
-                placeholder="Write a reply..."
+                placeholder={t("write_reply_placeholder")}
                 className="min-h-[60px] resize-none focus-visible:ring-1 focus-visible:ring-ring text-sm"
               />
               <div className="flex gap-2 justify-end">
-                <Button size="sm" variant="ghost" onClick={() => setIsReplying(false)}>Cancel</Button>
-                <Button size="sm" onClick={handleReplySubmit} disabled={isSubmitting || !replyContent.trim()}>Reply</Button>
+                <Button size="sm" variant="ghost" onClick={() => setIsReplying(false)}>{t("cancel")}</Button>
+                <Button size="sm" onClick={handleReplySubmit} disabled={isSubmitting || !replyContent.trim()}>{t("reply")}</Button>
               </div>
             </div>
           </div>

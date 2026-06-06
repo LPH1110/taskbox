@@ -25,25 +25,42 @@ import { api } from "@/lib/api";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { register } from "../authSlice";
+import { useTranslation } from "react-i18next";
 
 // 1. Define validation schema using Zod
-const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  fullName: z.string().nonempty(),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters." }),
-});
+// We will translate Zod errors dynamically using t() if possible or keep them as fallback,
+// but since the schema is created outside the React component, we can use react-i18next directly inside the component for custom errors,
+// or we can translate the errors dynamically during display. Let's make the schema define keys or just use translation.
+// Wait! Zod resolver passes validation errors to FormMessage. FormMessage displays the message defined in Zod.
+// We can use translation keys in the Zod messages, and then translate them inside a custom FormMessage, OR we can define the schema inside the component (which is fine in React),
+// or we can translate the message key dynamically if we pass keys like "auth:invalid_email" etc.
+// Let's pass the translation keys directly to the Zod message, and inside the Form, if the error message matches a key, translate it!
+// Or even simpler, let's redefine the schema inside the component so it has access to the `t` function!
+// Wait, moving the schema inside the component is standard and extremely easy:
+// "const formSchema = z.object({ email: z.string().email({ message: t('auth:invalid_email') }) })"
+// Let's do that! That is extremely elegant and doesn't require any custom form component wrappers.
 
-// 2. Define the type based on the schema (Automatic type inference)
-type LoginFormValues = z.infer<typeof formSchema>;
+interface LoginFormValues {
+  email: string;
+  fullName: string;
+  password: string;
+}
 
 export function RegisterForm() {
+  const { t } = useTranslation(["auth"]);
   const dispatch = useAppDispatch();
   const [loading] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { addToast } = useToast();
+
+  const formSchema = z.object({
+    email: z.string().email({ message: t("invalid_email") }),
+    fullName: z.string().min(1, { message: t("fullname_required") }),
+    password: z
+      .string()
+      .min(6, { message: t("password_length") }),
+  });
 
   const inviteToken = searchParams.get("invite_token");
   const emailParam = searchParams.get("email");
@@ -67,11 +84,11 @@ export function RegisterForm() {
           const response = await api.post<any, { success: boolean; data: { workspaceId: string } }>(
             `/invitations/${inviteToken}/accept`
           );
-          addToast("Successfully joined the workspace!", "success");
+          addToast(t("invite_success"), "success");
           navigate(`/workspaces/${response.data.workspaceId}`);
           return;
         } catch (inviteErr: any) {
-          addToast(inviteErr.message || "Failed to auto-accept invitation", "error");
+          addToast(inviteErr.message || t("invite_failed"), "error");
         }
       }
       navigate("/");
@@ -99,9 +116,9 @@ export function RegisterForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("email")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
+                    <Input placeholder={t("email_placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,9 +130,9 @@ export function RegisterForm() {
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>{t("fullname")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Jeremy Howard" {...field} />
+                    <Input placeholder={t("fullname_placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -128,7 +145,7 @@ export function RegisterForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t("password")}</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••" {...field} />
                   </FormControl>
@@ -139,7 +156,7 @@ export function RegisterForm() {
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? "Creating your account..." : "Create my account"}
+              {loading ? t("creating_account") : t("create_account")}
             </Button>
           </form>
         </Form>
@@ -149,7 +166,7 @@ export function RegisterForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or</span>
+            <span className="bg-background px-2 text-muted-foreground">{t("or")}</span>
           </div>
         </div>
 

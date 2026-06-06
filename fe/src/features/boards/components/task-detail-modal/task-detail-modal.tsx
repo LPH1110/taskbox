@@ -14,6 +14,7 @@ import { closeTaskDetail, updateTask } from "../../boardDetailSlide";
 import { CommentSection } from "../comment-section";
 import { AttachmentSection } from "../attachment-section";
 import { isOverdue } from "../../utils/format-due-date";
+import { useTranslation } from "react-i18next";
 
 import { Header } from "./header";
 import { Description } from "./description";
@@ -21,6 +22,7 @@ import { Sidebar } from "./sidebar";
 import { DeleteTaskDialog, MoveTaskDialog } from "../dialogs";
 
 export function TaskDetailModal() {
+  const { t } = useTranslation(["boards"]);
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const { selectedTaskId, tasks, columns, labels, members } = useAppSelector(
@@ -53,9 +55,9 @@ export function TaskDetailModal() {
       await dispatch(
         updateTask({ taskId: task.id, updates: { content: newTitle } })
       ).unwrap();
-      addToast("Task renamed", "success");
+      addToast(t("task_renamed_success"), "success");
     } catch (error) {
-      addToast("Failed to rename task", "error");
+      addToast(t("task_renamed_failed"), "error");
     }
   };
 
@@ -65,9 +67,9 @@ export function TaskDetailModal() {
         updateTask({ taskId: task.id, updates: { description } })
       ).unwrap();
       setIsEditingDescription(false);
-      addToast("Description saved", "success");
+      addToast(t("description_saved_success"), "success");
     } catch (error) {
-      addToast("Failed to save description", "error");
+      addToast(t("description_saved_failed"), "error");
     }
   };
 
@@ -82,9 +84,9 @@ export function TaskDetailModal() {
       await dispatch(
         updateTask({ taskId: task.id, updates: { due_date } })
       ).unwrap();
-      addToast(due_date ? "Due date updated" : "Due date removed", "success");
+      addToast(due_date ? t("due_date_updated_success") : t("due_date_removed_success"), "success");
     } catch (error) {
-      addToast("Failed to update due date", "error");
+      addToast(t("due_date_updated_failed"), "error");
     }
   };
 
@@ -143,9 +145,9 @@ export function TaskDetailModal() {
                 <Activity className="mt-0.5 h-6 w-6 text-muted-foreground shrink-0" />
                 <div className="space-y-4 w-full">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-base">Activity</h3>
+                    <h3 className="font-semibold text-base">{t("activity")}</h3>
                     <Button variant="ghost" size="sm" className="h-8 text-xs font-medium text-muted-foreground">
-                      Show Details
+                      {t("show_details")}
                     </Button>
                   </div>
 

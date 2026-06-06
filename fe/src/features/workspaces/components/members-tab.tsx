@@ -36,8 +36,8 @@ import {
   LogOut,
   Shield,
   ShieldCheck,
-  User,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface MembersTabProps {
   workspaceId: string;
@@ -46,6 +46,7 @@ interface MembersTabProps {
 export function MembersTab({ workspaceId }: MembersTabProps) {
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
+  const { t } = useTranslation(["workspaces"]);
   
   const members = useAppSelector((state) => state.workspaces.members);
   const isMembersLoading = useAppSelector((state) => state.workspaces.isMembersLoading);
@@ -176,7 +177,7 @@ export function MembersTab({ workspaceId }: MembersTabProps) {
         </div>
       ) : filteredMembers.length === 0 ? (
         <div className="text-center py-12 bg-input/10 rounded-lg border border-input/20">
-          <p className="text-muted-foreground">No members found</p>
+          <p className="text-muted-foreground">{t("workspaces:no_members")}</p>
         </div>
       ) : (
         <div className="rounded-lg border border-input/20 overflow-hidden bg-background/50 backdrop-blur-md">
@@ -247,8 +248,8 @@ export function MembersTab({ workspaceId }: MembersTabProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="member">Member</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="member">{t("workspaces:member")}</SelectItem>
+                            <SelectItem value="admin">{t("workspaces:admin")}</SelectItem>
                           </SelectContent>
                         </Select>
                       ) : (
@@ -357,7 +358,7 @@ export function MembersTab({ workspaceId }: MembersTabProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("workspaces:cancel")}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmRemoveMember}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
