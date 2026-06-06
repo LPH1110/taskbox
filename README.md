@@ -13,11 +13,19 @@
   <a href="#deployment">Deployment</a>
 </p>
 
+<p align="center">
+  <img src="./assets/start.png" alt="Taskbox Start Screen" width="800"/>
+</p>
+
 ---
 
 ## Why This Project?
 
 Taskbox is a **production-grade Kanban board** built to demonstrate full-stack engineering proficiency — not as a tutorial exercise, but as a system designed with the same concerns you'd face on a real team: **real-time sync**, **role-based access**, **file storage**, **i18n**, and **containerized & cloud-based deployment**.
+
+<p align="center">
+  <img src="./assets/main.png" alt="Taskbox Start Screen" width="800"/>
+</p>
 
 Every architectural decision was intentional. This README walks through those decisions.
 
