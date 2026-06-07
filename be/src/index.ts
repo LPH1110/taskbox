@@ -7,6 +7,9 @@ import { env } from "./config/env";
 import { initSocket } from "./config/socket";
 import { errorHandler } from "./middleware/error-handler";
 
+import swaggerUi from "swagger-ui-express";
+import { generateOpenApiDocument } from "./config/openapi";
+
 // Passport config
 import "./config/passport";
 
@@ -44,6 +47,10 @@ app.use(passport.initialize());
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "UP", time: new Date() });
 });
+
+// Swagger Documentation dynamically generated
+const swaggerDocument = generateOpenApiDocument();
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // API Routes
 app.use("/api/auth", authRouter);
