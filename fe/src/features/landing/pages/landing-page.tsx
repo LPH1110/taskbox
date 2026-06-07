@@ -56,7 +56,7 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground overflow-hidden font-sans">
       {/* LEFT PANEL*/}
-      <div className="relative hidden lg:flex flex-col justify-between flex-1 h-screen p-8 lg:p-12 xl:p-16 border-r border-border/50 bg-muted/10 overflow-hidden">
+      <div className="relative hidden lg:flex flex-col justify-center flex-1 h-screen p-8 lg:p-12 xl:p-16 border-r border-border/50 bg-muted/10 overflow-hidden">
         {/* Subtle Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary/5 blur-[120px]"></div>
@@ -65,6 +65,7 @@ export default function LandingPage() {
           {/* Dot Grid */}
           <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff11_1px,transparent_1px)] [background-size:24px_24px] opacity-50"></div>
         </div>
+
 
         {/* Brand Header */}
         <div className="relative z-10 flex items-center gap-3">
