@@ -6,6 +6,7 @@ import passport from "passport";
 import { env } from "./config/env";
 import { initSocket } from "./config/socket";
 import { errorHandler } from "./middleware/error-handler";
+import { requestLogger } from "./middleware/request-logger";
 
 import swaggerUi from "swagger-ui-express";
 import { generateOpenApiDocument } from "./config/openapi";
@@ -41,6 +42,10 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Request Logging Middleware (attach early to track all requests)
+app.use(requestLogger);
+
 app.use(passport.initialize());
 
 // Health Check

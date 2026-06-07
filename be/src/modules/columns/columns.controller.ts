@@ -4,6 +4,7 @@ import { socketEmitter } from "../../lib/socket-emitter";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { validate } from "../../middleware/validate";
 import { sendError, sendSuccess } from "../../utils/api-response";
+import { invalidateBoardCache } from "../../utils/redis";
 import {
   copyColumnSchema,
   createColumnSchema,
@@ -49,6 +50,7 @@ router.post("/boards/:boardId/columns", requireBoardMember, validate(createColum
     };
 
     socketEmitter.toBoardRoom(boardId, "column:upsert", responseData);
+    await invalidateBoardCache(boardId);
 
     return sendSuccess(res, responseData, 201);
   } catch (error) {
@@ -76,6 +78,7 @@ router.patch("/columns/:columnId", async (req: Request, res: Response, next: Nex
         });
 
         socketEmitter.toBoardRoom(boardId, "column:upsert", updated);
+        await invalidateBoardCache(boardId);
         return sendSuccess(res, updated);
       } catch (e) {
         return next(e);
@@ -140,6 +143,9 @@ router.patch("/columns/:columnId/move", validate(moveColumnSchema), async (req: 
 
           // Notify destination board room (add column)
           socketEmitter.toBoardRoom(targetBoardId, "column:upsert", targetColWithTasks);
+          
+          await invalidateBoardCache(sourceBoardId);
+          await invalidateBoardCache(targetBoardId);
 
           return sendSuccess(res, result);
         } catch (e) {
@@ -227,6 +233,7 @@ router.post("/columns/:columnId/copy", validate(copyColumnSchema), async (req: R
         result.createdTasks.forEach((t: any) => {
           socketEmitter.toBoardRoom(boardId, "task:upsert", { ...t, labelIds: [] });
         });
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, {
           newColumn: result.newCol,
@@ -260,6 +267,7 @@ router.delete("/columns/:columnId", async (req: Request, res: Response, next: Ne
         });
 
         socketEmitter.toBoardRoom(boardId, "column:delete", { id: columnId });
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, columnId);
       } catch (e) {
@@ -299,6 +307,7 @@ router.put("/columns/reorder", validate(reorderColumnsSchema), async (req: Reque
       // To prevent race conditions, just notify detail page columns are reordered
       // RTK client expects the original updates list payload
       socketEmitter.toBoardRoom(boardId, "column:reorder", updates);
+      await invalidateBoardCache(boardId);
 
       return sendSuccess(res, updates);
     } catch (e) {

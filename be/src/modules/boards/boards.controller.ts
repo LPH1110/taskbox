@@ -6,6 +6,7 @@ import { createBoardSchema, boardIdParamSchema, updateBoardSchema } from "./boar
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
 import { logActivity } from "../../utils/activity-logger";
+import { redis, invalidateBoardCache } from "../../utils/redis";
 
 
 const router = Router();
@@ -115,6 +116,7 @@ router.patch("/:boardId/favorite", requireBoardMember, validate(boardIdParamSche
 
     // Notify other clients about favorite status update
     socketEmitter.toBoardRoom(boardId, "board:update", updated);
+    await invalidateBoardCache(boardId);
 
     return sendSuccess(res, updated);
   } catch (error) {
@@ -171,6 +173,7 @@ router.patch("/:boardId", requireBoardMember, validate(updateBoardSchema), async
 
     // Notify other clients about update
     socketEmitter.toBoardRoom(boardId, "board:update", updated);
+    await invalidateBoardCache(boardId);
 
     return sendSuccess(res, updated);
   } catch (error) {
@@ -181,8 +184,14 @@ router.patch("/:boardId", requireBoardMember, validate(updateBoardSchema), async
 // GET /api/boards/:boardId/detail (Get full composite board details: columns, tasks, labels, members, etc.)
 router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema), async (req: Request, res: Response, next: NextFunction) => {
   const { boardId } = req.params;
+  const cacheKey = `board_detail:${boardId}`;
 
   try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return sendSuccess(res, JSON.parse(cached));
+    }
+
     // 1. Fetch Board Meta and Owner
     const board = await prisma.board.findUnique({
       where: { id: boardId },
@@ -269,7 +278,7 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
       }
     }
 
-    return sendSuccess(res, {
+    const boardDetail = {
       board,
       columns,
       tasks,
@@ -277,7 +286,11 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
       members: adaptedMembers,
       taskLabels,
       taskAssignees,
-    });
+    };
+
+    await redis.setex(cacheKey, 3600, JSON.stringify(boardDetail));
+
+    return sendSuccess(res, boardDetail);
   } catch (error) {
     return next(error);
   }

@@ -5,6 +5,7 @@ import { validate } from "../../middleware/validate";
 import { addMemberSchema, removeMemberSchema } from "./members.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
+import { invalidateBoardCache } from "../../utils/redis";
 
 const router = Router();
 
@@ -81,6 +82,7 @@ router.post("/boards/:boardId/members", requireBoardMember, validate(addMemberSc
       member: adaptedMember,
       type: "INSERT",
     });
+    await invalidateBoardCache(boardId);
 
     return sendSuccess(res, adaptedMember, 201);
   } catch (error) {
@@ -113,6 +115,7 @@ router.delete("/boards/:boardId/members/:userId", requireBoardMember, validate(r
       member: { board_id: boardId, user_id: userId } as any,
       type: "DELETE",
     });
+    await invalidateBoardCache(boardId);
 
     return sendSuccess(res, userId);
   } catch (error) {

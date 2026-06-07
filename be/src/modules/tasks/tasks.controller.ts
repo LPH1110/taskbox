@@ -12,6 +12,7 @@ import {
 } from "./tasks.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
+import { invalidateBoardCache } from "../../utils/redis";
 
 const router = Router();
 
@@ -113,6 +114,7 @@ router.post("/columns/:columnId/tasks", validate(createTaskSchema), async (req: 
       };
 
       socketEmitter.toBoardRoom(boardId, "task:upsert", adaptedTask);
+      await invalidateBoardCache(boardId);
 
       return sendSuccess(res, adaptedTask, 201);
     } catch (error) {
@@ -152,6 +154,7 @@ router.patch("/tasks/:taskId", validate(updateTaskSchema), async (req: Request, 
         };
 
         socketEmitter.toBoardRoom(boardId, "task:upsert", adaptedTask);
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, adaptedTask);
       } catch (e) {
@@ -188,6 +191,7 @@ router.delete("/tasks/:taskId", async (req: Request, res: Response, next: NextFu
           id: taskId,
           column_id: task.column_id,
         });
+        await invalidateBoardCache(task.board_id);
 
         return sendSuccess(res, { taskId, columnId: task.column_id });
       } catch (e) {
@@ -227,6 +231,7 @@ router.put("/tasks/reorder", validate(reorderTasksSchema), async (req: Request, 
 
       // Notify clients
       socketEmitter.toBoardRoom(boardId, "task:reorder", updates);
+      await invalidateBoardCache(boardId);
 
       return sendSuccess(res, updates);
     } catch (e) {
@@ -289,6 +294,7 @@ router.post("/tasks/move-all", validate(moveAllTasksSchema), async (req: Request
           targetColumnId,
           movedTasks: result,
         });
+        await invalidateBoardCache(col.board_id);
 
         return sendSuccess(res, {
           sourceColumnId,
@@ -358,6 +364,7 @@ router.post("/tasks/:taskId/assignees/:userId", validate(toggleTaskAssigneeSchem
           user_id: userId,
           type: "INSERT",
         });
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, { taskId, userId, isAdding: true });
       } catch (e) {
@@ -393,6 +400,7 @@ router.delete("/tasks/:taskId/assignees/:userId", validate(toggleTaskAssigneeSch
           user_id: userId,
           type: "DELETE",
         });
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, { taskId, userId, isAdding: false });
       } catch (e) {

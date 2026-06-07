@@ -14,6 +14,7 @@ import {
 import { requireAuth, requireWorkspaceMember, requireWorkspaceAdmin } from "../../middleware/auth";
 import { logActivity } from "../../utils/activity-logger";
 import { sendInvitationEmail, sendRemovalEmail } from "../../utils/mailer";
+import { redis } from "../../utils/redis";
 
 
 const router = Router();
@@ -21,11 +22,16 @@ const router = Router();
 // Protect all workspace routes
 router.use(requireAuth);
 
-// GET /api/workspaces (Fetch user's workspaces)
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req.user as any).id;
+  const cacheKey = `workspaces:${userId}`;
 
   try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return sendSuccess(res, JSON.parse(cached));
+    }
+
     const workspaces = await prisma.workspace.findMany({
       where: {
         OR: [
@@ -35,6 +41,8 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
       },
       orderBy: { created_at: "desc" },
     });
+
+    await redis.setex(cacheKey, 3600, JSON.stringify(workspaces));
 
     return sendSuccess(res, workspaces);
   } catch (error) {
@@ -63,6 +71,9 @@ router.post("/", validate(createWorkspaceSchema), async (req: Request, res: Resp
         owner_id: userId,
       },
     });
+
+    // Invalidate cache
+    await redis.del(`workspaces:${userId}`);
 
     return sendSuccess(res, workspace, 201);
   } catch (error) {

@@ -9,6 +9,7 @@ import {
 } from "./labels.schema";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
+import { invalidateBoardCache } from "../../utils/redis";
 
 const router = Router();
 
@@ -46,6 +47,7 @@ router.post("/boards/:boardId/labels", requireBoardMember, validate(createLabelS
     });
 
     socketEmitter.toBoardRoom(boardId, "label:upsert", label);
+    await invalidateBoardCache(boardId);
 
     return sendSuccess(res, label, 201);
   } catch (error) {
@@ -73,6 +75,7 @@ router.patch("/labels/:labelId", validate(updateLabelSchema), async (req: Reques
         });
 
         socketEmitter.toBoardRoom(boardId, "label:upsert", updated);
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, updated);
       } catch (e) {
@@ -102,6 +105,7 @@ router.delete("/labels/:labelId", async (req: Request, res: Response, next: Next
         });
 
         socketEmitter.toBoardRoom(boardId, "label:delete", { id: labelId });
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, labelId);
       } catch (e) {
@@ -148,6 +152,7 @@ router.post("/tasks/:taskId/labels/:labelId", validate(toggleTaskLabelSchema), a
           label_id: labelId,
           type: "INSERT",
         });
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, { taskId, labelId, isAdding: true });
       } catch (e) {
@@ -183,6 +188,7 @@ router.delete("/tasks/:taskId/labels/:labelId", validate(toggleTaskLabelSchema),
           label_id: labelId,
           type: "DELETE",
         });
+        await invalidateBoardCache(boardId);
 
         return sendSuccess(res, { taskId, labelId, isAdding: false });
       } catch (e) {

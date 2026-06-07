@@ -47,6 +47,8 @@ model Board {
   members   BoardMember[]
   tasks     Task[]
 
+  @@index([workspace_id])
+  @@index([owner_id])
   @@map("boards")
 }
 
@@ -60,6 +62,7 @@ model Column {
   board Board  @relation(fields: [board_id], references: [id], onDelete: Cascade)
   tasks Task[]
 
+  @@index([board_id])
   @@map("columns")
 }
 
@@ -81,6 +84,8 @@ model Task {
   comments   Comment[]
   attachments Attachment[]
 
+  @@index([column_id])
+  @@index([board_id])
   @@map("tasks")
 }
 
@@ -94,6 +99,7 @@ model Label {
   board      Board       @relation(fields: [board_id], references: [id], onDelete: Cascade)
   taskLabels TaskLabel[]
 
+  @@index([board_id])
   @@map("labels")
 }
 
@@ -105,6 +111,7 @@ model TaskLabel {
   label Label @relation(fields: [label_id], references: [id], onDelete: Cascade)
 
   @@id([task_id, label_id])
+  @@index([label_id])
   @@map("task_labels")
 }
 
@@ -116,6 +123,7 @@ model TaskAssignee {
   profile Profile @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([task_id, user_id])
+  @@index([user_id])
   @@map("task_assignees")
 }
 
@@ -129,6 +137,7 @@ model BoardMember {
   profile Profile @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([board_id, user_id])
+  @@index([user_id])
   @@map("board_members")
 }
 
@@ -147,6 +156,7 @@ model Workspace {
   activities  ActivityLog[]
   invitations WorkspaceInvitation[]
 
+  @@index([owner_id])
   @@map("workspaces")
 }
 
@@ -160,6 +170,7 @@ model WorkspaceMember {
   profile   Profile   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([workspace_id, user_id])
+  @@index([user_id])
   @@map("workspace_members")
 }
 
@@ -230,5 +241,6 @@ model Attachment {
   task     Task    @relation(fields: [task_id], references: [id], onDelete: Cascade)
   uploader Profile @relation("attachment_uploader", fields: [uploader_id], references: [id], onDelete: Cascade)
 
+  @@index([task_id])
   @@map("attachments")
 }
