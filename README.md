@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="./assets/start.png" alt="Taskbox Start Screen" width="800"/>
+  <img src="https://res.cloudinary.com/dup2fxrco/image/upload/v1780836762/start_qkf9rf.png" alt="Taskbox Start Screen" width="800"/>
 </p>
 
 ---
@@ -24,7 +24,7 @@
 Taskbox is a **production-grade Kanban board** built to demonstrate full-stack engineering proficiency — not as a tutorial exercise, but as a system designed with the same concerns you'd face on a real team: **real-time sync**, **role-based access**, **file storage**, **i18n**, and **containerized & cloud-based deployment**.
 
 <p align="center">
-  <img src="./assets/main.png" alt="Taskbox Start Screen" width="800"/>
+  <img src="https://res.cloudinary.com/dup2fxrco/image/upload/v1780865681/main_uftjtv.png" alt="Taskbox Dashboard Screen" width="800"/>
 </p>
 
 Every architectural decision was intentional. This README walks through those decisions.
@@ -74,6 +74,25 @@ taskbox/
 | **Socket.IO for real-time** | Board updates, column reordering, and task mutations broadcast live to all connected clients. This is why the backend runs on a persistent server (not serverless). |
 | **Prisma ORM** | Type-safe database access with auto-generated client. Schema serves as the single source of truth for the data model. |
 | **Containerized dev env** | `podman-compose.yml` spins up both PostgreSQL and the API server in one command. No "works on my machine" issues. |
+
+---
+
+## Performance Engineering
+
+Taskbox is built to handle extreme high-concurrency loads, simulating enterprise scale through a custom `wrk`-based load testing pipeline.
+
+### The Bottleneck (Local Development)
+Rendering deeply nested Trello-style boards requires expensive relational database queries (joining Boards, Columns, Tasks, Assignees, Labels, and Members). During initial stress testing, this endpoint bottlenecked at 260 Requests/Sec.
+
+### The Optimization Strategy
+1. **In-Memory Caching (Redis):** Implemented a granular Redis cache for Workspace and Board data, bypassing PostgreSQL entirely for the heaviest reads.
+2. **Real-time Cache Invalidation:** Built a strict cache invalidation protocol across 5 independent controllers (Tasks, Columns, Members, etc.) to ensure the HTTP cache and WebSocket events are never out of sync.
+3. **Database Indexing:** Added explicit `@@index` markers on all foreign keys (`workspace_id`, `board_id`, `column_id`) within the Prisma schema to eliminate full-table scans during cache-miss queries.
+
+### The Results
+- **Read Throughput:** Deep board fetch throughput increased by **2.5x** (from 260 to 638 Req/Sec).
+- **Latency:** Average response time was slashed by **50%** (from 363ms to 177ms).
+- **Lightweight Reads:** Pure cached endpoints (like Workspace lists) soared to **almost 1,000 Req/Sec** under heavy 100-connection synthetic loads.
 
 ---
 
@@ -130,6 +149,7 @@ taskbox/
 | **TypeScript** | End-to-end type safety |
 | **Prisma** | Type-safe ORM with migration management |
 | **PostgreSQL** | Relational database |
+| **Redis** | High-performance in-memory cache |
 | **Socket.IO** | Bidirectional real-time communication |
 | **Passport.js** | Google OAuth 2.0 + JWT strategy |
 | **Zod** | Runtime environment and request validation |
@@ -144,6 +164,7 @@ taskbox/
 | **Multi-stage Dockerfile** | Optimized production image (Alpine-based) |
 | **Vercel** | Frontend hosting with SPA routing |
 | **Vercel Postgres** | Managed production database |
+| **Upstash** | Serverless Redis caching layer |
 | **Render** | Persistent Node.js backend hosting |
 | **UptimeRobot** | Keep-alive monitoring to prevent server spin-down |
 
