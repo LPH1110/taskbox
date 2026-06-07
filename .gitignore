@@ -26,3 +26,4 @@ dist-ssr
 .env.*
 
 rootkey.csv
+be/scripts/load-test/results
