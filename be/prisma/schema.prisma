@@ -47,6 +47,7 @@ model Board {
   labels    Label[]
   members   BoardMember[]
   tasks     Task[]
+  automation_rules AutomationRule[]
 
   @@index([workspace_id])
   @@index([owner_id])
@@ -274,4 +275,36 @@ model ChecklistItem {
 
   @@index([checklist_id])
   @@map("checklist_items")
+}
+
+model AutomationRule {
+  id           String   @id @default(uuid()) @db.Uuid
+  board_id     String   @map("board_id") @db.Uuid
+  title        String
+  trigger      Json     // e.g., { type: "TASK_MOVED", ... }
+  condition    Json?    // e.g., { column_title: "Done" }
+  action       Json     // e.g., { type: "MOVE_TO_COLUMN", ... }
+  is_active    Boolean  @default(true) @map("is_active")
+  created_at   DateTime @default(now()) @map("created_at")
+  updated_at   DateTime @updatedAt @map("updated_at")
+
+  board        Board           @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  logs         AutomationLog[]
+
+  @@index([board_id])
+  @@map("automation_rules")
+}
+
+model AutomationLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  rule_id    String   @map("rule_id") @db.Uuid
+  status     String   // "success" | "failure"
+  error      String?  // error message if failed
+  metadata   Json?    // details about the trigger payload
+  created_at DateTime @default(now()) @map("created_at")
+
+  rule       AutomationRule @relation(fields: [rule_id], references: [id], onDelete: Cascade)
+
+  @@index([rule_id])
+  @@map("automation_logs")
 }
