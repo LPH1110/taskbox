@@ -5,6 +5,7 @@ import { validate } from "../../middleware/validate";
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
 import { invalidateBoardCache } from "../../utils/redis";
+import { TriggerEmitters } from "../automation/triggerEmitters";
 import {
   createChecklistSchema,
   updateChecklistSchema,
@@ -198,6 +199,25 @@ router.patch("/checklists/items/:itemId", validate(updateChecklistItemSchema), a
 
       socketEmitter.toBoardRoom(boardId, "checklistItem:update", item);
       await invalidateBoardCache(boardId);
+
+      if (is_completed) {
+        // Check if all items in this checklist are completed
+        const allItems = await prisma.checklistItem.findMany({
+          where: { checklist_id: item.checklist_id }
+        });
+        const allCompleted = allItems.every((i: any) => i.is_completed);
+        
+        if (allCompleted) {
+          // get the task ID for this checklist
+          const checklist = await prisma.checklist.findUnique({
+            where: { id: item.checklist_id },
+            select: { task_id: true }
+          });
+          if (checklist) {
+            await TriggerEmitters.emitEvent("CHECKLIST_COMPLETED", boardId, { taskId: checklist.task_id, checklistId: item.checklist_id });
+          }
+        }
+      }
 
       return sendSuccess(res, item);
     });

@@ -18,6 +18,7 @@ import {
   realtimeMemberEvent,
   realtimeTaskDelete,
   realtimeTaskLabelEvent,
+  realtimeTaskAssigneeEvent,
   realtimeTaskUpsert,
   realtimeCommentEvent,
   realtimeAttachmentEvent,
@@ -172,6 +173,10 @@ export default function BoardDetailPage() {
 
     socket.on("taskLabel:event", (data: { task_id: string; label_id: string; type: "INSERT" | "DELETE" }) => {
       dispatch(realtimeTaskLabelEvent(data));
+    });
+
+    socket.on("taskAssignee:event", (data: { task_id: string; user_id: string; type: "INSERT" | "DELETE" }) => {
+      dispatch(realtimeTaskAssigneeEvent({ task_id: data.task_id, user_id: data.user_id, type: data.type }));
     });
 
     socket.on("member:event", (data: { member: BoardMember; type: "INSERT" | "DELETE" }) => {
@@ -547,7 +552,7 @@ export default function BoardDetailPage() {
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
       />
-      <RulesBuilderModal 
+      <RulesBuilderModal
         isOpen={isRulesOpen}
         onClose={() => setIsRulesOpen(false)}
       />

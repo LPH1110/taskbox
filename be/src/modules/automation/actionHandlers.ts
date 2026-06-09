@@ -23,7 +23,7 @@ export const ActionHandlers = {
     const columnId = action.columnId;
     if (!taskId || !columnId) throw new Error("Missing taskId or columnId");
 
-    const task = await prisma.task.findUnique({ where: { id: taskId }});
+    const task = await prisma.task.findUnique({ where: { id: taskId } });
     if (task && task.column_id !== columnId) {
       const lastTask = await prisma.task.findFirst({
         where: { column_id: columnId },
@@ -116,7 +116,7 @@ export const ActionHandlers = {
 
     const task = await prisma.task.findUnique({
       where: { id: taskId },
-      include: { 
+      include: {
         assignees: { include: { profile: true } },
         column: { include: { board: { include: { owner: true } } } }
       }
@@ -146,7 +146,7 @@ export const ActionHandlers = {
     if (!taskId || !text) throw new Error("Missing taskId or text");
 
     // Use board owner as the bot if system user doesn't exist, or a designated ID
-    const board = await prisma.board.findUnique({ where: { id: boardId }});
+    const board = await prisma.board.findUnique({ where: { id: boardId } });
     if (!board) return;
 
     const comment = await prisma.comment.create({
