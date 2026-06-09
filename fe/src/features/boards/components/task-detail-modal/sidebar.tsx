@@ -5,13 +5,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Clock, CreditCard, Trash2, Plus, Paperclip } from "lucide-react";
+import { Clock, CreditCard, Trash2, Plus, Paperclip, CheckSquare } from "lucide-react";
 import { AssigneePopover } from "../popovers/assignee-popover";
 import { LabelPopover } from "../popovers/label-popover";
 import { PriorityPopover } from "../popovers/priority-popover";
 import { type Task } from "../../types/board-detail";
 import { formatDueDate } from "../../utils/format-due-date";
 import { useTranslation } from "react-i18next";
+import { useAppDispatch } from "@/store/hooks";
+import { createChecklist } from "../../boardDetailSlide";
 
 interface SidebarProps {
   task: Task;
@@ -31,6 +33,7 @@ export function Sidebar({
   setIsDeleteDialogOpen
 }: SidebarProps) {
   const { t } = useTranslation(["boards"]);
+  const dispatch = useAppDispatch();
   return (
     <div className="p-6 space-y-8">
       {/* Meta Data */}
@@ -150,6 +153,17 @@ export function Sidebar({
               />
             </PopoverContent>
           </Popover>
+
+          <Button
+            variant="secondary"
+            className="w-full justify-start h-8 text-sm hover:bg-accent"
+            onClick={async () => {
+              await dispatch(createChecklist({ taskId: task.id, title: t("checklist", "Checklist") }));
+            }}
+          >
+            <CheckSquare className="mr-2 h-4 w-4" />
+            {t("checklist", "Checklist")}
+          </Button>
         </div>
       </div>
 

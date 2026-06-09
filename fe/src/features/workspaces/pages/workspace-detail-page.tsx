@@ -93,6 +93,7 @@ export default function WorkspaceDetailPage() {
   const favoriteBoards = workspaceBoards.filter((b) => b.is_favorite);
   const isOwner = currentUser?.id === workspace.owner_id;
 
+
   const handleDeleteWorkspace = async () => {
     try {
       await api.delete(`/workspaces/${workspaceId}`);
@@ -132,7 +133,7 @@ export default function WorkspaceDetailPage() {
             </div>
           </div>
         </div>
-        
+
         {/* Workspace Operations (e.g. Settings / Delete) */}
         {isOwner && (
           <div className="flex gap-2">
@@ -170,11 +171,10 @@ export default function WorkspaceDetailPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors rounded-lg outline-none ${
-                isActive
-                  ? "text-foreground font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors rounded-lg outline-none ${isActive
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               <Icon className="h-4 w-4" />
               {tab.label}
@@ -208,7 +208,7 @@ export default function WorkspaceDetailPage() {
                   className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
                 >
                   {favoriteBoards.map((board) => (
-                    <motion.div key={`fav-${board.id}`} layout variants={itemVariants}>
+                    <motion.div key={`fav-${board.id}`} variants={itemVariants}>
                       <BoardCard board={board} />
                     </motion.div>
                   ))}
@@ -230,13 +230,13 @@ export default function WorkspaceDetailPage() {
                 className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
               >
                 {/* Create Button is always first */}
-                <motion.div layout variants={itemVariants}>
+                <motion.div variants={itemVariants}>
                   <NewBoardButton workspaceId={workspaceId} />
                 </motion.div>
 
                 {/* Render List */}
                 {workspaceBoards.map((board) => (
-                  <motion.div key={`all-${board.id}`} layout variants={itemVariants}>
+                  <motion.div key={`all-${board.id}`} variants={itemVariants}>
                     <BoardCard board={board} />
                   </motion.div>
                 ))}

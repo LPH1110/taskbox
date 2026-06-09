@@ -53,6 +53,7 @@ export default function BoardsListPage() {
 
   const favoriteBoards = boards.filter((b) => b.is_favorite);
 
+
   return (
     <div className="space-y-12 px-4 pb-16">
       {/* 1. Starred Boards Section */}
@@ -69,7 +70,7 @@ export default function BoardsListPage() {
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
           >
             {favoriteBoards.map((board) => (
-              <motion.div key={`fav-${board.id}`} layout variants={itemVariants}>
+              <motion.div key={`fav-${board.id}`} variants={itemVariants}>
                 <BoardCard board={board} />
               </motion.div>
             ))}
@@ -106,13 +107,13 @@ export default function BoardsListPage() {
                 className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
               >
                 {/* Create Button scoped to this workspace */}
-                <motion.div layout variants={itemVariants}>
+                <motion.div variants={itemVariants}>
                   <NewBoardButton workspaceId={workspace.id} />
                 </motion.div>
 
                 {/* Workspace Boards */}
                 {workspaceBoards.map((board) => (
-                  <motion.div key={`board-${board.id}`} layout variants={itemVariants}>
+                  <motion.div key={`board-${board.id}`} variants={itemVariants}>
                     <BoardCard board={board} />
                   </motion.div>
                 ))}

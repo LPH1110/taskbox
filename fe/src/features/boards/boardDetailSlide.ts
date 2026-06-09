@@ -1,454 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  createAsyncThunk,
   createSlice,
-  type PayloadAction,
+  type PayloadAction
 } from "@reduxjs/toolkit";
+import { addExtraReducers } from "./reducers/extraReducers";
+import type { Board, BoardMember } from "./types";
 import {
+  type Attachment,
   type BoardDetailState,
+  type Checklist,
+  type ChecklistItem,
   type Column,
+  type Comment,
   type Label,
   type Task,
-  type Comment,
-  type Attachment,
 } from "./types/board-detail";
-import { api } from "@/lib/api";
-import type { Board, BoardMember } from "./types";
 
-export const fetchBoardDetails = createAsyncThunk(
-  "boardDetail/fetchBoardDetails",
-  async (boardId: string, { rejectWithValue }) => {
-    try {
-      const response = await api.get<any, any>(`/boards/${boardId}/detail`);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// --- MEMBER ACTIONS ---
-export const addMember = createAsyncThunk(
-  "boardDetail/addMember",
-  async (
-    { boardId, userId }: { boardId: string; userId: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.post<any, any>(`/boards/${boardId}/members`, { userId });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateBoardDetails = createAsyncThunk(
-  "boardDetail/updateBoardDetails",
-  async (
-    { boardId, updates }: { boardId: string; updates: { title?: string; type?: "public" | "private" } },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.patch<any, any>(`/boards/${boardId}`, updates);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const removeMember = createAsyncThunk(
-  "boardDetail/removeMember",
-  async (
-    { boardId, userId }: { boardId: string; userId: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      await api.delete(`/boards/${boardId}/members/${userId}`);
-      return userId;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// --- LABEL ACTIONS ---
-export const createLabel = createAsyncThunk(
-  "boardDetail/createLabel",
-  async (
-    {
-      boardId,
-      title,
-      color,
-    }: { boardId: string; title: string; color: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.post<any, any>(`/boards/${boardId}/labels`, { title, color });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const toggleTaskLabel = createAsyncThunk(
-  "boardDetail/toggleTaskLabel",
-  async (
-    {
-      taskId,
-      labelId,
-      isAdding,
-    }: { taskId: string; labelId: string; isAdding: boolean },
-    { rejectWithValue }
-  ) => {
-    try {
-      if (isAdding) {
-        await api.post(`/tasks/${taskId}/labels/${labelId}`);
-      } else {
-        await api.delete(`/tasks/${taskId}/labels/${labelId}`);
-      }
-      return { taskId, labelId, isAdding };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const toggleTaskAssignee = createAsyncThunk(
-  "boardDetail/toggleTaskAssignee",
-  async (
-    {
-      taskId,
-      userId,
-      isAdding,
-    }: { taskId: string; userId: string; isAdding: boolean },
-    { rejectWithValue }
-  ) => {
-    try {
-      if (isAdding) {
-        await api.post(`/tasks/${taskId}/assignees/${userId}`);
-      } else {
-        await api.delete(`/tasks/${taskId}/assignees/${userId}`);
-      }
-      return { taskId, userId, isAdding };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateLabel = createAsyncThunk(
-  "boardDetail/updateLabel",
-  async (
-    {
-      labelId,
-      title,
-      color,
-    }: { labelId: string; title: string; color: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.patch<any, any>(`/labels/${labelId}`, { title, color });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const deleteLabel = createAsyncThunk(
-  "boardDetail/deleteLabel",
-  async (labelId: string, { rejectWithValue }) => {
-    try {
-      await api.delete(`/labels/${labelId}`);
-      return labelId;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// --- COLUMN ACTIONS ---
-
-export const createColumn = createAsyncThunk(
-  "boardDetail/createColumn",
-  async (
-    { boardId, title }: { boardId: string; title: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.post<any, any>(`/boards/${boardId}/columns`, { title });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateColumn = createAsyncThunk(
-  "boardDetail/updateColumn",
-  async (
-    { columnId, title }: { columnId: string; title: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.patch<any, any>(`/columns/${columnId}`, { title });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const moveColumnToDifferentBoard = createAsyncThunk(
-  "boardDetail/moveColumnToDifferentBoard",
-  async (
-    {
-      columnId,
-      targetBoardId,
-      newPosition,
-    }: { columnId: string; targetBoardId: string; newPosition: number },
-    { rejectWithValue }
-  ) => {
-    try {
-      await api.patch(`/columns/${columnId}/move`, { targetBoardId, newPosition });
-      return columnId;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateColumnOrder = createAsyncThunk(
-  "boardDetail/updateColumnOrder",
-  async (
-    updates: {
-      id: string;
-      board_id: string;
-      position: number;
-    }[],
-    { rejectWithValue }
-  ) => {
-    try {
-      await api.put(`/columns/reorder`, updates);
-      return updates;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const copyColumn = createAsyncThunk(
-  "boardDetail/copyColumn",
-  async (
-    { columnId, newTitle }: { columnId: string; newTitle: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.post<any, any>(`/columns/${columnId}/copy`, { newTitle });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const deleteColumn = createAsyncThunk(
-  "boardDetail/deleteColumn",
-  async (columnId: string, { rejectWithValue }) => {
-    try {
-      await api.delete(`/columns/${columnId}`);
-      return columnId;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// --- TASK ACTIONS ---
-export const updateTaskOrder = createAsyncThunk(
-  "boardDetail/updateTaskOrder",
-  async (
-    updates: {
-      id: string;
-      column_id: string;
-      position: number;
-      board_id: string;
-      content: string;
-    }[],
-    { rejectWithValue }
-  ) => {
-    try {
-      await api.put(`/tasks/reorder`, updates);
-      return updates;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const createTask = createAsyncThunk(
-  "boardDetail/createTask",
-  async (
-    {
-      columnId,
-      boardId,
-      content,
-    }: { columnId: string; boardId: string; content: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.post<any, any>(`/columns/${columnId}/tasks`, { boardId, content });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateTask = createAsyncThunk(
-  "boardDetail/updateTask",
-  async (
-    { taskId, updates }: { taskId: string; updates: Partial<Task> },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.patch<any, any>(`/tasks/${taskId}`, updates);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const deleteTask = createAsyncThunk(
-  "boardDetail/deleteTask",
-  async (
-    { taskId, columnId }: { taskId: string; columnId: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      await api.delete(`/tasks/${taskId}`);
-      return { taskId, columnId };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const moveAllTasks = createAsyncThunk(
-  "boardDetail/moveAllTasks",
-  async (
-    {
-      sourceColumnId,
-      targetColumnId,
-    }: { sourceColumnId: string; targetColumnId: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await api.post<any, any>(`/tasks/move-all`, { sourceColumnId, targetColumnId });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// --- COMMENTS ACTIONS ---
-export const fetchComments = createAsyncThunk(
-  "boardDetail/fetchComments",
-  async (taskId: string, { rejectWithValue }) => {
-    try {
-      const response = await api.get<any, any>(`/tasks/${taskId}/comments`);
-      return { taskId, comments: response.data };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const createComment = createAsyncThunk(
-  "boardDetail/createComment",
-  async ({ taskId, content, parentId }: { taskId: string, content: string, parentId?: string }, { rejectWithValue }) => {
-    try {
-      const response = await api.post<any, any>(`/tasks/${taskId}/comments`, { content, parentId });
-      return { taskId, comment: response.data };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const updateComment = createAsyncThunk(
-  "boardDetail/updateComment",
-  async ({ taskId, commentId, content }: { taskId: string, commentId: string, content: string }, { rejectWithValue }) => {
-    try {
-      const response = await api.patch<any, any>(`/comments/${commentId}`, { content });
-      return { taskId, comment: response.data };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const deleteComment = createAsyncThunk(
-  "boardDetail/deleteComment",
-  async ({ taskId, commentId }: { taskId: string, commentId: string }, { rejectWithValue }) => {
-    try {
-      await api.delete(`/comments/${commentId}`);
-      return { taskId, commentId };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// --- ATTACHMENTS ACTIONS ---
-export const fetchAttachments = createAsyncThunk(
-  "boardDetail/fetchAttachments",
-  async (taskId: string, { rejectWithValue }) => {
-    try {
-      const response = await api.get<any, any>(`/tasks/${taskId}/attachments`);
-      return { taskId, attachments: response.data };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const uploadAttachment = createAsyncThunk(
-  "boardDetail/uploadAttachment",
-  async ({ taskId, file }: { taskId: string, file: File }, { rejectWithValue }) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await api.post<any, any>(`/tasks/${taskId}/attachments`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      });
-      return { taskId, attachment: response.data };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const deleteAttachment = createAsyncThunk(
-  "boardDetail/deleteAttachment",
-  async ({ taskId, attachmentId }: { taskId: string, attachmentId: string }, { rejectWithValue }) => {
-    try {
-      await api.delete(`/attachments/${attachmentId}`);
-      return { taskId, attachmentId };
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// -----------------
+export * from "./thunks";
 
 const initialState: BoardDetailState = {
   tasks: {},
@@ -458,6 +26,7 @@ const initialState: BoardDetailState = {
   members: [],
   comments: {},
   attachments: {},
+  checklists: {},
   isLoading: false,
   selectedTaskId: null,
   currentBoard: null,
@@ -676,11 +245,11 @@ const boardDetailSlice = createSlice({
     closeTaskDetail: (state) => {
       state.selectedTaskId = null;
     },
-    
-    realtimeCommentEvent: (state, action: PayloadAction<{type: "INSERT"|"UPDATE"|"DELETE", comment?: Comment, commentId?: string, taskId: string}>) => {
+
+    realtimeCommentEvent: (state, action: PayloadAction<{ type: "INSERT" | "UPDATE" | "DELETE", comment?: Comment, commentId?: string, taskId: string }>) => {
       const { type, comment, commentId, taskId } = action.payload;
       if (!state.comments[taskId]) state.comments[taskId] = [];
-      
+
       if (type === "INSERT" && comment) {
         if (!state.comments[taskId].find(c => c.id === comment.id)) {
           state.comments[taskId].push(comment);
@@ -692,11 +261,11 @@ const boardDetailSlice = createSlice({
         state.comments[taskId] = state.comments[taskId].filter(c => c.id !== commentId && c.parent_id !== commentId);
       }
     },
-    
-    realtimeAttachmentEvent: (state, action: PayloadAction<{type: "INSERT"|"DELETE", attachment?: Attachment, attachmentId?: string, taskId: string}>) => {
+
+    realtimeAttachmentEvent: (state, action: PayloadAction<{ type: "INSERT" | "DELETE", attachment?: Attachment, attachmentId?: string, taskId: string }>) => {
       const { type, attachment, attachmentId, taskId } = action.payload;
       if (!state.attachments[taskId]) state.attachments[taskId] = [];
-      
+
       if (type === "INSERT" && attachment) {
         if (!state.attachments[taskId].find(a => a.id === attachment.id)) {
           // add to top
@@ -706,346 +275,71 @@ const boardDetailSlice = createSlice({
         state.attachments[taskId] = state.attachments[taskId].filter(a => a.id !== attachmentId);
       }
     },
+
+    realtimeChecklistEvent: (state, action: PayloadAction<{ type: "INSERT" | "UPDATE" | "DELETE", checklist?: Checklist, checklistId?: string, taskId?: string }>) => {
+      const { type, checklist, checklistId, taskId } = action.payload;
+
+      if (type === "INSERT" && checklist && taskId) {
+        if (!state.checklists[taskId]) state.checklists[taskId] = [];
+        if (!state.checklists[taskId].find(c => c.id === checklist.id)) {
+          state.checklists[taskId].push({ ...checklist, items: [] });
+        }
+      } else if (type === "UPDATE" && checklist && taskId) {
+        if (!state.checklists[taskId]) state.checklists[taskId] = [];
+        const idx = state.checklists[taskId].findIndex(c => c.id === checklist.id);
+        if (idx !== -1) {
+          state.checklists[taskId][idx] = { ...state.checklists[taskId][idx], ...checklist };
+        }
+      } else if (type === "DELETE" && checklistId) {
+        if (taskId && state.checklists[taskId]) {
+          state.checklists[taskId] = state.checklists[taskId].filter(c => c.id !== checklistId);
+        } else {
+          for (const tId in state.checklists) {
+            state.checklists[tId] = state.checklists[tId].filter(c => c.id !== checklistId);
+          }
+        }
+      }
+    },
+
+    realtimeChecklistItemEvent: (state, action: PayloadAction<{ type: "INSERT" | "UPDATE" | "DELETE", item?: ChecklistItem, itemId?: string }>) => {
+      const { type, item, itemId } = action.payload;
+
+      if ((type === "INSERT" || type === "UPDATE") && item) {
+        for (const tId in state.checklists) {
+          const checklist = state.checklists[tId].find(c => c.id === item.checklist_id);
+          if (checklist) {
+            if (type === "INSERT") {
+              if (!checklist.items.find(i => i.id === item.id)) {
+                checklist.items.push(item);
+              }
+            } else {
+              const idx = checklist.items.findIndex(i => i.id === item.id);
+              if (idx !== -1) {
+                checklist.items[idx] = item;
+              }
+            }
+            break;
+          }
+        }
+      } else if (type === "DELETE" && itemId) {
+        for (const tId in state.checklists) {
+          let found = false;
+          for (const checklist of state.checklists[tId]) {
+            const idx = checklist.items.findIndex(i => i.id === itemId);
+            if (idx !== -1) {
+              checklist.items.splice(idx, 1);
+              found = true;
+              break;
+            }
+          }
+          if (found) break;
+        }
+      }
+    },
   },
 
   extraReducers: (builder) => {
-    // --- Handle Fetch Board Details ---
-    builder
-      .addCase(fetchBoardDetails.pending, (state) => {
-        if (!state.currentBoard) {
-          state.isLoading = true;
-        }
-      })
-      .addCase(fetchBoardDetails.fulfilled, (state, action) => {
-        state.isLoading = false;
-        const { labels, board, columns, tasks, taskLabels, taskAssignees, members } =
-          action.payload;
-
-        state.currentBoard = board;
-        const newTasks: Record<string, Task> = {};
-        const newColumns: Record<string, Column> = {};
-        const newLabels: Record<string, Label> = {};
-        const taskLabelMap: Record<string, string[]> = {};
-        const taskAssigneeMap: Record<string, string[]> = {};
-        const newColumnOrder: string[] = [];
-
-        // Normalize labels
-        labels.forEach((l: Label) => {
-          newLabels[l.id] = l;
-        });
-        state.labels = newLabels;
-
-        // Map Task Labels
-        // taskId -> [labelId1, labelId2]
-        taskLabels.forEach((tl: any) => {
-          if (!taskLabelMap[tl.task_id]) taskLabelMap[tl.task_id] = [];
-          taskLabelMap[tl.task_id].push(tl.label_id);
-        });
-
-        // Map Task Assignees
-        if (taskAssignees) {
-          taskAssignees.forEach((ta: any) => {
-            if (!taskAssigneeMap[ta.task_id]) taskAssigneeMap[ta.task_id] = [];
-            taskAssigneeMap[ta.task_id].push(ta.user_id);
-          });
-        }
-
-        // Process Columns
-        columns.forEach((col: Column) => {
-          newColumns[col.id] = {
-            id: col.id,
-            board_id: col.board_id,
-            title: col.title,
-            position: col.position,
-            taskIds: [],
-          };
-          newColumnOrder.push(col.id);
-        });
-
-        // Process Tasks and link to Columns
-        tasks.forEach((task: Task) => {
-          newTasks[task.id] = {
-            id: task.id,
-            content: task.content,
-            column_id: task.column_id,
-            priority: task.priority,
-            description: task.description,
-            position: task.position,
-            labelIds: taskLabelMap[task.id] || [],
-            assigneeIds: taskAssigneeMap[task.id] || [],
-            due_date: task.due_date,
-          };
-
-          if (newColumns[task.column_id]) {
-            newColumns[task.column_id].taskIds.push(task.id);
-          }
-        });
-
-        state.tasks = newTasks;
-        state.columns = newColumns;
-        state.columnOrder = newColumnOrder;
-        state.members = members || [];
-      });
-
-    // --- Handle Add Member
-    builder.addCase(addMember.fulfilled, (state, action) => {
-      if (!state.members.find((m) => m.user_id === action.payload.user_id)) {
-        state.members.push(action.payload);
-      }
-    });
-
-    // --- Handle Update Board Details ---
-    builder.addCase(updateBoardDetails.fulfilled, (state, action) => {
-      if (state.currentBoard && state.currentBoard.id === action.payload.id) {
-        state.currentBoard = { ...state.currentBoard, ...action.payload };
-      }
-    });
-
-    // --- Handle Remove Member ---
-    builder.addCase(removeMember.fulfilled, (state, action) => {
-      const removedUserId = action.payload;
-      // Filter out the removed member from the list
-      state.members = state.members.filter((m) => m.user_id !== removedUserId);
-    });
-
-    // --- Handle Create Label
-    builder.addCase(createLabel.fulfilled, (state, action) => {
-      const label = action.payload;
-      state.labels[label.id] = label;
-    });
-
-    // --- Handle Update Label ---
-    builder.addCase(updateLabel.fulfilled, (state, action) => {
-      const updatedLabel = action.payload;
-      if (state.labels[updatedLabel.id]) {
-        state.labels[updatedLabel.id] = updatedLabel;
-      }
-    });
-
-    // --- Handle Delete Label ---
-    builder.addCase(deleteLabel.fulfilled, (state, action) => {
-      const labelId = action.payload;
-
-      delete state.labels[labelId];
-
-      Object.values(state.tasks).forEach((task) => {
-        if (task.labelIds && task.labelIds.includes(labelId)) {
-          task.labelIds = task.labelIds.filter((id) => id !== labelId);
-        }
-      });
-    });
-
-    // Handle Toggle Task Label
-    builder.addCase(toggleTaskLabel.fulfilled, (state, action) => {
-      const { taskId, labelId, isAdding } = action.payload;
-      const task = state.tasks[taskId];
-      if (task) {
-        if (isAdding) {
-          if (!task.labelIds.includes(labelId)) task.labelIds.push(labelId);
-        } else {
-          task.labelIds = task.labelIds.filter((id) => id !== labelId);
-        }
-      }
-    });
-
-    // Handle Toggle Task Assignee
-    builder.addCase(toggleTaskAssignee.fulfilled, (state, action) => {
-      const { taskId, userId, isAdding } = action.payload;
-      const task = state.tasks[taskId];
-      if (task) {
-        if (isAdding) {
-          if (!task.assigneeIds.includes(userId)) task.assigneeIds.push(userId);
-        } else {
-          task.assigneeIds = task.assigneeIds.filter((id) => id !== userId);
-        }
-      }
-    });
-
-    // --- Handle Create Column --
-    builder.addCase(createColumn.fulfilled, (state, action) => {
-      const column = action.payload;
-      state.columns[column.id] = { ...column, taskIds: [] };
-      if (!state.columnOrder.includes(column.id)) {
-        state.columnOrder.push(column.id);
-      }
-    });
-
-    // --- Handle Update Column --
-    builder.addCase(updateColumn.fulfilled, (state, action) => {
-      const updatedColumn = action.payload;
-      if (state.columns[updatedColumn.id]) {
-        state.columns[updatedColumn.id].title = updatedColumn.title;
-      }
-    });
-
-    // --- Handle Copy Column ---
-    builder.addCase(copyColumn.fulfilled, (state, action) => {
-      const { newColumn, newTasks, originalColumnId } = action.payload;
-      state.columns[newColumn.id] = {
-        ...newColumn,
-        taskIds: newTasks.map((t: any) => t.id),
-      };
-      newTasks.forEach((task: any) => {
-        state.tasks[task.id] = { ...task, labelIds: [] };
-      });
-
-      if (!state.columnOrder.includes(newColumn.id)) {
-        const index = state.columnOrder.indexOf(originalColumnId);
-        if (index !== -1) {
-          state.columnOrder.splice(index + 1, 0, newColumn.id);
-        } else {
-          state.columnOrder.push(newColumn.id);
-        }
-      }
-    });
-
-    // --- Handle Move Column
-    builder.addCase(moveColumnToDifferentBoard.fulfilled, (state, action) => {
-      const removedColumnId = action.payload;
-
-      // 1. Remove from columns object
-      delete state.columns[removedColumnId];
-
-      // 2. Remove from columnOrder array
-      state.columnOrder = state.columnOrder.filter(
-        (id) => id !== removedColumnId
-      );
-    });
-
-    // --- Handle Delete Column ---
-    builder.addCase(deleteColumn.fulfilled, (state, action) => {
-      const columnId = action.payload;
-
-      // Remove tasks associated with this column from state
-      if (state.columns[columnId]) {
-        const taskIdsToRemove = state.columns[columnId].taskIds;
-        taskIdsToRemove.forEach((taskId) => {
-          delete state.tasks[taskId];
-        });
-      }
-
-      // Remove column from dictionary
-      delete state.columns[columnId];
-
-      // Remove from order array
-      state.columnOrder = state.columnOrder.filter((id) => id !== columnId);
-    });
-
-    // --- Handle Create Task ---
-    builder.addCase(createTask.fulfilled, (state, action) => {
-      const task = action.payload;
-      state.tasks[task.id] = {
-        ...task,
-        labelIds: [],
-        assigneeIds: [],
-        position: task.position ?? 99999,
-      };
-      const col = state.columns[task.column_id];
-      if (col && !col.taskIds.includes(task.id)) {
-        col.taskIds.push(task.id);
-      }
-    });
-    // --- Handle Update Task ---
-    builder.addCase(updateTask.fulfilled, (state, action) => {
-      const updatedTask = action.payload;
-      if (state.tasks[updatedTask.id]) {
-        state.tasks[updatedTask.id] = {
-          ...state.tasks[updatedTask.id],
-          ...updatedTask,
-        };
-      }
-    });
-
-    // --- Handle Delete Task ---
-    builder.addCase(deleteTask.fulfilled, (state, action) => {
-      const { taskId, columnId } = action.payload;
-
-      // 1. Remove from tasks object
-      delete state.tasks[taskId];
-
-      // 2. Remove from column's taskIds array
-      if (state.columns[columnId]) {
-        state.columns[columnId].taskIds = state.columns[
-          columnId
-        ].taskIds.filter((id) => id !== taskId);
-      }
-
-      // 3. Close the modal if open
-      state.selectedTaskId = null;
-    });
-
-    // --- Handle Move All Tasks
-    builder.addCase(moveAllTasks.fulfilled, (state, action) => {
-      const { sourceColumnId, targetColumnId, movedTasks } = action.payload;
-
-      if (!movedTasks || movedTasks.length === 0) return;
-
-      const sourceColumn = state.columns[sourceColumnId];
-      const targetColumn = state.columns[targetColumnId];
-
-      if (!sourceColumn || !targetColumn) return;
-
-      // 1. Move Task IDs in local state
-      // Extract IDs that are being moved
-      const movedTaskIds = movedTasks.map((t: Task) => t.id);
-
-      // Remove from Source
-      state.columns[sourceColumnId].taskIds = []; // Empty the source
-
-      // Append to Target
-      state.columns[targetColumnId].taskIds.push(...movedTaskIds);
-
-      // 2. Update Task Objects
-      movedTasks.forEach((task: Task) => {
-        if (state.tasks[task.id]) {
-          state.tasks[task.id].column_id = targetColumnId;
-          state.tasks[task.id].position = task.position;
-        }
-      });
-    });
-
-    // --- Comments ---
-    builder.addCase(fetchComments.fulfilled, (state, action) => {
-      state.comments[action.payload.taskId] = action.payload.comments;
-    });
-    builder.addCase(createComment.fulfilled, (state, action) => {
-      const { taskId, comment } = action.payload;
-      if (!state.comments[taskId]) state.comments[taskId] = [];
-      if (!state.comments[taskId].find(c => c.id === comment.id)) {
-        state.comments[taskId].push(comment);
-      }
-    });
-    builder.addCase(updateComment.fulfilled, (state, action) => {
-      const { taskId, comment } = action.payload;
-      if (state.comments[taskId]) {
-        const idx = state.comments[taskId].findIndex(c => c.id === comment.id);
-        if (idx !== -1) state.comments[taskId][idx] = comment;
-      }
-    });
-    builder.addCase(deleteComment.fulfilled, (state, action) => {
-      const { taskId, commentId } = action.payload;
-      if (state.comments[taskId]) {
-        state.comments[taskId] = state.comments[taskId].filter(c => c.id !== commentId && c.parent_id !== commentId);
-      }
-    });
-
-    // --- Attachments ---
-    builder.addCase(fetchAttachments.fulfilled, (state, action) => {
-      state.attachments[action.payload.taskId] = action.payload.attachments;
-    });
-    builder.addCase(uploadAttachment.fulfilled, (state, action) => {
-      const { taskId, attachment } = action.payload;
-      if (!state.attachments[taskId]) state.attachments[taskId] = [];
-      if (!state.attachments[taskId].find(a => a.id === attachment.id)) {
-        state.attachments[taskId].unshift(attachment);
-      }
-    });
-    builder.addCase(deleteAttachment.fulfilled, (state, action) => {
-      const { taskId, attachmentId } = action.payload;
-      if (state.attachments[taskId]) {
-        state.attachments[taskId] = state.attachments[taskId].filter(a => a.id !== attachmentId);
-      }
-    });
+    addExtraReducers(builder);
   },
 });
 
@@ -1066,5 +360,7 @@ export const {
   realtimeTaskUpsert,
   realtimeCommentEvent,
   realtimeAttachmentEvent,
+  realtimeChecklistEvent,
+  realtimeChecklistItemEvent,
 } = boardDetailSlice.actions;
 export default boardDetailSlice.reducer;

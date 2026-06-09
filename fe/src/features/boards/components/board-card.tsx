@@ -20,6 +20,9 @@ export function BoardCard({ board }: BoardCardProps) {
     dispatch(toggleFavorite(board.id));
   };
 
+  console.log(board);
+
+
   return (
     <motion.div
       whileHover={{ y: -2, scale: 1.015 }}

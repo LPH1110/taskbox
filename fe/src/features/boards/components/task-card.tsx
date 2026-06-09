@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Draggable } from "@hello-pangea/dnd";
 import { openTaskDetail } from "../boardDetailSlide";
 import { type Task } from "../types/board-detail";
-import { Clock, Flag } from "lucide-react";
+import { Clock, Flag, CheckSquare } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDueDate, isOverdue } from "../utils/format-due-date";
 import { useTranslation } from "react-i18next";
@@ -20,6 +20,10 @@ export function TaskCard({ task, index }: TaskCardProps) {
   // Get all labels from store
   const allLabels = useAppSelector((state) => state.boardDetail.labels);
   const allMembers = useAppSelector((state) => state.boardDetail.members);
+  const taskChecklists = useAppSelector((state) => state.boardDetail.checklists[task.id] || []);
+
+  const totalChecklistItems = taskChecklists.reduce((sum, cl) => sum + cl.items.length, 0);
+  const completedChecklistItems = taskChecklists.reduce((sum, cl) => sum + cl.items.filter(i => i.is_completed).length, 0);
 
   return (
     <Draggable draggableId={task.id} index={index}>
@@ -61,8 +65,8 @@ export function TaskCard({ task, index }: TaskCardProps) {
               </div>
               <div className="flex items-center justify-between mt-1">
                 <div className="flex items-center gap-2">
-                  {(task.priority || task.due_date) && (
-                    <div className="flex items-center gap-2">
+                  {(task.priority || task.due_date || totalChecklistItems > 0) && (
+                    <div className="flex items-center gap-2 flex-wrap">
                       {task.due_date && (() => {
                         const isTaskOverdue = isOverdue(task.due_date);
                         return (
@@ -86,6 +90,18 @@ export function TaskCard({ task, index }: TaskCardProps) {
                                 : "text-blue-500 fill-blue-500"
                             }`}
                           />
+                        </div>
+                      )}
+                      {totalChecklistItems > 0 && (
+                        <div 
+                          className={`flex items-center gap-1 text-[10px] px-1.5 py-0 h-5 rounded-md ${
+                            completedChecklistItems === totalChecklistItems 
+                              ? "bg-green-500/20 text-green-700 dark:text-green-400" 
+                              : "bg-secondary text-secondary-foreground"
+                          }`}
+                        >
+                          <CheckSquare className="h-3 w-3" />
+                          <span>{completedChecklistItems}/{totalChecklistItems}</span>
                         </div>
                       )}
                     </div>
