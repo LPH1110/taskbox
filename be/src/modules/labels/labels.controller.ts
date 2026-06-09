@@ -10,6 +10,7 @@ import {
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
 import { invalidateBoardCache } from "../../utils/redis";
+import { TriggerEmitters } from "../automation/triggerEmitters";
 
 const router = Router();
 
@@ -154,6 +155,9 @@ router.post("/tasks/:taskId/labels/:labelId", validate(toggleTaskLabelSchema), a
         });
         await invalidateBoardCache(boardId);
 
+        // Emit Automation Event
+        await TriggerEmitters.emitEvent("LABEL_ADDED", boardId, { taskId, labelId });
+
         return sendSuccess(res, { taskId, labelId, isAdding: true });
       } catch (e) {
         return next(e);
@@ -189,6 +193,9 @@ router.delete("/tasks/:taskId/labels/:labelId", validate(toggleTaskLabelSchema),
           type: "DELETE",
         });
         await invalidateBoardCache(boardId);
+
+        // Emit Automation Event
+        await TriggerEmitters.emitEvent("LABEL_REMOVED", boardId, { taskId, labelId });
 
         return sendSuccess(res, { taskId, labelId, isAdding: false });
       } catch (e) {

@@ -129,6 +129,33 @@ export function RulesBuilderModal({
   const getColName = (id: string) => columns.find(c => c.id === id)?.title || "Unknown Column";
   const getUserName = (id: string) => members.find(m => m.user_id === id)?.profiles?.full_name || "Unknown User";
 
+  const renderTriggerDescription = (rule: Rule) => {
+    switch (rule.trigger?.type) {
+      case "TASK_MOVED": return <span>moved to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getColName(rule.condition?.toColumnId)}</strong></span>;
+      case "LABEL_ADDED": return <span>label added</span>;
+      case "LABEL_REMOVED": return <span>label removed</span>;
+      case "CHECKLIST_COMPLETED": return <span>checklist completed</span>;
+      case "DUE_DATE_APPROACHING": return <span>due date approaching</span>;
+      case "DUE_DATE_PASSED": return <span>due date passed</span>;
+      case "TASK_CREATED": return <span>task created</span>;
+      default: return <span>unknown trigger</span>;
+    }
+  };
+
+  const renderActionDescription = (rule: Rule) => {
+    switch (rule.action?.type) {
+      case "MOVE_TO_COLUMN": return <span>move to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getColName(rule.action.columnId)}</strong></span>;
+      case "ASSIGN_USER": return <span>assign to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getUserName(rule.action.userId)}</strong></span>;
+      case "ADD_LABEL": return <span>add label</span>;
+      case "REMOVE_LABEL": return <span>remove label</span>;
+      case "SET_DUE_DATE": return <span>set due date to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{rule.action.formula}</strong></span>;
+      case "SEND_EMAIL_NOTIFICATION": return <span>email <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{rule.action.target}</strong></span>;
+      case "POST_COMMENT": return <span>post auto-comment</span>;
+      case "ADD_CHECKLIST_TEMPLATE": return <span>add checklist</span>;
+      default: return <span>unknown action</span>;
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-6xl bg-background border-border/40 shadow-2xl rounded-xl">
@@ -185,23 +212,10 @@ export function RulesBuilderModal({
                             </div>
                             <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
                               <span className="bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground font-medium">When</span>
-                              {rule.trigger?.type === "TASK_MOVED" && <span>moved to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getColName(rule.condition?.toColumnId)}</strong></span>}
-                              {rule.trigger?.type === "LABEL_ADDED" && <span>label added</span>}
-                              {rule.trigger?.type === "LABEL_REMOVED" && <span>label removed</span>}
-                              {rule.trigger?.type === "CHECKLIST_COMPLETED" && <span>checklist completed</span>}
-                              {rule.trigger?.type === "DUE_DATE_APPROACHING" && <span>due date approaching</span>}
-                              {rule.trigger?.type === "DUE_DATE_PASSED" && <span>due date passed</span>}
-                              {rule.trigger?.type === "TASK_CREATED" && <span>task created</span>}
+                              {renderTriggerDescription(rule)}
                               <ArrowRight className="h-3 w-3 mx-1 shrink-0" />
                               <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">Then</span>
-                              {rule.action?.type === "MOVE_TO_COLUMN" && <span>move to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getColName(rule.action.columnId)}</strong></span>}
-                              {rule.action?.type === "ASSIGN_USER" && <span>assign to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getUserName(rule.action.userId)}</strong></span>}
-                              {rule.action?.type === "ADD_LABEL" && <span>add label</span>}
-                              {rule.action?.type === "REMOVE_LABEL" && <span>remove label</span>}
-                              {rule.action?.type === "SET_DUE_DATE" && <span>set due date to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{rule.action.formula}</strong></span>}
-                              {rule.action?.type === "SEND_EMAIL_NOTIFICATION" && <span>email <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{rule.action.target}</strong></span>}
-                              {rule.action?.type === "POST_COMMENT" && <span>post auto-comment</span>}
-                              {rule.action?.type === "ADD_CHECKLIST_TEMPLATE" && <span>add checklist</span>}
+                              {renderActionDescription(rule)}
                             </div>
                           </div>
                           <Button variant="ghost" size="icon" onClick={() => handleDelete(rule.id)} className="text-muted-foreground hover:text-destructive shrink-0">

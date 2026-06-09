@@ -14,6 +14,7 @@ import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
 import { invalidateBoardCache } from "../../utils/redis";
 import { automationQueue } from "../automation/automation.queue";
+import { TriggerEmitters } from "../automation/triggerEmitters";
 
 const router = Router();
 
@@ -117,6 +118,9 @@ router.post("/columns/:columnId/tasks", validate(createTaskSchema), async (req: 
       socketEmitter.toBoardRoom(boardId, "task:upsert", adaptedTask);
       await invalidateBoardCache(boardId);
 
+      // Trigger TASK_CREATED automation event
+      await TriggerEmitters.emitEvent("TASK_CREATED", boardId, { taskId: task.id });
+
       return sendSuccess(res, adaptedTask, 201);
     } catch (error) {
       return next(error);
@@ -147,16 +151,16 @@ router.patch("/tasks/:taskId", validate(updateTaskSchema), async (req: Request, 
 
         // Automation Trigger: TASK_MOVED
         if (originalTask && updates.column_id && originalTask.column_id !== updates.column_id) {
-          await automationQueue.add("TASK_MOVED", {
-            boardId,
-            triggerType: "TASK_MOVED",
-            payload: {
-              taskId,
-              fromColumnId: originalTask.column_id,
-              toColumnId: updates.column_id,
-            },
-            depth: 0,
+          await TriggerEmitters.emitEvent("TASK_MOVED", boardId, {
+            taskId,
+            fromColumnId: originalTask.column_id,
+            toColumnId: updates.column_id,
           });
+        }
+
+        // Schedule delayed automation jobs if due date changes
+        if (updates.due_date && updates.due_date !== originalTask?.due_date) {
+          await TriggerEmitters.scheduleDueDateJobs(boardId, taskId, new Date(updates.due_date));
         }
 
         // Retrieve labels attached to task to maintain state integrity
