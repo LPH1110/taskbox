@@ -8,6 +8,7 @@ import { InlineEditable } from "@/components/ui/inline-editable";
 import { ChecklistItemRow } from "./checklist-item-row";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { AnimatePresence, motion } from "motion/react";
 
 export function ChecklistGroup({ checklist, taskId }: { checklist: Checklist, taskId: string }) {
   const { t } = useTranslation(["boards"]);
@@ -67,34 +68,55 @@ export function ChecklistGroup({ checklist, taskId }: { checklist: Checklist, ta
 
         {/* Items */}
         <div className="space-y-2">
-          {checklist.items.map(item => (
-            <ChecklistItemRow key={item.id} item={item} />
-          ))}
+          <AnimatePresence mode="popLayout">
+            {checklist.items.map(item => (
+              <ChecklistItemRow key={item.id} item={item} />
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Add Item Form */}
-        {!isAdding ? (
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setIsAdding(true)}>
-            {t("add_an_item", "Add an item")}
-          </Button>
-        ) : (
-          <div className="space-y-2">
-            <Input 
-              value={newItemContent} 
-              onChange={e => setNewItemContent(e.target.value)} 
-              placeholder={t("add_an_item", "Add an item")}
-              autoFocus
-              onKeyDown={e => {
-                if (e.key === "Enter") handleAddItem();
-                if (e.key === "Escape") setIsAdding(false);
-              }}
-            />
-            <div className="flex items-center gap-2">
-              <Button size="sm" onClick={handleAddItem}>{t("add", "Add")}</Button>
-              <Button variant="ghost" size="sm" onClick={() => setIsAdding(false)}>{t("cancel", "Cancel")}</Button>
-            </div>
-          </div>
-        )}
+        <AnimatePresence mode="popLayout">
+          {!isAdding ? (
+            <motion.div
+              key="add-button"
+              layout
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0, overflow: "hidden" }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setIsAdding(true)}>
+                {t("add_an_item", "Add an item")}
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="add-input"
+              layout
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0, overflow: "hidden" }}
+              transition={{ duration: 0.2 }}
+              className="space-y-2"
+            >
+              <Input 
+                value={newItemContent} 
+                onChange={e => setNewItemContent(e.target.value)} 
+                placeholder={t("add_an_item", "Add an item")}
+                autoFocus
+                onKeyDown={e => {
+                  if (e.key === "Enter") handleAddItem();
+                  if (e.key === "Escape") setIsAdding(false);
+                }}
+              />
+              <div className="flex items-center gap-2">
+                <Button size="sm" onClick={handleAddItem}>{t("add", "Add")}</Button>
+                <Button variant="ghost" size="sm" onClick={() => setIsAdding(false)}>{t("cancel", "Cancel")}</Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
