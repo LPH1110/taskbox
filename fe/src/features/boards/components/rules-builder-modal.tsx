@@ -185,7 +185,13 @@ export function RulesBuilderModal({
                             </div>
                             <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
                               <span className="bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground font-medium">When</span>
-                              moved to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getColName(rule.condition?.toColumnId)}</strong>
+                              {rule.trigger?.type === "TASK_MOVED" && <span>moved to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getColName(rule.condition?.toColumnId)}</strong></span>}
+                              {rule.trigger?.type === "LABEL_ADDED" && <span>label added</span>}
+                              {rule.trigger?.type === "LABEL_REMOVED" && <span>label removed</span>}
+                              {rule.trigger?.type === "CHECKLIST_COMPLETED" && <span>checklist completed</span>}
+                              {rule.trigger?.type === "DUE_DATE_APPROACHING" && <span>due date approaching</span>}
+                              {rule.trigger?.type === "DUE_DATE_PASSED" && <span>due date passed</span>}
+                              {rule.trigger?.type === "TASK_CREATED" && <span>task created</span>}
                               <ArrowRight className="h-3 w-3 mx-1 shrink-0" />
                               <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">Then</span>
                               {rule.action?.type === "MOVE_TO_COLUMN" && <span>move to <strong className="text-foreground truncate max-w-[100px] sm:max-w-[150px] inline-block align-bottom">{getColName(rule.action.columnId)}</strong></span>}

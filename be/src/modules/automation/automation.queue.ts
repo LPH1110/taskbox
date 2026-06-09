@@ -1,9 +1,12 @@
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 
-// Reuse the same connection config
-const connection = new Redis(process.env.REDIS_URL || "redis://localhost:6379", {
+const connectionUrl = process.env.REDIS_URL || "redis://localhost:6379";
+const connection = new Redis(connectionUrl, {
   maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+  family: 0,
+  tls: connectionUrl.startsWith("rediss://") ? { rejectUnauthorized: false } : undefined,
 });
 
 export const AUTOMATION_QUEUE_NAME = "automation-events";

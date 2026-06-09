@@ -1,7 +1,11 @@
 import Redis from "ioredis";
 import { Logger } from "./logger";
 
-export const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
+const connectionUrl = process.env.REDIS_URL || "redis://localhost:6379";
+export const redis = new Redis(connectionUrl, {
+  family: 0,
+  tls: connectionUrl.startsWith("rediss://") ? { rejectUnauthorized: false } : undefined,
+});
 
 redis.on("connect", () => {
   Logger.info("Redis", "Connected to Redis successfully");
