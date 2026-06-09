@@ -76,7 +76,7 @@ const boardsSlice = createSlice({
     });
     builder.addCase(fetchBoards.fulfilled, (state, action) => {
       state.isLoading = false;
-      state.items = action.payload;
+      state.items = action.payload; console.log("FETCH BOARDS PAYLOAD:", action.payload);
     });
     builder.addCase(fetchBoards.rejected, (state, action) => {
       state.isLoading = false;

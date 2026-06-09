@@ -21,6 +21,8 @@ import {
   realtimeTaskUpsert,
   realtimeCommentEvent,
   realtimeAttachmentEvent,
+  realtimeChecklistEvent,
+  realtimeChecklistItemEvent,
   updateBoardDetails,
   updateColumnOrder,
   updateTaskOrder,
@@ -42,7 +44,7 @@ import { MembersDialog } from "../components/dialogs";
 import { TaskDetailModal } from "../components";
 import { socket } from "@/lib/socket";
 import type { Board, BoardMember } from "../types";
-import type { Column, Label, Task, Comment, Attachment } from "../types/board-detail";
+import type { Column, Label, Task, Comment, Attachment, Checklist, ChecklistItem } from "../types/board-detail";
 
 export default function BoardDetailPage() {
   const { t } = useTranslation(["boards"]);
@@ -195,6 +197,26 @@ export default function BoardDetailPage() {
       dispatch(realtimeAttachmentEvent(data));
     });
 
+    socket.on("checklist:create", (checklist: Checklist) => {
+      dispatch(realtimeChecklistEvent({ type: "INSERT", checklist, taskId: checklist.task_id }));
+    });
+    socket.on("checklist:update", (checklist: Checklist) => {
+      dispatch(realtimeChecklistEvent({ type: "UPDATE", checklist, taskId: checklist.task_id }));
+    });
+    socket.on("checklist:delete", ({ id, task_id }: { id: string; task_id: string }) => {
+      dispatch(realtimeChecklistEvent({ type: "DELETE", checklistId: id, taskId: task_id }));
+    });
+
+    socket.on("checklistItem:create", (item: ChecklistItem) => {
+      dispatch(realtimeChecklistItemEvent({ type: "INSERT", item }));
+    });
+    socket.on("checklistItem:update", (item: ChecklistItem) => {
+      dispatch(realtimeChecklistItemEvent({ type: "UPDATE", item }));
+    });
+    socket.on("checklistItem:delete", ({ id }: { id: string }) => {
+      dispatch(realtimeChecklistItemEvent({ type: "DELETE", itemId: id }));
+    });
+
     return () => {
       socket.emit("leave:board", boardId);
       socket.off("board:update");
@@ -211,6 +233,12 @@ export default function BoardDetailPage() {
       socket.off("task:move-all");
       socket.off("comment:event");
       socket.off("attachment:event");
+      socket.off("checklist:create");
+      socket.off("checklist:update");
+      socket.off("checklist:delete");
+      socket.off("checklistItem:create");
+      socket.off("checklistItem:update");
+      socket.off("checklistItem:delete");
       socket.disconnect();
     };
   }, [dispatch, boardId, user]);

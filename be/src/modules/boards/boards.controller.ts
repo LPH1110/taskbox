@@ -260,6 +260,8 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
     let tasks: any[] = [];
     let taskLabels: any[] = [];
     let taskAssignees: any[] = [];
+    let checklists: any[] = [];
+    let checklistItems: any[] = [];
 
     if (columnIds.length > 0) {
       tasks = await prisma.task.findMany({
@@ -275,6 +277,17 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
         taskAssignees = await prisma.taskAssignee.findMany({
           where: { task_id: { in: taskIds } },
         });
+        checklists = await prisma.checklist.findMany({
+          where: { task_id: { in: taskIds } },
+          orderBy: { created_at: "asc" },
+        });
+        const checklistIds = checklists.map((c: any) => c.id);
+        if (checklistIds.length > 0) {
+          checklistItems = await prisma.checklistItem.findMany({
+            where: { checklist_id: { in: checklistIds } },
+            orderBy: { created_at: "asc" },
+          });
+        }
       }
     }
 
@@ -286,6 +299,8 @@ router.get("/:boardId/detail", requireBoardMember, validate(boardIdParamSchema),
       members: adaptedMembers,
       taskLabels,
       taskAssignees,
+      checklists,
+      checklistItems,
     };
 
     await redis.setex(cacheKey, 3600, JSON.stringify(boardDetail));

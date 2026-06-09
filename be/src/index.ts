@@ -25,6 +25,7 @@ import workspacesRouter from "./modules/workspaces/workspaces.controller";
 import invitationsRouter from "./modules/invitations/invitations.controller";
 import commentsRouter from "./modules/comments/comments.controller";
 import attachmentsRouter from "./modules/attachments/attachments.controller";
+import checklistsRouter from "./modules/checklists/checklists.controller";
 
 const app = express();
 const httpServer = createServer(app);
@@ -68,6 +69,7 @@ app.use("/api", labelsRouter);
 app.use("/api", membersRouter);
 app.use("/api", commentsRouter);
 app.use("/api", attachmentsRouter);
+app.use("/api", checklistsRouter);
 
 // Centralized Error Handling
 app.use(errorHandler);

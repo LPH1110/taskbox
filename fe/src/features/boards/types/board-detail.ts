@@ -50,6 +50,24 @@ export interface Attachment {
   uploader: { id: string; full_name: string; avatar_url: string | null; email: string };
 }
 
+export interface ChecklistItem {
+  id: string;
+  checklist_id: string;
+  content: string;
+  is_completed: boolean;
+  assignee_id: string | null;
+  due_date: string | null;
+  created_at: string;
+}
+
+export interface Checklist {
+  id: string;
+  task_id: string;
+  title: string;
+  created_at: string;
+  items: ChecklistItem[];
+}
+
 export interface BoardDetailState {
   tasks: Record<string, Task>;
   columns: Record<string, Column>;
@@ -57,6 +75,7 @@ export interface BoardDetailState {
   members: BoardMember[];
   comments: Record<string, Comment[]>;
   attachments: Record<string, Attachment[]>;
+  checklists: Record<string, Checklist[]>;
   columnOrder: string[];
   isLoading: boolean;
   selectedTaskId: string | null;

@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { closeTaskDetail, updateTask } from "../../boardDetailSlide";
 import { CommentSection } from "../comment-section";
 import { AttachmentSection } from "../attachment-section";
+import { ChecklistSection } from "../checklist-section";
 import { isOverdue } from "../../utils/format-due-date";
 import { useTranslation } from "react-i18next";
 
@@ -136,6 +137,9 @@ export function TaskDetailModal() {
                 handleSaveDescription={handleSaveDescription}
                 handleCancelDescription={handleCancelDescription}
               />
+
+              {/* Checklists Section */}
+              <ChecklistSection taskId={task.id} />
 
               {/* Attachments Section */}
               <AttachmentSection taskId={task.id} />
