@@ -13,6 +13,7 @@ import {
 import { requireAuth, requireBoardMember } from "../../middleware/auth";
 import { socketEmitter } from "../../lib/socket-emitter";
 import { invalidateBoardCache } from "../../utils/redis";
+import { automationQueue } from "../automation/automation.queue";
 
 const router = Router();
 
@@ -137,10 +138,26 @@ router.patch("/tasks/:taskId", validate(updateTaskSchema), async (req: Request, 
       if (err) return next(err);
 
       try {
+        const originalTask = await prisma.task.findUnique({ where: { id: taskId } });
+        
         const updated = await prisma.task.update({
           where: { id: taskId },
           data: updates,
         });
+
+        // Automation Trigger: TASK_MOVED
+        if (originalTask && updates.column_id && originalTask.column_id !== updates.column_id) {
+          await automationQueue.add("TASK_MOVED", {
+            boardId,
+            triggerType: "TASK_MOVED",
+            payload: {
+              taskId,
+              fromColumnId: originalTask.column_id,
+              toColumnId: updates.column_id,
+            },
+            depth: 0,
+          });
+        }
 
         // Retrieve labels attached to task to maintain state integrity
         const taskLabels = await prisma.taskLabel.findMany({
@@ -216,6 +233,13 @@ router.put("/tasks/reorder", validate(reorderTasksSchema), async (req: Request, 
     if (err) return next(err);
 
     try {
+      // Fetch original tasks to detect column changes
+      const originalTasks = await prisma.task.findMany({
+        where: { id: { in: updates.map((u: any) => u.id) } },
+        select: { id: true, column_id: true }
+      });
+      const originalMap = new Map(originalTasks.map(t => [t.id, t.column_id]));
+
       // Execute all updates inside transaction
       await prisma.$transaction(
         updates.map((update: any) =>
@@ -228,6 +252,23 @@ router.put("/tasks/reorder", validate(reorderTasksSchema), async (req: Request, 
           })
         )
       );
+
+      // Trigger automations for tasks that moved to a new column
+      for (const update of updates) {
+        const originalColumnId = originalMap.get(update.id);
+        if (originalColumnId && originalColumnId !== update.column_id) {
+          await automationQueue.add("TASK_MOVED", {
+            boardId,
+            triggerType: "TASK_MOVED",
+            payload: {
+              taskId: update.id,
+              fromColumnId: originalColumnId,
+              toColumnId: update.column_id,
+            },
+            depth: 0,
+          });
+        }
+      }
 
       // Notify clients
       socketEmitter.toBoardRoom(boardId, "task:reorder", updates);

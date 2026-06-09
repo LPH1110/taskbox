@@ -14,6 +14,9 @@ import { generateOpenApiDocument } from "./config/openapi";
 // Passport config
 import "./config/passport";
 
+// Initialize Automation Worker
+import "./modules/automation/automation.worker";
+
 // Routers
 import authRouter from "./modules/auth/auth.controller";
 import boardsRouter from "./modules/boards/boards.controller";
@@ -26,6 +29,7 @@ import invitationsRouter from "./modules/invitations/invitations.controller";
 import commentsRouter from "./modules/comments/comments.controller";
 import attachmentsRouter from "./modules/attachments/attachments.controller";
 import checklistsRouter from "./modules/checklists/checklists.controller";
+import automationRouter from "./modules/automation/automation.controller";
 
 const app = express();
 const httpServer = createServer(app);
@@ -70,6 +74,7 @@ app.use("/api", membersRouter);
 app.use("/api", commentsRouter);
 app.use("/api", attachmentsRouter);
 app.use("/api", checklistsRouter);
+app.use("/api/boards/:boardId/automations", automationRouter);
 
 // Centralized Error Handling
 app.use(errorHandler);

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
-import { Check, ChevronDown, Filter, Globe, Lock, UserPlus } from "lucide-react";
+import { Check, ChevronDown, Filter, Globe, Lock, UserPlus, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useParams, useLocation } from "react-router-dom";
@@ -42,6 +42,7 @@ import { BoardSkeleton } from "../components/board-skeleton";
 import { MemberPopover } from "../components/popovers/member-popover";
 import { MembersDialog } from "../components/dialogs";
 import { TaskDetailModal } from "../components";
+import { RulesBuilderModal } from "../components/rules-builder-modal";
 import { socket } from "@/lib/socket";
 import type { Board, BoardMember } from "../types";
 import type { Column, Label, Task, Comment, Attachment, Checklist, ChecklistItem } from "../types/board-detail";
@@ -56,6 +57,7 @@ export default function BoardDetailPage() {
     useAppSelector((state) => state.boardDetail);
   const { user } = useAppSelector((state) => state.auth);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState("");
   const { containerRef, onWheel } = useSmoothHorizontalScroll();
@@ -485,6 +487,15 @@ export default function BoardDetailPage() {
           </Button>
 
           <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsRulesOpen(true)}
+            className="opacity-95 hover:opacity-100 shadow-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-0 backdrop-blur-md"
+          >
+            <Zap className="mr-2 h-4 w-4" /> Rules
+          </Button>
+
+          <Button
             size="sm"
             className="cursor-pointer opacity-95 hover:opacity-100 shadow-sm bg-primary text-primary-foreground"
             onClick={() => setIsShareOpen(true)}
@@ -535,6 +546,10 @@ export default function BoardDetailPage() {
       <MembersDialog
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
+      />
+      <RulesBuilderModal 
+        isOpen={isRulesOpen}
+        onClose={() => setIsRulesOpen(false)}
       />
     </div>
   );
