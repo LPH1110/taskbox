@@ -4,6 +4,7 @@ import { updateChecklistItem, deleteChecklistItem } from "../../boardDetailSlide
 import { InlineEditable } from "@/components/ui/inline-editable";
 import { Button } from "@/components/ui/button";
 import { Trash2, User, Calendar } from "lucide-react";
+import { motion } from "motion/react";
 
 export function ChecklistItemRow({ item }: { item: ChecklistItem }) {
   const dispatch = useAppDispatch();
@@ -26,7 +27,14 @@ export function ChecklistItemRow({ item }: { item: ChecklistItem }) {
   const assignee = members.find(m => m.user_id === item.assignee_id);
 
   return (
-    <div className="group flex items-start gap-3 rounded-md p-1 hover:bg-muted/50 transition-colors">
+    <motion.div 
+      layout
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, height: 0, overflow: "hidden" }}
+      transition={{ duration: 0.2, layout: { duration: 0.2 } }}
+      className="group flex items-start gap-3 rounded-md p-1 hover:bg-muted/50 transition-colors"
+    >
       <div className="pt-1 flex-shrink-0">
         <input 
           type="checkbox" 
@@ -64,6 +72,6 @@ export function ChecklistItemRow({ item }: { item: ChecklistItem }) {
       >
         <Trash2 className="h-3 w-3" />
       </Button>
-    </div>
+    </motion.div>
   );
 }
