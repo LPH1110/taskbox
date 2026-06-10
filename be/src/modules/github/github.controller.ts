@@ -23,7 +23,8 @@ router.get("/auth", requireAuth, (req: Request, res: Response) => {
   // This ensures we know exactly who initiated the flow when GitHub redirects back.
   const stateToken = signToken({ id: userId, email }, "5m");
 
-  const redirectUri = `${env.CLIENT_URL || "http://localhost:5173"}/api/github/callback`;
+  // We use process.env.GITHUB_CALLBACK_URL for production, or dynamically construct it for local dev.
+  const redirectUri = process.env.GITHUB_CALLBACK_URL || `${req.protocol}://${req.get("host")}/api/github/callback`;
   const scopes = "repo user";
 
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&state=${stateToken}`;
