@@ -59,6 +59,7 @@ model Column {
   board_id   String   @map("board_id") @db.Uuid
   title      String
   position   Int      @default(0)
+  category   String   @default("IN_PROGRESS") @map("category")
   created_at DateTime @default(now()) @map("created_at")
 
   board Board  @relation(fields: [board_id], references: [id], onDelete: Cascade)

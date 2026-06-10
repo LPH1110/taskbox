@@ -70,14 +70,41 @@ router.post("/", validate(createBoardSchema), async (req: Request, res: Response
       return sendError(res, "Workspace not found or unauthorized", 403);
     }
 
-    const board = await prisma.board.create({
-      data: {
-        title,
-        background_image: background,
-        type,
-        owner_id: userId,
-        workspace_id: workspaceId,
-      },
+    const board = await prisma.$transaction(async (tx) => {
+      const b = await tx.board.create({
+        data: {
+          title,
+          background_image: background,
+          type,
+          owner_id: userId,
+          workspace_id: workspaceId,
+        },
+      });
+      await tx.column.create({
+        data: {
+          board_id: b.id,
+          title: "Todo",
+          position: 0,
+          category: "TODO",
+        },
+      });
+      await tx.column.create({
+        data: {
+          board_id: b.id,
+          title: "In Progress",
+          position: 1,
+          category: "IN_PROGRESS",
+        },
+      });
+      await tx.column.create({
+        data: {
+          board_id: b.id,
+          title: "Done",
+          position: 2,
+          category: "DONE",
+        },
+      });
+      return b;
     });
 
     // Log activity

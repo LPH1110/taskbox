@@ -51,6 +51,7 @@ export function addExtraReducers(builder: ActionReducerMapBuilder<BoardDetailSta
             board_id: col.board_id,
             title: col.title,
             position: col.position,
+            category: col.category,
             taskIds: [],
           };
           newColumnOrder.push(col.id);

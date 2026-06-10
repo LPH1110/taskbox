@@ -11,6 +11,7 @@ export const ColumnSchema = registry.register("Column", z.object({
 
 export const createColumnBodySchema = registry.register("CreateColumnRequest", z.object({
   title: z.string().min(1),
+  category: z.string().optional(),
 }));
 
 export const createColumnSchema = z.object({
@@ -20,6 +21,7 @@ export const createColumnSchema = z.object({
 
 export const updateColumnBodySchema = registry.register("UpdateColumnRequest", z.object({
   title: z.string().min(1),
+  category: z.string().optional(),
 }));
 
 export const updateColumnSchema = z.object({

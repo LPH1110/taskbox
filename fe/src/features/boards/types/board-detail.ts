@@ -24,6 +24,7 @@ export interface Column {
   board_id: string;
   title: string;
   position: number;
+  category: string;
   taskIds: string[];
 }
 
