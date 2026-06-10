@@ -27,6 +27,7 @@ model Profile {
   comments              Comment[]             @relation("comment_author")
   attachments           Attachment[]          @relation("attachment_uploader")
   checklist_items       ChecklistItem[]       @relation("checklist_item_assignee")
+  github_account        UserGitHubAccount?
 
   @@map("profiles")
 }
@@ -34,8 +35,10 @@ model Profile {
 model Board {
   id               String   @id @default(uuid()) @db.Uuid
   title            String
+  key              String?  @db.VarChar(10)
   workspace_id     String   @map("workspace_id") @db.Uuid
   type             String   @default("private")
+  github_repo_full_name String? @map("github_repo_full_name")
   background_image String?  @map("background_image")
   is_favorite      Boolean  @default(false) @map("is_favorite")
   owner_id         String   @map("owner_id") @db.Uuid
@@ -51,6 +54,7 @@ model Board {
 
   @@index([workspace_id])
   @@index([owner_id])
+  @@unique([workspace_id, key])
   @@map("boards")
 }
 
@@ -71,6 +75,7 @@ model Column {
 
 model Task {
   id          String    @id @default(uuid()) @db.Uuid
+  sequence_id Int       @map("sequence_id")
   content     String
   description String?
   column_id   String    @map("column_id") @db.Uuid
@@ -90,6 +95,7 @@ model Task {
 
   @@index([column_id])
   @@index([board_id])
+  @@unique([board_id, sequence_id])
   @@map("tasks")
 }
 
@@ -308,4 +314,17 @@ model AutomationLog {
 
   @@index([rule_id])
   @@map("automation_logs")
+}
+
+model UserGitHubAccount {
+  id              String   @id @default(uuid()) @db.Uuid
+  user_id         String   @unique @map("user_id") @db.Uuid
+  github_user_id  Int      @unique @map("github_user_id")
+  github_username String   @map("github_username")
+  access_token    String?  @map("access_token")
+  created_at      DateTime @default(now()) @map("created_at")
+
+  profile         Profile  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("user_github_accounts")
 }

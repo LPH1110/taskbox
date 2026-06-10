@@ -43,6 +43,15 @@ export const updateBoardSchema = z.object({
   body: updateBoardBodySchema,
 });
 
+export const updateBoardGithubSchema = z.object({
+  params: z.object({
+    boardId: z.string().uuid(),
+  }),
+  body: z.object({
+    github_repo_full_name: z.string().nullable(),
+  }),
+});
+
 registry.registerPath({
   method: "post",
   path: "/api/boards",

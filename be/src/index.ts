@@ -29,8 +29,10 @@ import invitationsRouter from "./modules/invitations/invitations.controller";
 import commentsRouter from "./modules/comments/comments.controller";
 import attachmentsRouter from "./modules/attachments/attachments.controller";
 import checklistsRouter from "./modules/checklists/checklists.controller";
+import githubRouter from "./modules/github/github.controller";
 import automationRouter from "./modules/automation/automation.controller";
 import analyticsRouter from "./modules/analytics/analytics.controller";
+import webhooksRouter from "./modules/webhooks/webhooks.controller";
 
 const app = express();
 const httpServer = createServer(app);
@@ -46,6 +48,10 @@ app.use(cors({
   origin: env.CLIENT_URL,
   credentials: true,
 }));
+
+// Mount Webhook Router before global body parser to preserve rawBody
+app.use("/api/webhooks", webhooksRouter);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -77,6 +83,7 @@ app.use("/api", commentsRouter);
 app.use("/api", attachmentsRouter);
 app.use("/api", checklistsRouter);
 app.use("/api/boards/:boardId/automations", automationRouter);
+app.use("/api/github", githubRouter);
 
 // Centralized Error Handling
 app.use(errorHandler);

@@ -100,12 +100,20 @@ router.post("/columns/:columnId/tasks", validate(createTaskSchema), async (req: 
         where: { column_id: columnId },
       });
 
+      const maxSequenceTask = await prisma.task.findFirst({
+        where: { board_id: boardId },
+        orderBy: { sequence_id: 'desc' },
+        select: { sequence_id: true }
+      });
+      const nextSequenceId = (maxSequenceTask?.sequence_id || 0) + 1;
+
       const task = await prisma.task.create({
         data: {
           content,
           column_id: columnId,
           board_id: boardId,
           position: count,
+          sequence_id: nextSequenceId,
         },
       });
 

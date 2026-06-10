@@ -75,7 +75,18 @@
     "notifications": "Thông báo",
     "notifications_desc": "Quản lý cảnh báo và webhooks.",
     "email_alerts": "Cảnh báo qua Email",
-    "email_alerts_desc": "Nhận tóm tắt hàng ngày."
+    "email_alerts_desc": "Nhận tóm tắt hàng ngày.",
+    "github_identity": "Định danh GitHub",
+    "github_linked_desc": "Tài khoản của bạn đã được liên kết. Chúng tôi có thể tự động giao PR của bạn vào thẻ công việc.",
+    "github_unlinked_desc": "Liên kết tài khoản GitHub của bạn để bật các tính năng tự động hóa.",
+    "disconnect": "Ngắt kết nối",
+    "connect_github": "Kết nối GitHub",
+    "loading_github_status": "Đang tải trạng thái tích hợp GitHub...",
+    "github_linked_success": "Đã liên kết tài khoản GitHub thành công!",
+    "github_link_failed": "Kết nối GitHub thất bại: {{error}}",
+    "github_disconnect_success": "Đã ngắt kết nối tài khoản GitHub",
+    "github_disconnect_failed": "Ngắt kết nối thất bại",
+    "github_init_failed": "Khởi tạo kết nối GitHub thất bại"
   },
   "workspaces": {
     "invalid_invitation": "Lời mời không hợp lệ",
@@ -326,6 +337,13 @@
     "enter_card_title_placeholder": "Nhập tiêu đề cho thẻ này...",
     "add_card": "Thêm thẻ",
     "add_card_button": "Thêm thẻ",
-    "priority_label": "Độ ưu tiên: {{priority}}"
+    "priority_label": "Độ ưu tiên: {{priority}}",
+    "link_github_repo": "Liên kết Kho lưu trữ GitHub",
+    "link_github_repo_desc": "Kết nối bảng này với một kho lưu trữ GitHub để tự động di chuyển thẻ công việc từ Pull Requests.",
+    "repo_full_name": "Tên đầy đủ của Kho lưu trữ",
+    "repo_format": "Định dạng:",
+    "save_linkage": "Lưu Liên kết",
+    "github_repo_linked": "Đã liên kết kho lưu trữ GitHub thành công",
+    "github_repo_link_failed": "Liên kết kho lưu trữ thất bại"
   }
 }
