@@ -9,6 +9,7 @@ export interface Board {
   owner_id?: string;
   columnOrder?: string[];
   role?: "admin" | "member" | "viewer";
+  github_repo_full_name?: string | null;
 }
 
 export interface UserProfile {

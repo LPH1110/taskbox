@@ -3,6 +3,7 @@ import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll"
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
 import { Check, ChevronDown, Filter, Globe, Lock, UserPlus, Zap, BarChart3 } from "lucide-react";
+import { GithubIcon as Github } from "@/components/icons/github-icon";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
@@ -41,7 +42,7 @@ import { AddColumnForm } from "../components/add-column-form";
 import { BoardColumn } from "../components/board-column";
 import { BoardSkeleton } from "../components/board-skeleton";
 import { MemberPopover } from "../components/popovers/member-popover";
-import { MembersDialog } from "../components/dialogs";
+import { MembersDialog, GithubRepoDialog } from "../components/dialogs";
 import { TaskDetailModal } from "../components";
 import { RulesBuilderModal } from "../components/rules-builder-modal";
 import { socket } from "@/lib/socket";
@@ -60,6 +61,7 @@ export default function BoardDetailPage() {
   const { user } = useAppSelector((state) => state.auth);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+  const [isGithubOpen, setIsGithubOpen] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState("");
   const { containerRef, onWheel } = useSmoothHorizontalScroll();
@@ -501,6 +503,17 @@ export default function BoardDetailPage() {
             <Zap className="mr-2 h-4 w-4" /> Rules
           </Button>
 
+          {canModifyVisibility && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsGithubOpen(true)}
+              className="opacity-95 hover:opacity-100 shadow-sm bg-slate-900/10 hover:bg-slate-900/20 text-slate-900 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white border-0 backdrop-blur-md"
+            >
+              <Github className="mr-2 h-4 w-4" /> GitHub
+            </Button>
+          )}
+
           <Button
             variant="secondary"
             size="sm"
@@ -566,6 +579,13 @@ export default function BoardDetailPage() {
         isOpen={isRulesOpen}
         onClose={() => setIsRulesOpen(false)}
       />
+      {boardId && (
+        <GithubRepoDialog
+          isOpen={isGithubOpen}
+          onClose={() => setIsGithubOpen(false)}
+          boardId={boardId}
+        />
+      )}
     </div>
   );
 }

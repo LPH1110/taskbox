@@ -75,7 +75,18 @@
     "notifications": "Notifications",
     "notifications_desc": "Manage your alerts and webhooks.",
     "email_alerts": "Email Alerts",
-    "email_alerts_desc": "Receive daily digests."
+    "email_alerts_desc": "Receive daily digests.",
+    "github_identity": "GitHub Identity",
+    "github_linked_desc": "Your account is linked. We can auto-assign your PRs to tasks.",
+    "github_unlinked_desc": "Link your GitHub account to enable automation features.",
+    "disconnect": "Disconnect",
+    "connect_github": "Connect GitHub",
+    "loading_github_status": "Loading GitHub integration status...",
+    "github_linked_success": "Successfully linked GitHub account!",
+    "github_link_failed": "GitHub connection failed: {{error}}",
+    "github_disconnect_success": "Disconnected GitHub account",
+    "github_disconnect_failed": "Failed to disconnect",
+    "github_init_failed": "Failed to initiate GitHub connection"
   },
   "workspaces": {
     "invalid_invitation": "Invalid Invitation",
@@ -326,6 +337,13 @@
     "enter_card_title_placeholder": "Enter a title for this card...",
     "add_card": "Add Card",
     "add_card_button": "Add a card",
-    "priority_label": "Priority: {{priority}}"
+    "priority_label": "Priority: {{priority}}",
+    "link_github_repo": "Link GitHub Repository",
+    "link_github_repo_desc": "Connect this board to a GitHub repository to enable automatic task transitions from Pull Requests.",
+    "repo_full_name": "Repository Full Name",
+    "repo_format": "Format:",
+    "save_linkage": "Save Linkage",
+    "github_repo_linked": "GitHub repository linked successfully",
+    "github_repo_link_failed": "Failed to link repository"
   }
 }

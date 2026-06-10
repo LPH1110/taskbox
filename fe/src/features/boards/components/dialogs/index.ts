@@ -6,3 +6,4 @@ export { MembersDialog } from './members-dialog';
 export { MoveAllTasksDialog } from './move-all-tasks-dialog';
 export { MoveColumnDialog } from './move-column-dialog';
 export { MoveTaskDialog } from './move-task-dialog';
+export { GithubRepoDialog } from './github-repo-dialog';

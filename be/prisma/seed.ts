@@ -58,6 +58,16 @@ async function main() {
     },
   });
 
+  // Link John to a mock GitHub account
+  await prisma.userGitHubAccount.create({
+    data: {
+      user_id: john.id,
+      github_user_id: 12345678,
+      github_username: "johndoe_gh",
+      access_token: "mock_encrypted_token",
+    },
+  });
+
   // 3. Create Workspace
   console.log("💼 Creating seed workspace...");
   const workspace = await prisma.workspace.create({
@@ -82,10 +92,12 @@ async function main() {
   const board = await prisma.board.create({
     data: {
       title: "Engineering Board",
+      key: "ENG",
       workspace_id: workspace.id,
       type: "private",
       is_favorite: true,
       owner_id: john.id,
+      github_repo_full_name: "taskbox/test-repo",
     },
   });
 
@@ -131,6 +143,7 @@ async function main() {
   // Todo tasks
   const task1 = await prisma.task.create({
     data: {
+      sequence_id: 1,
       board_id: board.id,
       column_id: todoCol.id,
       content: "Setup Redis Caching Layers",
@@ -142,6 +155,7 @@ async function main() {
 
   const task2 = await prisma.task.create({
     data: {
+      sequence_id: 2,
       board_id: board.id,
       column_id: todoCol.id,
       content: "Design Swagger API Specs",
@@ -154,6 +168,7 @@ async function main() {
   // In Progress tasks
   const task3 = await prisma.task.create({
     data: {
+      sequence_id: 3,
       board_id: board.id,
       column_id: progressCol.id,
       content: "Build Recharts Dashboard",
@@ -172,6 +187,7 @@ async function main() {
   // QA tasks
   const task4 = await prisma.task.create({
     data: {
+      sequence_id: 4,
       board_id: board.id,
       column_id: qaCol.id,
       content: "Validate SQL Unique Constraints",
@@ -196,6 +212,7 @@ async function main() {
 
   await prisma.task.create({
     data: {
+      sequence_id: 5,
       board_id: board.id,
       column_id: doneCol.id,
       content: "Configure Passport JWT Strategy",
@@ -211,6 +228,7 @@ async function main() {
 
   await prisma.task.create({
     data: {
+      sequence_id: 6,
       board_id: board.id,
       column_id: doneCol.id,
       content: "Implement Checklist Component",

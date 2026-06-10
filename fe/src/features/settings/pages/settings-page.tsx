@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { GithubIntegrationSection } from "../components/github-integration-section";
 
 export default function SettingsPage() {
   const { t } = useTranslation(["settings", "common"]);
@@ -94,6 +95,19 @@ export default function SettingsPage() {
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform ${notifications ? "translate-x-6" : "translate-x-1"}`} />
                 </button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3 */}
+        <section className="border-t border-border py-12">
+          <div className="grid gap-8 md:grid-cols-4">
+            <div className="md:col-span-1">
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">Integrations</h2>
+              <p className="mt-2 text-sm text-muted-foreground">Connect Taskbox with other services.</p>
+            </div>
+            <div className="space-y-6 md:col-span-3">
+               <GithubIntegrationSection />
             </div>
           </div>
         </section>
