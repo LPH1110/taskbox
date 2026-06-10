@@ -36,8 +36,10 @@ export function ChecklistItemRow({ item }: { item: ChecklistItem }) {
       className="group flex items-start gap-3 rounded-md p-1 hover:bg-muted/50 transition-colors"
     >
       <div className="pt-1 flex-shrink-0">
+        <label htmlFor={`check-item-${item.id}`} className="sr-only">Toggle completed status</label>
         <input 
           type="checkbox" 
+          id={`check-item-${item.id}`}
           checked={item.is_completed} 
           onChange={handleToggle}
           className="h-4 w-4 rounded-sm border-primary text-primary focus:ring-primary cursor-pointer accent-primary"

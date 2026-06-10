@@ -18,7 +18,16 @@ redis.on("error", (err) => {
 export const invalidateBoardCache = async (boardId: string) => {
   try {
     await redis.del(`board_detail:${boardId}`);
+    await invalidateAnalyticsCache(boardId);
   } catch (err) {
     Logger.error("Redis", `Failed to invalidate cache for board ${boardId}`, err);
+  }
+};
+
+export const invalidateAnalyticsCache = async (boardId: string) => {
+  try {
+    await redis.del(`board_analytics:${boardId}`);
+  } catch (err) {
+    Logger.error("Redis", `Failed to invalidate analytics cache for board ${boardId}`, err);
   }
 };

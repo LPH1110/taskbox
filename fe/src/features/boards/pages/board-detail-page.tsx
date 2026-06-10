@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { useSmoothHorizontalScroll } from "@/hooks/use-smooth-horizontal-scroll";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { DragDropContext, type DropResult, Droppable } from "@hello-pangea/dnd";
-import { Check, ChevronDown, Filter, Globe, Lock, UserPlus, Zap } from "lucide-react";
+import { Check, ChevronDown, Filter, Globe, Lock, UserPlus, Zap, BarChart3 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import {
   fetchBoardDetails,
   moveColumn,
@@ -52,6 +52,7 @@ export default function BoardDetailPage() {
   const { t } = useTranslation(["boards"]);
   const { boardId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { addToast } = useToast();
   const { tasks, columns, columnOrder, isLoading, currentBoard, members } =
@@ -498,6 +499,15 @@ export default function BoardDetailPage() {
             className="opacity-95 hover:opacity-100 shadow-sm bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-0 backdrop-blur-md"
           >
             <Zap className="mr-2 h-4 w-4" /> Rules
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate(`/boards/${boardId}/analytics`)}
+            className="opacity-95 hover:opacity-100 shadow-sm bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-0 backdrop-blur-md"
+          >
+            <BarChart3 className="mr-2 h-4 w-4" /> Analytics
           </Button>
 
           <Button

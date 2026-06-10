@@ -9,7 +9,8 @@ import {
   copyColumnSchema,
   createColumnSchema,
   moveColumnSchema,
-  reorderColumnsSchema
+  reorderColumnsSchema,
+  updateColumnSchema
 } from "./columns.schema";
 
 const router = Router();
@@ -29,9 +30,18 @@ async function getBoardIdForColumn(columnId: string) {
 // POST /api/boards/:boardId/columns (Create Column)
 router.post("/boards/:boardId/columns", requireBoardMember, validate(createColumnSchema), async (req: Request, res: Response, next: NextFunction) => {
   const { boardId } = req.params;
-  const { title } = req.body;
+  const { title, category = "IN_PROGRESS" } = req.body;
 
   try {
+    if (category === "DONE") {
+      const existingDone = await prisma.column.findFirst({
+        where: { board_id: boardId, category: "DONE" },
+      });
+      if (existingDone) {
+        return sendError(res, "Board already has a DONE column", 400);
+      }
+    }
+
     const count = await prisma.column.count({
       where: { board_id: boardId },
     });
@@ -41,6 +51,7 @@ router.post("/boards/:boardId/columns", requireBoardMember, validate(createColum
         board_id: boardId,
         title,
         position: count,
+        category,
       },
     });
 
@@ -58,10 +69,10 @@ router.post("/boards/:boardId/columns", requireBoardMember, validate(createColum
   }
 });
 
-// PATCH /api/columns/:columnId (Update Column Title)
-router.patch("/columns/:columnId", async (req: Request, res: Response, next: NextFunction) => {
+// PATCH /api/columns/:columnId (Update Column Title or Category)
+router.patch("/columns/:columnId", validate(updateColumnSchema), async (req: Request, res: Response, next: NextFunction) => {
   const { columnId } = req.params;
-  const { title } = req.body;
+  const { title, category } = req.body;
 
   try {
     const boardId = await getBoardIdForColumn(columnId);
@@ -72,9 +83,25 @@ router.patch("/columns/:columnId", async (req: Request, res: Response, next: Nex
     return requireBoardMember(req, res, async (err) => {
       if (err) return next(err);
       try {
+        if (category === "DONE") {
+          const existingDone = await prisma.column.findFirst({
+            where: {
+              board_id: boardId,
+              category: "DONE",
+              id: { not: columnId },
+            },
+          });
+          if (existingDone) {
+            return sendError(res, "Board already has a DONE column", 400);
+          }
+        }
+
         const updated = await prisma.column.update({
           where: { id: columnId },
-          data: { title },
+          data: {
+            ...(title !== undefined ? { title } : {}),
+            ...(category !== undefined ? { category } : {}),
+          },
         });
 
         socketEmitter.toBoardRoom(boardId, "column:upsert", updated);
@@ -190,6 +217,7 @@ router.post("/columns/:columnId/copy", validate(copyColumnSchema), async (req: R
               board_id: boardId,
               title: newTitle,
               position: col.position + 1, // Place directly next to original
+              category: "IN_PROGRESS",
             },
           });
 
@@ -262,6 +290,17 @@ router.delete("/columns/:columnId", async (req: Request, res: Response, next: Ne
       if (err) return next(err);
 
       try {
+        const col = await prisma.column.findUnique({
+          where: { id: columnId },
+          select: { category: true },
+        });
+
+        if (!col) return sendError(res, "Column not found", 404);
+
+        if (col.category === "DONE") {
+          return sendError(res, "Cannot delete the DONE column", 403);
+        }
+
         await prisma.column.delete({
           where: { id: columnId },
         });

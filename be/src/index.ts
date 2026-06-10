@@ -30,6 +30,7 @@ import commentsRouter from "./modules/comments/comments.controller";
 import attachmentsRouter from "./modules/attachments/attachments.controller";
 import checklistsRouter from "./modules/checklists/checklists.controller";
 import automationRouter from "./modules/automation/automation.controller";
+import analyticsRouter from "./modules/analytics/analytics.controller";
 
 const app = express();
 const httpServer = createServer(app);
@@ -65,6 +66,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/boards", boardsRouter);
+app.use("/api/boards", analyticsRouter);
 app.use("/api/workspaces", workspacesRouter);
 app.use("/api/invitations", invitationsRouter);
 app.use("/api", columnsRouter);
@@ -81,6 +83,7 @@ app.use(errorHandler);
 
 // Start Server
 const port = env.PORT;
+
 httpServer.listen(port, () => {
   console.log(`🚀 Taskbox backend listening on port ${port}`);
   console.log(`👉 CORS allowed origin: ${env.CLIENT_URL}`);

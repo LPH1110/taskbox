@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { ProtectedRoute } from "@/components/layout/protected-route";
 import BoardDetailPage from "@/features/boards/pages/board-detail-page";
+import AnalyticsPage from "@/features/analytics/pages/analytics-page";
 import BoardsListPage from "@/features/boards/pages/boards-list-page";
 import DashboardPage from "@/features/boards/pages/dashboard-page";
 import ProfilePage from "@/features/profile/pages/profile-page";
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
           {
             path: "/boards/:boardId",
             element: <BoardDetailPage />,
+          },
+          {
+            path: "/boards/:boardId/analytics",
+            element: <AnalyticsPage />,
           },
           {
             path: "/dashboard",

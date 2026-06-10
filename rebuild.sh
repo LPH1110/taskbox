@@ -22,5 +22,8 @@ sleep 5
 echo "📦 Running Prisma migrations..."
 podman-compose exec api npx prisma db push || podman compose exec api npx prisma db push
 
+echo "🌱 Seeding database..."
+podman-compose exec api npx prisma db seed || podman compose exec api npx prisma db seed
+
 echo "✅ All services are running!"
 podman-compose ps || podman compose ps
